@@ -829,6 +829,16 @@ textarea.fi{resize:vertical;min-height:70px}
     </div>
   </div>
   </div><!-- /cfg-admin-block -->
+
+  <!-- BOTÃO SAIR — visível para todas -->
+  <div class="card" style="display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:8px">
+    <div>
+      <div style="font-size:13px;font-weight:600;color:var(--carvao)">Sair da conta</div>
+      <div style="font-size:12px;color:var(--cinza);margin-top:2px">Você será redirecionada para a tela de login</div>
+    </div>
+    <button onclick="sairNauta()" style="padding:9px 18px;background:var(--carvao);color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap">↩ Sair</button>
+  </div>
+
 </div>
 
 
@@ -2485,6 +2495,12 @@ window.fazerLoginNauta = async function(){
 
 window.sairAdmin = function(){
   document.getElementById('admin-screen')?.remove();
+  NEGOCIO_ID=''; USUARIO_ADMIN=false;
+  buildLoginScreen();
+};
+
+window.sairNauta = function(){
+  if(!confirm('Sair da conta?')) return;
   NEGOCIO_ID=''; USUARIO_ADMIN=false;
   buildLoginScreen();
 };
