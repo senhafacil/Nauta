@@ -1276,34 +1276,22 @@ function switchPrecTab(tab){
   const diag = document.getElementById('prec-diag');
   const t1   = document.getElementById('prec-tab1');
   const t2   = document.getElementById('prec-tab2');
-  if(!calc||!diag||!t1||!t2) return;
+  if(!calc||!diag) return;
 
   if(tab==='calc'){
-    calc.style.display='grid';
-    diag.style.display='none';
-    t1.style.background='var(--branco)';
-    t1.style.fontWeight='600';
-    t1.style.color='var(--carvao)';
-    t1.style.boxShadow='0 1px 4px rgba(0,0,0,.08)';
-    t2.style.background='transparent';
-    t2.style.fontWeight='500';
-    t2.style.color='var(--cinza)';
-    t2.style.boxShadow='none';
+    calc.setAttribute('style','display:grid');
+    diag.setAttribute('style','display:none');
+    if(t1){ t1.style.background='var(--branco)'; t1.style.fontWeight='600'; t1.style.color='var(--carvao)'; t1.style.boxShadow='0 1px 4px rgba(0,0,0,.08)'; }
+    if(t2){ t2.style.background='transparent';   t2.style.fontWeight='500'; t2.style.color='var(--cinza)';  t2.style.boxShadow='none'; }
     renderInsumos('calc');
-    setTimeout(calcPreco, 50);
+    setTimeout(calcPreco, 100);
   } else {
-    calc.style.display='none';
-    diag.style.display='grid';
-    t2.style.background='var(--branco)';
-    t2.style.fontWeight='600';
-    t2.style.color='var(--carvao)';
-    t2.style.boxShadow='0 1px 4px rgba(0,0,0,.08)';
-    t1.style.background='transparent';
-    t1.style.fontWeight='500';
-    t1.style.color='var(--cinza)';
-    t1.style.boxShadow='none';
+    calc.setAttribute('style','display:none');
+    diag.setAttribute('style','display:grid');
+    if(t2){ t2.style.background='var(--branco)'; t2.style.fontWeight='600'; t2.style.color='var(--carvao)'; t2.style.boxShadow='0 1px 4px rgba(0,0,0,.08)'; }
+    if(t1){ t1.style.background='transparent';   t1.style.fontWeight='500'; t1.style.color='var(--cinza)';  t1.style.boxShadow='none'; }
     renderInsumos('diag');
-    setTimeout(calcDiag, 50);
+    setTimeout(calcDiag, 100);
   }
 }
 
@@ -2864,71 +2852,13 @@ window.filtroEstoque = function(f, btn){
   renderEstoque();
 };
 
-window.salvarItemEstoque = function(){
-  const nome  = document.getElementById('est-nome')?.value.trim();
-  const qtd   = parseFloat(document.getElementById('est-qtd')?.value)||0;
-  const min   = parseFloat(document.getElementById('est-min')?.value)||1;
-  const unid  = document.getElementById('est-unid')?.value||'un.';
-  const preco = parseFloat(document.getElementById('est-preco')?.value)||0;
-  const obs   = document.getElementById('est-obs')?.value.trim()||'';
-  if(!nome){ toast('Informe o nome do item!'); return; }
-  if(!DB.estoque) DB.estoque=[];
-  if(!DB.nextId.estoque) DB.nextId.estoque=1;
-  DB.estoque.push({id:DB.nextId.estoque++, nome, qtd, min, unid, preco, obs});
-  salvarDados();
-  closeM('m-estoque');
-  renderEstoque();
-  toast('✅ Item adicionado ao estoque!');
-};
-
-window.atualizarQtdEstoque = function(id, qtd){
-  DB.estoque = DB.estoque.map(i=>i.id===id?{...i,qtd}:i);
-  salvarDados();
-  renderEstoque();
-};
-
-window.excluirEstoque = function(id){
-  if(!confirm('Excluir este item do estoque?')) return;
-  DB.estoque = DB.estoque.filter(i=>i.id!==id);
-  salvarDados();
-  renderEstoque();
-};
-
-// Override openM to handle estoque modal
-const _openMOrig = window.openM;
-window.openM = function(id){
-  if(id==='m-estoque'){
-    const m = document.getElementById('m-estoque');
-    if(m){
-      ['est-nome','est-obs'].forEach(f=>{const el=document.getElementById(f);if(el)el.value='';});
-      ['est-qtd','est-preco'].forEach(f=>{const el=document.getElementById(f);if(el)el.value='0';});
-      const emin=document.getElementById('est-min');if(emin)emin.value='1';
-      m.classList.add('open');
-    }
-    return;
-  }
-  if(_openMOrig) _openMOrig(id);
-};
-
-const _closeMOrig = window.closeM;
-window.closeM = function(id){
-  if(id==='m-estoque'){
-    const m = document.getElementById('m-estoque');
-    if(m) m.classList.remove('open');
-    return;
-  }
-  if(_closeMOrig) _closeMOrig(id);
-};
-
-// Hook into go() to render estoque when navigating
-const _goOrig = window.go || function(){};
-window.go = function(pg){
-  _goOrig(pg);
-  if(pg==='estoque') setTimeout(renderEstoque, 50);
-};
 
 // Inicia com tela de login
 buildLoginScreen();
+
+</script>
+</body>
+</html>
 
 </script>
 </body>
