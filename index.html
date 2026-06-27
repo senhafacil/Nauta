@@ -2475,10 +2475,15 @@ window.fazerLoginNauta = async function(){
       renderInsumos('diag');
       buildCalendario();
       const propNome = DB.config?.nome_proprietaria || rows[0].nome || login;
-      document.getElementById('su-name').textContent = propNome;
+      // Atualiza sidebar imediatamente
+      const suAv = document.getElementById('su-av');
+      const suName = document.getElementById('su-name');
+      const suRole = document.getElementById('su-role');
+      if(suAv) suAv.textContent = propNome.substring(0,2).toUpperCase();
+      if(suName) suName.textContent = propNome;
       const nichoInfo = NICHO_OPCOES?.find(x=>x.key===nichoKey);
+      if(suRole) suRole.textContent = nichoInfo ? nichoInfo.ico+' '+nichoInfo.nome : 'Proprietária';
       if(nichoInfo){
-        document.getElementById('su-role').textContent = nichoInfo.ico+' '+nichoInfo.nome;
         const sbn = document.getElementById('sb-nicho');
         if(sbn) sbn.textContent = nichoInfo.ico+' '+nichoInfo.nome;
       }
