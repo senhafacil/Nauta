@@ -477,16 +477,14 @@ textarea.fi{resize:vertical;min-height:70px}
     <div class="card">
       <div class="card-t">Itens do Pedido</div>
       <div id="cmd-items">
-        
-        
-        
+        <div style="text-align:center;color:var(--cinza);padding:20px;font-size:13px">Selecione um pedido para ver os itens</div>
       </div>
       <!-- NICHO campos extras comanda -->
       <div id="cmd-nicho-extra"></div>
       <div style="border-top:2px solid var(--borda);margin-top:13px;padding-top:13px">
-        <div style="display:flex;justify-content:space-between;font-size:15px;font-weight:700;padding:4px 0"><span>Total</span><span>R$305,00</span></div>
+        <div style="display:flex;justify-content:space-between;font-size:15px;font-weight:700;padding:4px 0"><span>Total</span><span id="cmd-total">R$0,00</span></div>
         <div style="display:flex;justify-content:space-between;font-size:13px;color:var(--cinza);padding:5px 0"><span>Sinal recebido</span><span style="color:var(--verde);font-weight:600">— R$0,00</span></div>
-        <div style="display:flex;justify-content:space-between;font-size:16px;font-weight:700;padding:11px 0;border-top:1px solid var(--borda);margin-top:7px"><span>Saldo a receber</span><span style="color:var(--terra)" id="saldo-val">R$155,00</span></div>
+        <div style="display:flex;justify-content:space-between;font-size:16px;font-weight:700;padding:11px 0;border-top:1px solid var(--borda);margin-top:7px"><span>Saldo a receber</span><span style="color:var(--terra)" id="saldo-val">R$0,00</span></div>
       </div>
       <div style="margin-top:14px">
         <div class="fl" style="margin-bottom:7px">Pagamento final</div>
@@ -520,7 +518,7 @@ textarea.fi{resize:vertical;min-height:70px}
       <div class="fr"><span style="color:var(--cinza)">Entrega</span><strong>—</strong></div>
       <!-- NICHO específicos -->
       <div id="cmd-det-nicho"></div>
-      <div class="fr" style="border:none"><span style="color:var(--cinza)">Status</span><span class="bp bp-d">Em produção</span></div>
+      <div class="fr" style="border:none"><span style="color:var(--cinza)">Status</span><span class="bp bp-c">—</span></div>
       <div style="margin-top:13px;padding:11px 13px;background:var(--dourado-l);border-radius:var(--r);border-left:3px solid var(--dourado)">
         <div style="font-size:10px;font-weight:700;color:var(--dourado);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">📝 Obs.</div>
         <div id="cmd-obs" style="font-size:13px;color:var(--carvao2)">Nenhuma observação.</div>
