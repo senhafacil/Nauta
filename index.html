@@ -745,9 +745,11 @@ textarea.fi{resize:vertical;min-height:70px}
 
 <!-- ══════════ CONFIGURAÇÕES / NICHOS ══════════ -->
 <div class="page" id="pg-configuracoes">
+
+  <!-- NICHO — só admin -->
   <div id="cfg-nicho-block" style="display:none">
-  <div class="g2">
-    <div class="card">
+  <div class="g2" style="margin-bottom:16px">
+    <div class="card" style="grid-column:1/-1">
       <div class="card-t">🏷️ Tipo de Negócio (Nicho) <span class="nicho-tag" id="nicho-tag-cur">🎂 Confeitaria</span></div>
       <div style="font-size:12px;color:var(--cinza);margin-bottom:12px">Ao selecionar seu nicho, o sistema adapta <strong>formulários, campos, terminologia, relatórios e dicas</strong> automaticamente.</div>
       <div class="nicho-grid" id="nicho-grid">
@@ -762,7 +764,6 @@ textarea.fi{resize:vertical;min-height:70px}
         <button class="nb" onclick="selNicho(this,'estetica','💅','Estética')"><span class="nb-ico">💅</span><div class="nb-lbl">Estética/Beleza</div></button>
         <button class="nb" onclick="selNicho(this,'loja','🛍️','Loja Virtual')"><span class="nb-ico">🛍️</span><div class="nb-lbl">Loja Virtual</div></button>
       </div>
-      <!-- preview das adaptações -->
       <div id="nicho-preview" style="margin-top:16px;padding:14px;background:var(--cream);border-radius:var(--r);border:1px solid var(--borda)">
         <div style="font-size:11px;font-weight:700;color:var(--terra);text-transform:uppercase;letter-spacing:.05em;margin-bottom:9px">Adaptações ativas para Confeitaria:</div>
         <div id="nicho-preview-content" style="font-size:12px;color:var(--carvao2);line-height:1.8">
@@ -775,25 +776,24 @@ textarea.fi{resize:vertical;min-height:70px}
         </div>
       </div>
     </div>
+  </div>
   </div><!-- /cfg-nicho-block -->
 
-    <div class="card">
-      <div class="card-t">💳 Taxas de Cartão <button class="btn btn-v btn-xs" onclick="salvarTaxas()">💾 Salvar</button></div>
-      <div style="font-size:12px;color:var(--cinza);margin-bottom:13px">Configuradas aqui, as taxas são calculadas automaticamente ao fechar a comanda.</div>
-
-      <div style="font-size:11px;font-weight:700;color:var(--terra);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Crédito</div>
-      <div class="tx-row"><div class="tx-lbl"><span class="bp bp-t" style="margin-right:6px">1x</span>À vista</div><div style="display:flex;align-items:center;gap:4px"><input class="tx-inp" id="tx-c1" type="number" step="0.01" value="2.99"><span style="font-size:12px;color:var(--cinza)">%</span></div></div>
-      <div class="tx-row"><div class="tx-lbl"><span class="bp bp-t" style="margin-right:6px">2x</span>2 parcelas</div><div style="display:flex;align-items:center;gap:4px"><input class="tx-inp" id="tx-c2" type="number" step="0.01" value="3.49"><span style="font-size:12px;color:var(--cinza)">%</span></div></div>
-      <div class="tx-row"><div class="tx-lbl"><span class="bp bp-t" style="margin-right:6px">3x</span>3 parcelas</div><div style="display:flex;align-items:center;gap:4px"><input class="tx-inp" id="tx-c3" type="number" step="0.01" value="3.99"><span style="font-size:12px;color:var(--cinza)">%</span></div></div>
-      <div class="tx-row"><div class="tx-lbl"><span class="bp bp-t" style="margin-right:6px">4-6x</span>4 a 6 parcelas</div><div style="display:flex;align-items:center;gap:4px"><input class="tx-inp" id="tx-c6" type="number" step="0.01" value="4.99"><span style="font-size:12px;color:var(--cinza)">%</span></div></div>
-      <div class="tx-row"><div class="tx-lbl"><span class="bp bp-t" style="margin-right:6px">7-12x</span>7 a 12 parcelas</div><div style="display:flex;align-items:center;gap:4px"><input class="tx-inp" id="tx-c12" type="number" step="0.01" value="6.99"><span style="font-size:12px;color:var(--cinza)">%</span></div></div>
-
-      <div style="font-size:11px;font-weight:700;color:var(--verde);text-transform:uppercase;letter-spacing:.05em;margin:14px 0 8px">Débito e Pix</div>
-      <div class="tx-row"><div class="tx-lbl"><span class="bp bp-v" style="margin-right:6px">Déb.</span>Débito</div><div style="display:flex;align-items:center;gap:4px"><input class="tx-inp" id="tx-deb" type="number" step="0.01" value="1.49"><span style="font-size:12px;color:var(--cinza)">%</span></div></div>
-      <div class="tx-row"><div class="tx-lbl"><span class="bp bp-v" style="margin-right:6px">Pix</span>Pix</div><div style="display:flex;align-items:center;gap:4px"><input class="tx-inp" id="tx-pix" type="number" step="0.01" value="0.00"><span style="font-size:12px;color:var(--cinza)">%</span></div></div>
-      <div class="tx-row" style="border:none"><div class="tx-lbl"><span class="bp bp-c" style="margin-right:6px">Din.</span>Dinheiro</div><div style="display:flex;align-items:center;gap:4px"><input class="tx-inp" id="tx-din" type="number" step="0.01" value="0.00"><span style="font-size:12px;color:var(--cinza)">%</span></div></div>
-      <div id="tx-saved" style="display:none;margin-top:9px;padding:8px 12px;background:var(--verde-l);border-radius:var(--r);font-size:12px;color:var(--verde);font-weight:600">✓ Taxas salvas!</div>
-    </div>
+  <!-- TAXAS — visível para todas -->
+  <div class="card">
+    <div class="card-t">💳 Taxas de Cartão <button class="btn btn-v btn-xs" onclick="salvarTaxas()">💾 Salvar</button></div>
+    <div style="font-size:12px;color:var(--cinza);margin-bottom:13px">Configuradas aqui, as taxas são calculadas automaticamente ao fechar a comanda.</div>
+    <div style="font-size:11px;font-weight:700;color:var(--terra);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Crédito</div>
+    <div class="tx-row"><div class="tx-lbl"><span class="bp bp-t" style="margin-right:6px">1x</span>À vista</div><div style="display:flex;align-items:center;gap:4px"><input class="tx-inp" id="tx-c1" type="number" step="0.01" value="2.99"><span style="font-size:12px;color:var(--cinza)">%</span></div></div>
+    <div class="tx-row"><div class="tx-lbl"><span class="bp bp-t" style="margin-right:6px">2x</span>2 parcelas</div><div style="display:flex;align-items:center;gap:4px"><input class="tx-inp" id="tx-c2" type="number" step="0.01" value="3.49"><span style="font-size:12px;color:var(--cinza)">%</span></div></div>
+    <div class="tx-row"><div class="tx-lbl"><span class="bp bp-t" style="margin-right:6px">3x</span>3 parcelas</div><div style="display:flex;align-items:center;gap:4px"><input class="tx-inp" id="tx-c3" type="number" step="0.01" value="3.99"><span style="font-size:12px;color:var(--cinza)">%</span></div></div>
+    <div class="tx-row"><div class="tx-lbl"><span class="bp bp-t" style="margin-right:6px">4-6x</span>4 a 6 parcelas</div><div style="display:flex;align-items:center;gap:4px"><input class="tx-inp" id="tx-c6" type="number" step="0.01" value="4.99"><span style="font-size:12px;color:var(--cinza)">%</span></div></div>
+    <div class="tx-row"><div class="tx-lbl"><span class="bp bp-t" style="margin-right:6px">7-12x</span>7 a 12 parcelas</div><div style="display:flex;align-items:center;gap:4px"><input class="tx-inp" id="tx-c12" type="number" step="0.01" value="6.99"><span style="font-size:12px;color:var(--cinza)">%</span></div></div>
+    <div style="font-size:11px;font-weight:700;color:var(--verde);text-transform:uppercase;letter-spacing:.05em;margin:14px 0 8px">Débito e Pix</div>
+    <div class="tx-row"><div class="tx-lbl"><span class="bp bp-v" style="margin-right:6px">Déb.</span>Débito</div><div style="display:flex;align-items:center;gap:4px"><input class="tx-inp" id="tx-deb" type="number" step="0.01" value="1.49"><span style="font-size:12px;color:var(--cinza)">%</span></div></div>
+    <div class="tx-row"><div class="tx-lbl"><span class="bp bp-v" style="margin-right:6px">Pix</span>Pix</div><div style="display:flex;align-items:center;gap:4px"><input class="tx-inp" id="tx-pix" type="number" step="0.01" value="0.00"><span style="font-size:12px;color:var(--cinza)">%</span></div></div>
+    <div class="tx-row" style="border:none"><div class="tx-lbl"><span class="bp bp-c" style="margin-right:6px">Din.</span>Dinheiro</div><div style="display:flex;align-items:center;gap:4px"><input class="tx-inp" id="tx-din" type="number" step="0.01" value="0.00"><span style="font-size:12px;color:var(--cinza)">%</span></div></div>
+    <div id="tx-saved" style="display:none;margin-top:9px;padding:8px 12px;background:var(--verde-l);border-radius:var(--r);font-size:12px;color:var(--verde);font-weight:600">✓ Taxas salvas!</div>
   </div>
 
   <!-- BOTÃO RECONFIGURAR — só admin -->
