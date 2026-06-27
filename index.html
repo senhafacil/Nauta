@@ -2854,19 +2854,24 @@ window.openM = function(id){
   if(id==='m-estoque'){
     const m = document.getElementById('m-estoque');
     if(m){
-      // Reset fields
       ['est-nome','est-obs'].forEach(f=>{const el=document.getElementById(f);if(el)el.value='';});
-      ['est-qtd','est-min','est-preco'].forEach(f=>{const el=document.getElementById(f);if(el)el.value=f==='est-min'?'1':'0';});
-      m.style.display='flex';
+      ['est-qtd','est-preco'].forEach(f=>{const el=document.getElementById(f);if(el)el.value='0';});
+      const emin=document.getElementById('est-min');if(emin)emin.value='1';
+      m.classList.add('open');
     }
     return;
   }
   if(_openMOrig) _openMOrig(id);
 };
 
-window.closeM = window.closeM || function(id){
-  const m = document.getElementById(id);
-  if(m) m.style.display='none';
+const _closeMOrig = window.closeM;
+window.closeM = function(id){
+  if(id==='m-estoque'){
+    const m = document.getElementById('m-estoque');
+    if(m) m.classList.remove('open');
+    return;
+  }
+  if(_closeMOrig) _closeMOrig(id);
 };
 
 // Hook into go() to render estoque when navigating
