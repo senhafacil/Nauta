@@ -310,9 +310,13 @@ textarea.fi{resize:vertical;min-height:70px}
   </div>
   <div class="su">
     <div class="su-av">MA</div>
-    <div><div class="su-name">Proprietária</div><div class="su-role">Administradora</div></div>
+    <div style="flex:1"><div class="su-name" id="su-name">Proprietária</div><div class="su-role" id="su-role">Administradora</div></div>
     <div class="su-dot"></div>
   </div>
+  <button onclick="sairNauta()" style="margin:8px 12px 12px;width:calc(100% - 24px);padding:9px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:10px;color:rgba(255,255,255,.6);font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;text-align:left;display:flex;align-items:center;gap:8px;transition:background .15s"
+    onmouseover="this.style.background='rgba(255,255,255,.15)'" onmouseout="this.style.background='rgba(255,255,255,.08)'">
+    ↩ Sair da conta
+  </button>
 </nav>
 
 <!-- ═══ MAIN ═══ -->
