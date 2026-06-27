@@ -273,6 +273,11 @@ textarea.fi{resize:vertical;min-height:70px}
 
 /* TOAST */
 #toast{display:none;position:fixed;bottom:24px;right:24px;background:var(--carvao);color:#FAF7F2;padding:11px 18px;border-radius:var(--r);font-size:13px;font-weight:500;z-index:999;box-shadow:var(--sombra-m)}
+
+/* ── FIXES ── */
+.modal-box{background:var(--branco);border-radius:var(--r-l);padding:26px;width:500px;max-width:100%;box-shadow:var(--sombra-m);animation:mi .18s ease;margin:auto}
+.btn.on{background:var(--terra);color:#fff;border-color:var(--terra)}
+.btn.on:hover{background:var(--terra-d)}
 </style>
 </head>
 <body>
@@ -944,7 +949,7 @@ textarea.fi{resize:vertical;min-height:70px}
   <!-- ABAS -->
   <div style="display:flex;gap:4px;background:var(--cream2);border-radius:var(--r-l);padding:4px;width:fit-content">
     <button id="prec-tab1" onclick="switchPrecTab('calc')" style="padding:7px 18px;border-radius:var(--r);border:none;background:var(--branco);font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;color:var(--carvao);box-shadow:var(--sombra)">💰 Calculadora de Preço</button>
-    <button id="prec-tab2" onclick="switchPrecTab('diag')" style="padding:7px 18px;border-radius:var(--r);border:none;background:transparent;font-size:12px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;color:var(--cinza)">🔍 Diagnóstico do Preço Atual</button>
+    <button id="prec-tab2" onclick="switchPrecTab('diag')" style="padding:7px 18px;border-radius:var(--r);border:none;background:transparent;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;color:var(--carvao)">🔍 Diagnóstico do Preço Atual</button>
   </div>
 
   <!-- ── CALCULADORA ── -->
