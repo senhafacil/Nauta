@@ -2461,7 +2461,15 @@ window.fazerLoginNauta = async function(){
     }
     NEGOCIO_ID = rows[0].login;
     USUARIO_ADMIN = rows[0].login === 'vanessa2026';
+    const nomeLogin = rows[0].nome || rows[0].login;
     document.getElementById('login-screen')?.remove();
+
+    // Atualiza sidebar imediatamente com nome do login
+    const suAvEl = document.getElementById('su-av');
+    const suNameEl = document.getElementById('su-name');
+    if(suAvEl) suAvEl.textContent = nomeLogin.substring(0,2).toUpperCase();
+    if(suNameEl) suNameEl.textContent = nomeLogin;
+
     if(USUARIO_ADMIN){
       buildAdminScreen();
     } else {
@@ -2474,15 +2482,14 @@ window.fazerLoginNauta = async function(){
       renderInsumos('calc');
       renderInsumos('diag');
       buildCalendario();
-      const propNome = DB.config?.nome_proprietaria || rows[0].nome || login;
-      // Atualiza sidebar imediatamente
-      const suAv = document.getElementById('su-av');
-      const suName = document.getElementById('su-name');
-      const suRole = document.getElementById('su-role');
-      if(suAv) suAv.textContent = propNome.substring(0,2).toUpperCase();
-      if(suName) suName.textContent = propNome;
+      const propNome = DB.config?.nome_proprietaria || nomeLogin;
+      const suAv2 = document.getElementById('su-av');
+      const suName2 = document.getElementById('su-name');
+      const suRole2 = document.getElementById('su-role');
+      if(suAv2) suAv2.textContent = propNome.substring(0,2).toUpperCase();
+      if(suName2) suName2.textContent = propNome;
       const nichoInfo = NICHO_OPCOES?.find(x=>x.key===nichoKey);
-      if(suRole) suRole.textContent = nichoInfo ? nichoInfo.ico+' '+nichoInfo.nome : 'Proprietária';
+      if(suRole2) suRole2.textContent = nichoInfo ? nichoInfo.ico+' '+nichoInfo.nome : 'Proprietária';
       if(nichoInfo){
         const sbn = document.getElementById('sb-nicho');
         if(sbn) sbn.textContent = nichoInfo.ico+' '+nichoInfo.nome;
@@ -2490,7 +2497,6 @@ window.fazerLoginNauta = async function(){
       document.getElementById('tb-title').textContent = 'Bem-vinda, '+propNome.split(' ')[0]+'! 👋';
       atualizarFuncProprietaria(propNome);
       setSaveStatus('☁ Sincronizado');
-      // Mostra blocos admin só para Vanessa
       if(USUARIO_ADMIN){
         const b = document.getElementById('cfg-admin-block');
         if(b) b.style.display='block';
