@@ -306,7 +306,7 @@ textarea.fi{resize:vertical;min-height:70px}
     <div class="ni" onclick="go('tarefas')"><span class="ni-ico">✅</span>Tarefas da Equipe</div>
     <div class="ni" onclick="go('compras')"><span class="ni-ico">🛒</span>Lista de Compras</div>
     <div class="ni" onclick="go('funcionarios')"><span class="ni-ico">👥</span>Funcionários</div>
-    <div class="ni" onclick="go('configuracoes')"><span class="ni-ico">⚙️</span>Configurações</div>
+    <div class="ni" onclick="go('configuracoes')" id="nav-configuracoes"><span class="ni-ico">⚙️</span>Configurações</div>
   </div>
   <div class="su">
     <div class="su-av">MA</div>
@@ -794,7 +794,8 @@ textarea.fi{resize:vertical;min-height:70px}
     </div>
   </div>
 
-  <!-- BOTÃO RECONFIGURAR -->
+  <!-- BOTÃO RECONFIGURAR — só admin -->
+  <div id="cfg-admin-block" style="display:none">
   <div style="background:var(--carvao);border-radius:var(--r-l);padding:20px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px">
     <div>
       <div style="font-size:14px;font-weight:600;color:#FAF7F2;margin-bottom:4px">🔄 Reconfigurar negócio</div>
@@ -825,6 +826,7 @@ textarea.fi{resize:vertical;min-height:70px}
       <button class="btn btn-p btn-sm" style="margin-top:4px" onclick="toast('Configurações salvas!')">💾 Salvar</button>
     </div>
   </div>
+  </div><!-- /cfg-admin-block -->
 </div>
 
 
@@ -2464,6 +2466,11 @@ window.fazerLoginNauta = async function(){
       document.getElementById('tb-title').textContent = 'Bem-vinda, '+propNome.split(' ')[0]+'! 👋';
       atualizarFuncProprietaria(propNome);
       setSaveStatus('☁ Sincronizado');
+      // Mostra bloco admin só para Vanessa
+      if(USUARIO_ADMIN){
+        const b = document.getElementById('cfg-admin-block');
+        if(b) b.style.display='block';
+      }
       setTimeout(()=>{ if(typeof toast==='function') toast('🎉 Bem-vinda, '+propNome.split(' ')[0]+'!'); }, 400);
     }
   }catch(e){
