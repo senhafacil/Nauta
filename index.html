@@ -745,6 +745,7 @@ textarea.fi{resize:vertical;min-height:70px}
 
 <!-- ══════════ CONFIGURAÇÕES / NICHOS ══════════ -->
 <div class="page" id="pg-configuracoes">
+  <div id="cfg-nicho-block" style="display:none">
   <div class="g2">
     <div class="card">
       <div class="card-t">🏷️ Tipo de Negócio (Nicho) <span class="nicho-tag" id="nicho-tag-cur">🎂 Confeitaria</span></div>
@@ -774,6 +775,7 @@ textarea.fi{resize:vertical;min-height:70px}
         </div>
       </div>
     </div>
+  </div><!-- /cfg-nicho-block -->
 
     <div class="card">
       <div class="card-t">💳 Taxas de Cartão <button class="btn btn-v btn-xs" onclick="salvarTaxas()">💾 Salvar</button></div>
@@ -2466,10 +2468,12 @@ window.fazerLoginNauta = async function(){
       document.getElementById('tb-title').textContent = 'Bem-vinda, '+propNome.split(' ')[0]+'! 👋';
       atualizarFuncProprietaria(propNome);
       setSaveStatus('☁ Sincronizado');
-      // Mostra bloco admin só para Vanessa
+      // Mostra blocos admin só para Vanessa
       if(USUARIO_ADMIN){
         const b = document.getElementById('cfg-admin-block');
         if(b) b.style.display='block';
+        const n = document.getElementById('cfg-nicho-block');
+        if(n) n.style.display='block';
       }
       setTimeout(()=>{ if(typeof toast==='function') toast('🎉 Bem-vinda, '+propNome.split(' ')[0]+'!'); }, 400);
     }
