@@ -1248,14 +1248,31 @@ function switchPrecTab(tab){
   const t1   = document.getElementById('prec-tab1');
   const t2   = document.getElementById('prec-tab2');
   if(!calc||!diag||!t1||!t2) return;
+
   if(tab==='calc'){
-    calc.style.display='grid'; diag.style.display='none';
-    t1.style.cssText += ';background:var(--branco);font-weight:600;color:var(--carvao);box-shadow:var(--sombra)';
-    t2.style.cssText += ';background:transparent;font-weight:500;color:var(--cinza);box-shadow:none';
+    calc.style.display='grid';
+    diag.style.display='none';
+    t1.style.background='var(--branco)';
+    t1.style.fontWeight='600';
+    t1.style.color='var(--carvao)';
+    t1.style.boxShadow='0 1px 4px rgba(0,0,0,.08)';
+    t2.style.background='transparent';
+    t2.style.fontWeight='500';
+    t2.style.color='var(--cinza)';
+    t2.style.boxShadow='none';
+    renderInsumos('calc');
+    setTimeout(calcPreco, 50);
   } else {
-    calc.style.display='none'; diag.style.display='grid';
-    t2.style.cssText += ';background:var(--branco);font-weight:600;color:var(--carvao);box-shadow:var(--sombra)';
-    t1.style.cssText += ';background:transparent;font-weight:500;color:var(--cinza);box-shadow:none';
+    calc.style.display='none';
+    diag.style.display='grid';
+    t2.style.background='var(--branco)';
+    t2.style.fontWeight='600';
+    t2.style.color='var(--carvao)';
+    t2.style.boxShadow='0 1px 4px rgba(0,0,0,.08)';
+    t1.style.background='transparent';
+    t1.style.fontWeight='500';
+    t1.style.color='var(--cinza)';
+    t1.style.boxShadow='none';
     renderInsumos('diag');
     setTimeout(calcDiag, 50);
   }
