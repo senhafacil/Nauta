@@ -309,8 +309,8 @@ textarea.fi{resize:vertical;min-height:70px}
     <div class="ni" onclick="go('configuracoes')" id="nav-configuracoes"><span class="ni-ico">⚙️</span>Configurações</div>
   </div>
   <div class="su">
-    <div class="su-av">MA</div>
-    <div style="flex:1"><div class="su-name" id="su-name">Proprietária</div><div class="su-role" id="su-role">Administradora</div></div>
+    <div class="su-av" id="su-av">?</div>
+    <div style="flex:1"><div class="su-name" id="su-name">—</div><div class="su-role" id="su-role">—</div></div>
     <div class="su-dot"></div>
   </div>
   <button onclick="sairNauta()" style="margin:8px 12px 12px;width:calc(100% - 24px);padding:9px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:10px;color:rgba(255,255,255,.6);font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;text-align:left;display:flex;align-items:center;gap:8px;transition:background .15s"
@@ -2344,6 +2344,9 @@ function atualizarFuncProprietaria(nome){
   const av = document.getElementById('func-av-prop');
   if(el && nome) el.textContent = nome;
   if(av && nome) av.textContent = nome.substring(0,2).toUpperCase();
+  // Atualiza avatar da sidebar
+  const suAv = document.getElementById('su-av');
+  if(suAv && nome) suAv.textContent = nome.substring(0,2).toUpperCase();
 }
 
 // ── TELA DE LOGIN ──
