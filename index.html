@@ -971,36 +971,79 @@ textarea.fi{resize:vertical;min-height:70px}
         <span style="font-weight:700;color:var(--rubi);font-size:16px" id="prec-total-ins">R$ 0,00</span>
       </div>
       <div style="margin-top:16px;padding-top:14px;border-top:2px solid var(--cream3)">
-        <div style="font-size:12px;font-weight:700;color:var(--carvao);margin-bottom:12px;text-transform:uppercase;letter-spacing:.05em">Custos e percentuais</div>
+        <div style="font-size:12px;font-weight:700;color:var(--carvao);margin-bottom:12px;text-transform:uppercase;letter-spacing:.05em">📦 Embalagens (R$)</div>
         <div class="fr2">
           <div class="fg">
-            <div class="fl">Custo fixo por pedido (R$)</div>
-            <input class="fi" type="number" id="prec-fixo" step="0.01" placeholder="Ex: 15,00" oninput="window.calcPreco&&calcPreco()" value="0">
-            <div style="font-size:10px;color:var(--cinza);margin-top:3px">Aluguel, energia etc. ÷ nº de pedidos do mês</div>
+            <div class="fl" style="display:flex;align-items:center;gap:5px">Embalagem principal
+              <span title="Caixa, pote, sacola ou embalagem principal do produto. Coloque o custo unitário." style="cursor:help;background:var(--cinza);color:#fff;border-radius:50%;width:16px;height:16px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0">?</span>
+            </div>
+            <input class="fi" type="number" id="prec-emb1" step="0.01" placeholder="Ex: 3,50" value="0" oninput="window.calcPreco&&calcPreco()">
           </div>
           <div class="fg">
-            <div class="fl">Lucro desejado (%)</div>
-            <input class="fi" type="number" id="prec-lucro" step="1" placeholder="Ex: 30" oninput="window.calcPreco&&calcPreco()" value="30">
+            <div class="fl" style="display:flex;align-items:center;gap:5px">Embalagem secundária
+              <span title="Laço, fita, papel de seda, tag, adesivo etc. Some tudo e coloque aqui." style="cursor:help;background:var(--cinza);color:#fff;border-radius:50%;width:16px;height:16px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0">?</span>
+            </div>
+            <input class="fi" type="number" id="prec-emb2" step="0.01" placeholder="Ex: 1,00" value="0" oninput="window.calcPreco&&calcPreco()">
+          </div>
+        </div>
+
+        <div style="font-size:12px;font-weight:700;color:var(--carvao);margin:14px 0 12px;text-transform:uppercase;letter-spacing:.05em">🚚 Frete / Entrega (R$)</div>
+        <div class="fr2">
+          <div class="fg">
+            <div class="fl" style="display:flex;align-items:center;gap:5px">Custo de entrega
+              <span title="Valor médio que você gasta para entregar cada pedido (motoboy, Correios, iFood etc.)." style="cursor:help;background:var(--cinza);color:#fff;border-radius:50%;width:16px;height:16px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0">?</span>
+            </div>
+            <input class="fi" type="number" id="prec-frete" step="0.01" placeholder="Ex: 8,00" value="0" oninput="window.calcPreco&&calcPreco()">
+          </div>
+          <div class="fg">
+            <div class="fl" style="display:flex;align-items:center;gap:5px">Mão de obra (R$)
+              <span title="Como calcular: defina quanto quer ganhar por hora (ex: R$30/h). Multiplique pelo tempo gasto neste produto (ex: 2h = R$60). Cole esse valor aqui. Isso garante que seu tempo é pago!" style="cursor:help;background:var(--cinza);color:#fff;border-radius:50%;width:16px;height:16px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0">?</span>
+            </div>
+            <input class="fi" type="number" id="prec-mao-obra" step="0.01" placeholder="Ex: 30,00" value="0" oninput="window.calcPreco&&calcPreco()">
+          </div>
+        </div>
+
+        <div style="font-size:12px;font-weight:700;color:var(--carvao);margin:14px 0 12px;text-transform:uppercase;letter-spacing:.05em">➕ Outros custos e lucro</div>
+        <div class="fr2">
+          <div class="fg">
+            <div class="fl" style="display:flex;align-items:center;gap:5px">Custo fixo por unidade (R$)
+              <span title="Como calcular: some todos os seus custos fixos mensais (aluguel, energia, internet...) e divida pelo número de produtos que vende por mês. Ex: R$500 fixos ÷ 50 produtos = R$10 por unidade." style="cursor:help;background:var(--cinza);color:#fff;border-radius:50%;width:16px;height:16px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0">?</span>
+            </div>
+            <input class="fi" type="number" id="prec-fixo" step="0.01" placeholder="Ex: 10,00" value="0" oninput="window.calcPreco&&calcPreco()">
+          </div>
+          <div class="fg">
+            <div class="fl" style="display:flex;align-items:center;gap:5px">Lucro desejado (%)
+              <span title="Percentual de lucro que você quer ter sobre o preço final. Ex: 30% significa que 30% do que você cobra é lucro puro." style="cursor:help;background:var(--cinza);color:#fff;border-radius:50%;width:16px;height:16px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0">?</span>
+            </div>
+            <input class="fi" type="number" id="prec-lucro" step="1" placeholder="Ex: 30" value="30" oninput="window.calcPreco&&calcPreco()">
           </div>
         </div>
         <div class="fr2">
           <div class="fg">
-            <div class="fl">Taxa de cartão (%)</div>
-            <input class="fi" type="number" id="prec-cartao" step="0.01" placeholder="Ex: 2.99" oninput="window.calcPreco&&calcPreco()" value="0">
+            <div class="fl" style="display:flex;align-items:center;gap:5px">Taxa de cartão (%)
+              <span title="Percentual cobrado pela maquininha ou plataforma de pagamento. Verifique na sua conta (ex: Mercado Pago, Stone, PagSeguro)." style="cursor:help;background:var(--cinza);color:#fff;border-radius:50%;width:16px;height:16px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0">?</span>
+            </div>
+            <input class="fi" type="number" id="prec-cartao" step="0.01" placeholder="Ex: 2,99" value="0" oninput="window.calcPreco&&calcPreco()">
           </div>
           <div class="fg">
-            <div class="fl" id="lbl-prec-comissao">Comissão / parceria (%)</div>
-            <input class="fi" type="number" id="prec-comissao" step="0.01" placeholder="Ex: 10" oninput="window.calcPreco&&calcPreco()" value="0">
+            <div class="fl" style="display:flex;align-items:center;gap:5px" id="lbl-prec-comissao">Comissão / parceria (%)
+              <span title="Percentual pago para parceiros, revendedoras ou plataformas (iFood, Elo7 etc.)." style="cursor:help;background:var(--cinza);color:#fff;border-radius:50%;width:16px;height:16px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0">?</span>
+            </div>
+            <input class="fi" type="number" id="prec-comissao" step="0.01" placeholder="Ex: 10" value="0" oninput="window.calcPreco&&calcPreco()">
           </div>
         </div>
         <div class="fr2">
           <div class="fg">
-            <div class="fl">Imposto (%)</div>
-            <input class="fi" type="number" id="prec-imposto" step="0.01" placeholder="Ex: 6" oninput="window.calcPreco&&calcPreco()" value="0">
+            <div class="fl" style="display:flex;align-items:center;gap:5px">Imposto (%)
+              <span title="Percentual de imposto sobre o faturamento. MEI isento em geral. Simples Nacional: varia por faixa (ex: 6% a 15,5%)." style="cursor:help;background:var(--cinza);color:#fff;border-radius:50%;width:16px;height:16px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0">?</span>
+            </div>
+            <input class="fi" type="number" id="prec-imposto" step="0.01" placeholder="Ex: 6" value="0" oninput="window.calcPreco&&calcPreco()">
           </div>
           <div class="fg">
-            <div class="fl" id="lbl-prec-outro">Outro custo % (ex: frete)</div>
-            <input class="fi" type="number" id="prec-outro-pct" step="0.01" placeholder="Ex: 5" oninput="window.calcPreco&&calcPreco()" value="0">
+            <div class="fl" style="display:flex;align-items:center;gap:5px" id="lbl-prec-outro">Outro custo (R$)
+              <span title="Qualquer outro custo que não se encaixa nas categorias acima. Ex: taxa de marketplace, material de escritório etc." style="cursor:help;background:var(--cinza);color:#fff;border-radius:50%;width:16px;height:16px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0">?</span>
+            </div>
+            <input class="fi" type="number" id="prec-outro-pct" step="0.01" placeholder="Ex: 5,00" value="0" oninput="window.calcPreco&&calcPreco()">
           </div>
         </div>
       </div>
@@ -1021,11 +1064,14 @@ textarea.fi{resize:vertical;min-height:70px}
   <div id="prec-diag" style="display:none" class="g2">
     <div class="card">
       <div class="card-t">Diagnóstico — preço que você cobra hoje</div>
+
       <div class="fg">
-        <div class="fl">Preço que você cobra (R$)</div>
-        <input class="fi" type="number" id="diag-preco" step="0.01" placeholder="Ex: 80,00" oninput="window.calcDiag&&calcDiag()">
+        <div class="fl">Preço que você cobra hoje (R$) *</div>
+        <input class="fi" type="number" id="diag-preco" step="0.01" placeholder="Ex: 80,00">
       </div>
-      <div class="card-t" style="margin-top:14px;margin-bottom:8px">Insumos / Produtos
+
+      <!-- INSUMOS -->
+      <div class="card-t" style="margin-top:14px;margin-bottom:8px">Matéria-prima / Insumos
         <button class="btn btn-p btn-xs" onclick="window.addInsumo&&addInsumo('diag')">+ Adicionar</button>
       </div>
       <div style="display:grid;grid-template-columns:1fr 70px 90px 60px 24px;gap:6px;font-size:10px;font-weight:700;color:var(--cinza);text-transform:uppercase;letter-spacing:.05em;padding:0 0 6px;border-bottom:1px solid var(--cream3);margin-bottom:8px">
@@ -1036,33 +1082,88 @@ textarea.fi{resize:vertical;min-height:70px}
         <span style="font-weight:600">Total insumos</span>
         <span style="font-weight:700;color:var(--rubi)" id="diag-total-ins">R$ 0,00</span>
       </div>
-      <div class="fr2" style="margin-top:14px">
+
+      <!-- EMBALAGENS -->
+      <div style="font-size:12px;font-weight:700;color:var(--carvao);margin:14px 0 8px;text-transform:uppercase;letter-spacing:.05em">📦 Embalagens (R$)</div>
+      <div class="fr2">
         <div class="fg">
-          <div class="fl">Custo fixo por atend. (R$)</div>
-          <input class="fi" type="number" id="diag-fixo" step="0.01" placeholder="Ex: 15,00" oninput="window.calcDiag&&calcDiag()" value="0">
+          <div class="fl">Embalagem principal</div>
+          <input class="fi" type="number" id="diag-emb1" step="0.01" placeholder="Ex: 3,50" value="0" oninput="window.calcDiag&&calcDiag()">
+        </div>
+        <div class="fg">
+          <div class="fl">Embalagem secundária</div>
+          <input class="fi" type="number" id="diag-emb2" step="0.01" placeholder="Ex: 1,00" value="0" oninput="window.calcDiag&&calcDiag()">
+        </div>
+      </div>
+
+      <!-- FRETE / ENTREGA -->
+      <div style="font-size:12px;font-weight:700;color:var(--carvao);margin:14px 0 8px;text-transform:uppercase;letter-spacing:.05em">🚚 Frete / Entrega (R$)</div>
+      <div class="fr2">
+        <div class="fg">
+          <div class="fl">Custo de entrega</div>
+          <input class="fi" type="number" id="diag-frete" step="0.01" placeholder="Ex: 8,00" value="0" oninput="window.calcDiag&&calcDiag()">
         </div>
         <div class="fg">
           <div class="fl">Taxa de cartão (%)</div>
-          <input class="fi" type="number" id="diag-cartao" step="0.01" placeholder="Ex: 2.99" oninput="window.calcDiag&&calcDiag()" value="0">
+          <input class="fi" type="number" id="diag-cartao" step="0.01" placeholder="Ex: 2,99" value="0" oninput="window.calcDiag&&calcDiag()">
+        </div>
+      </div>
+
+      <!-- OUTROS CUSTOS -->
+      <div style="font-size:12px;font-weight:700;color:var(--carvao);margin:14px 0 8px;text-transform:uppercase;letter-spacing:.05em">➕ Outros custos</div>
+      <div class="fr2">
+        <div class="fg">
+          <div class="fl" style="display:flex;align-items:center;gap:5px">
+            Custo fixo por unidade (R$)
+            <span title="Como calcular: some todos os custos fixos do mês (aluguel, energia, internet, embalagens fixas...) e divida pelo número de produtos que você vende por mês. Ex: R$500 fixos ÷ 50 produtos = R$10 por unidade." style="cursor:help;background:var(--cinza);color:#fff;border-radius:50%;width:16px;height:16px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0">?</span>
+          </div>
+          <input class="fi" type="number" id="diag-fixo" step="0.01" placeholder="Ex: 10,00" value="0" oninput="window.calcDiag&&calcDiag()">
+        </div>
+        <div class="fg">
+          <div class="fl" id="lbl-diag-comissao">Comissão / parceria (%)</div>
+          <input class="fi" type="number" id="diag-comissao" step="0.01" placeholder="Ex: 10" value="0" oninput="window.calcDiag&&calcDiag()">
         </div>
       </div>
       <div class="fr2">
         <div class="fg">
-          <div class="fl" id="lbl-diag-comissao">Comissão (%)</div>
-          <input class="fi" type="number" id="diag-comissao" step="0.01" placeholder="Ex: 10" oninput="window.calcDiag&&calcDiag()" value="0">
+          <div class="fl">Imposto (%)</div>
+          <input class="fi" type="number" id="diag-imposto" step="0.01" placeholder="Ex: 6" value="0" oninput="window.calcDiag&&calcDiag()">
         </div>
         <div class="fg">
-          <div class="fl">Imposto (%)</div>
-          <input class="fi" type="number" id="diag-imposto" step="0.01" placeholder="Ex: 6" oninput="window.calcDiag&&calcDiag()" value="0">
+          <div class="fl">Outro custo (R$)</div>
+          <input class="fi" type="number" id="diag-outro" step="0.01" placeholder="Ex: 5,00" value="0" oninput="window.calcDiag&&calcDiag()">
         </div>
       </div>
+      <div class="fr2">
+        <div class="fg">
+          <div class="fl" style="display:flex;align-items:center;gap:5px">
+            Mão de obra (R$)
+            <span title="Como calcular: defina quanto quer ganhar por hora (ex: R$30/h). Multiplique pelo tempo gasto neste produto (ex: 2h = R$60). Cole esse valor aqui. Isso garante que seu tempo é pago!" style="cursor:help;background:var(--cinza);color:#fff;border-radius:50%;width:16px;height:16px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0">?</span>
+          </div>
+          <input class="fi" type="number" id="diag-mao-obra" step="0.01" placeholder="Ex: 30,00" value="0" oninput="window.calcDiag&&calcDiag()">
+        </div>
+        <div class="fg">
+          <div class="fl" style="display:flex;align-items:center;gap:5px">
+            Lucro desejado (%)
+            <span title="Percentual de lucro que você quer ter sobre o preço final, além de cobrir todos os custos." style="cursor:help;background:var(--cinza);color:#fff;border-radius:50%;width:16px;height:16px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0">?</span>
+          </div>
+          <input class="fi" type="number" id="diag-lucro" step="1" placeholder="Ex: 20" value="0" oninput="window.calcDiag&&calcDiag()">
+        </div>
+      </div>
+
+      <!-- BOTÃO CALCULAR -->
+      <button onclick="window.calcDiag&&calcDiag()"
+        style="width:100%;margin-top:18px;padding:13px;background:var(--terra);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:'DM Serif Display',serif;letter-spacing:.02em">
+        🔍 Calcular diagnóstico
+      </button>
     </div>
+
     <div class="card">
       <div class="card-t">Resultado do Diagnóstico</div>
       <div id="diag-resultado">
         <div style="text-align:center;padding:30px;color:var(--cinza)">
           <div style="font-size:48px;margin-bottom:10px">🔍</div>
-          <div style="font-size:13px">Informe o preço que cobra hoje para ver o diagnóstico</div>
+          <div style="font-size:13px">Preencha os campos ao lado e clique em <strong>Calcular diagnóstico</strong></div>
         </div>
       </div>
     </div>
@@ -1132,11 +1233,17 @@ function calcPreco(){
   const comissao  = parseFloat(document.getElementById('prec-comissao')?.value)||0;
   const lucro     = parseFloat(document.getElementById('prec-lucro')?.value)||0;
   const outroPct  = parseFloat(document.getElementById('prec-outro-pct')?.value)||0;
+  const emb1      = parseFloat(document.getElementById('prec-emb1')?.value)||0;
+  const emb2      = parseFloat(document.getElementById('prec-emb2')?.value)||0;
+  const frete     = parseFloat(document.getElementById('prec-frete')?.value)||0;
+  const maoObra   = parseFloat(document.getElementById('prec-mao-obra')?.value)||0;
+  const totalEmb  = emb1 + emb2;
+  const totalFixosR = custoProd + custoFixo + maoObra + totalEmb + frete + outroPct;
 
   const ti = document.getElementById('prec-total-ins');
   if(ti) ti.textContent = fmt2(custoProd);
 
-  const totalPct = txCartao + imposto + comissao + lucro + outroPct;
+  const totalPct = txCartao + imposto + comissao + lucro;
   const res = document.getElementById('prec-resultado');
   const sim = document.getElementById('prec-simulacao');
   if(!res) return;
@@ -1146,8 +1253,8 @@ function calcPreco(){
     return;
   }
 
-  const totalFixoR = custoProd + custoFixo;
-  if(totalFixoR === 0){
+  const totalFixoR = totalFixosR;
+  if(totalFixosR === 0){
     res.innerHTML='<div style="text-align:center;padding:30px 20px;color:var(--cinza);font-size:13px">Adicione os insumos e preencha os custos para calcular</div>';
     return;
   }
@@ -1211,7 +1318,14 @@ function calcDiag(){
   const txCartao  = parseFloat(document.getElementById('diag-cartao')?.value)||0;
   const comissao  = parseFloat(document.getElementById('diag-comissao')?.value)||0;
   const imposto   = parseFloat(document.getElementById('diag-imposto')?.value)||0;
+  const emb1      = parseFloat(document.getElementById('diag-emb1')?.value)||0;
+  const emb2      = parseFloat(document.getElementById('diag-emb2')?.value)||0;
+  const frete     = parseFloat(document.getElementById('diag-frete')?.value)||0;
+  const maoObra   = parseFloat(document.getElementById('diag-mao-obra')?.value)||0;
+  const outro     = parseFloat(document.getElementById('diag-outro')?.value)||0;
+  const lucroDesej= parseFloat(document.getElementById('diag-lucro')?.value)||0;
 
+  const totalEmb = emb1 + emb2;
   const ti2 = document.getElementById('diag-total-ins');
   if(ti2) ti2.textContent = fmt2(custoProd);
 
@@ -1219,18 +1333,22 @@ function calcDiag(){
   if(!res) return;
 
   if(!preco){
-    res.innerHTML='<div style="text-align:center;padding:30px;color:var(--cinza);font-size:13px">Informe o preço que você cobra hoje</div>';
+    res.innerHTML='<div style="text-align:center;padding:30px;color:var(--cinza);font-size:13px">Informe o preço que você cobra hoje e clique em <strong>Calcular</strong></div>';
     return;
   }
 
   const valCartao   = preco * txCartao/100;
   const valImposto  = preco * imposto/100;
   const valComissao = preco * comissao/100;
-  const totalCustos = custoProd + custoFixo + valCartao + valImposto + valComissao;
+  const totalCustos = custoProd + custoFixo + maoObra + totalEmb + frete + outro + valCartao + valImposto + valComissao;
   const lucroLiq    = preco - totalCustos;
   const lucropct    = preco > 0 ? (lucroLiq/preco*100) : 0;
-  const totalPct    = txCartao + imposto + comissao;
-  const precoMinimo = totalPct < 100 ? (custoProd + custoFixo) / (1 - totalPct/100) : 0;
+  const totalPctVar = txCartao + imposto + comissao;
+  const custosTotaisFixos = custoProd + custoFixo + maoObra + totalEmb + frete + outro;
+  const precoMinimo = totalPctVar < 100 ? custosTotaisFixos / (1 - totalPctVar/100) : 0;
+  const precoComLucro = lucroDesej > 0 && totalPctVar + lucroDesej < 100 
+    ? custosTotaisFixos / (1 - (totalPctVar + lucroDesej)/100) 
+    : 0;
   const diferenca   = preco - precoMinimo;
 
   const positivo = lucroLiq >= 0;
@@ -1242,21 +1360,27 @@ function calcDiag(){
     <div style="text-align:center;padding:20px;background:${bg};border-radius:var(--r-l);margin-bottom:14px">
       <div style="font-size:11px;color:${cor};margin-bottom:4px;font-weight:700;text-transform:uppercase">${icone} Situação atual</div>
       <div style="font-size:36px;font-weight:700;color:${cor}">${lucroLiq>=0?'+':''}${fmt2(lucroLiq)}</div>
-      <div style="font-size:12px;color:${cor};font-weight:600">${positivo?'LUCRO':'PREJUÍZO'} de ${Math.abs(lucropct).toFixed(1)}% por pedido</div>
+      <div style="font-size:12px;color:${cor};font-weight:600">${positivo?'LUCRO':'PREJUÍZO'} de ${Math.abs(lucropct).toFixed(1)}% por venda</div>
     </div>
     <div style="display:flex;flex-direction:column;gap:6px;font-size:13px;margin-bottom:14px">
       <div style="display:flex;justify-content:space-between;padding:8px 12px;background:var(--cream);border-radius:var(--r)"><span>💵 Preço cobrado</span><span style="font-weight:700">${fmt2(preco)}</span></div>
-      <div style="display:flex;justify-content:space-between;padding:8px 12px;background:var(--cream);border-radius:var(--r)"><span>🧴 Custo de insumos</span><span style="font-weight:600;color:var(--rubi)">− ${fmt2(custoProd)}</span></div>
+      ${custoProd>0?`<div style="display:flex;justify-content:space-between;padding:8px 12px;background:var(--cream);border-radius:var(--r)"><span>🧴 Insumos</span><span style="font-weight:600;color:var(--rubi)">− ${fmt2(custoProd)}</span></div>`:''}
+      ${totalEmb>0?`<div style="display:flex;justify-content:space-between;padding:8px 12px;background:var(--cream);border-radius:var(--r)"><span>📦 Embalagens</span><span style="font-weight:600;color:var(--rubi)">− ${fmt2(totalEmb)}</span></div>`:''}
+      ${frete>0?`<div style="display:flex;justify-content:space-between;padding:8px 12px;background:var(--cream);border-radius:var(--r)"><span>🚚 Frete/Entrega</span><span style="font-weight:600;color:var(--rubi)">− ${fmt2(frete)}</span></div>`:''}
+      ${maoObra>0?`<div style="display:flex;justify-content:space-between;padding:8px 12px;background:var(--cream);border-radius:var(--r)"><span>👐 Mão de obra</span><span style="font-weight:600;color:var(--rubi)">− ${fmt2(maoObra)}</span></div>`:''}
       ${custoFixo>0?`<div style="display:flex;justify-content:space-between;padding:8px 12px;background:var(--cream);border-radius:var(--r)"><span>🏢 Custo fixo</span><span style="font-weight:600;color:var(--rubi)">− ${fmt2(custoFixo)}</span></div>`:''}
+      ${outro>0?`<div style="display:flex;justify-content:space-between;padding:8px 12px;background:var(--cream);border-radius:var(--r)"><span>➕ Outros</span><span style="font-weight:600;color:var(--rubi)">− ${fmt2(outro)}</span></div>`:''}
       ${txCartao>0?`<div style="display:flex;justify-content:space-between;padding:8px 12px;background:var(--cream);border-radius:var(--r)"><span>💳 Taxa cartão</span><span style="font-weight:600;color:var(--rubi)">− ${fmt2(valCartao)}</span></div>`:''}
       ${comissao>0?`<div style="display:flex;justify-content:space-between;padding:8px 12px;background:var(--cream);border-radius:var(--r)"><span>🤝 Comissão</span><span style="font-weight:600;color:var(--rubi)">− ${fmt2(valComissao)}</span></div>`:''}
+      ${imposto>0?`<div style="display:flex;justify-content:space-between;padding:8px 12px;background:var(--cream);border-radius:var(--r)"><span>📋 Imposto</span><span style="font-weight:600;color:var(--rubi)">− ${fmt2(valImposto)}</span></div>`:''}
     </div>
-    <div style="background:var(--cream2);border-radius:var(--r);padding:13px;font-size:13px">
+    <div style="background:var(--cream2);border-radius:var(--r);padding:13px;font-size:13px;margin-bottom:12px">
       <div style="font-weight:700;margin-bottom:9px;color:var(--carvao)">📌 Comparativo</div>
       <div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="color:var(--cinza)">Preço mínimo (sem prejuízo)</span><span style="font-weight:700">${fmt2(precoMinimo)}</span></div>
+      ${precoComLucro>0?`<div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="color:var(--cinza)">Com ${lucroDesej}% de lucro</span><span style="font-weight:700;color:var(--verde)">${fmt2(precoComLucro)}</span></div>`:''}
       <div style="display:flex;justify-content:space-between"><span style="color:var(--cinza)">Sua diferença</span><span style="font-weight:700;color:${diferenca>=0?'var(--verde)':'var(--rubi)'}">${diferenca>=0?'+':''}${fmt2(diferenca)}</span></div>
     </div>
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:12px">
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px">
       ${[5,10,20,30].map(q=>`
         <div style="text-align:center;background:${bg};border-radius:var(--r);padding:8px">
           <div style="font-size:10px;color:var(--cinza)">${q}x/mês</div>
