@@ -1094,11 +1094,11 @@ textarea.fi{resize:vertical;min-height:70px}
       <div style="font-size:12px;font-weight:700;color:var(--carvao);margin:14px 0 8px;text-transform:uppercase;letter-spacing:.05em">🚚 Frete / Entrega (R$)</div>
       <div class="fr2">
         <div class="fg">
-          <div class="fl">Custo de entrega</div>
+          <div class="fl" style="display:flex;align-items:center;gap:5px">Custo de entrega <span title="Valor médio que você gasta para entregar cada pedido. Ex: motoboy, Correios, iFood etc." style="cursor:help;background:var(--cinza);color:#fff;border-radius:50%;width:16px;height:16px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0">?</span></div>
           <input class="fi" type="number" id="diag-frete" step="0.01" placeholder="Ex: 8,00" value="0" oninput="window.calcDiag&&calcDiag()">
         </div>
         <div class="fg">
-          <div class="fl">Taxa de cartão (%)</div>
+          <div class="fl" style="display:flex;align-items:center;gap:5px">Taxa de cartão (%) <span title="Percentual cobrado pela maquininha. Verifique na sua conta (Mercado Pago, Stone, PagSeguro etc.)." style="cursor:help;background:var(--cinza);color:#fff;border-radius:50%;width:16px;height:16px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0">?</span></div>
           <input class="fi" type="number" id="diag-cartao" step="0.01" placeholder="Ex: 2,99" value="0" oninput="window.calcDiag&&calcDiag()">
         </div>
       </div>
@@ -1114,17 +1114,17 @@ textarea.fi{resize:vertical;min-height:70px}
           <input class="fi" type="number" id="diag-fixo" step="0.01" placeholder="Ex: 10,00" value="0" oninput="window.calcDiag&&calcDiag()">
         </div>
         <div class="fg">
-          <div class="fl" id="lbl-diag-comissao">Comissão / parceria (%)</div>
+          <div class="fl" style="display:flex;align-items:center;gap:5px" id="lbl-diag-comissao">Comissão / parceria (%) <span title="Percentual pago para parceiros, revendedoras ou plataformas (iFood, Elo7 etc.)." style="cursor:help;background:var(--cinza);color:#fff;border-radius:50%;width:16px;height:16px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0">?</span></div>
           <input class="fi" type="number" id="diag-comissao" step="0.01" placeholder="Ex: 10" value="0" oninput="window.calcDiag&&calcDiag()">
         </div>
       </div>
       <div class="fr2">
         <div class="fg">
-          <div class="fl">Imposto (%)</div>
+          <div class="fl" style="display:flex;align-items:center;gap:5px">Imposto (%) <span title="MEI: em geral isento de IRPJ. Simples Nacional: varia por faixa (ex: 6% a 15,5%). Consulte seu contador." style="cursor:help;background:var(--cinza);color:#fff;border-radius:50%;width:16px;height:16px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0">?</span></div>
           <input class="fi" type="number" id="diag-imposto" step="0.01" placeholder="Ex: 6" value="0" oninput="window.calcDiag&&calcDiag()">
         </div>
         <div class="fg">
-          <div class="fl">Outro custo (R$)</div>
+          <div class="fl" style="display:flex;align-items:center;gap:5px">Outro custo (R$) <span title="Qualquer custo que não se encaixa acima. Ex: taxa de marketplace, material de escritório, gás etc." style="cursor:help;background:var(--cinza);color:#fff;border-radius:50%;width:16px;height:16px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0">?</span></div>
           <input class="fi" type="number" id="diag-outro" step="0.01" placeholder="Ex: 5,00" value="0" oninput="window.calcDiag&&calcDiag()">
         </div>
       </div>
