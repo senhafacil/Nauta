@@ -1196,11 +1196,11 @@ function renderInsumos(tipo){
         oninput="${tipo==='calc'?'window.calcInsumos':'window.diagInsumos'}[${i}].nome=this.value;${cb}">
       <input class="fi" type="number" placeholder="Qtd" value="${p.qtd}" step="0.01"
         style="padding:6px 8px;font-size:12px;text-align:center"
-        oninput="${tipo==='calc'?'window.calcInsumos':'window.diagInsumos'}[${i}].qtd=parseFloat(this.value)||0;${cb}">
+        oninput="${tipo==='calc'?'window.calcInsumos':'window.diagInsumos'}[${i}].qtd=parseFloat(this.value)||0;document.getElementById('ins-tot-${tipo}-${i}').textContent=fmt2((${tipo==='calc'?'window.calcInsumos':'window.diagInsumos'}[${i}].qtd||0)*(${tipo==='calc'?'window.calcInsumos':'window.diagInsumos'}[${i}].custo||0));${cb}">
       <input class="fi" type="number" placeholder="R$ unit." value="${p.custo||''}" step="0.01"
         style="padding:6px 8px;font-size:12px;text-align:right"
-        oninput="${tipo==='calc'?'window.calcInsumos':'window.diagInsumos'}[${i}].custo=parseFloat(this.value)||0;${cb}">
-      <div style="font-size:12px;font-weight:600;color:var(--carvao2);text-align:right">${fmt2(p.qtd*p.custo)}</div>
+        oninput="${tipo==='calc'?'window.calcInsumos':'window.diagInsumos'}[${i}].custo=parseFloat(this.value)||0;document.getElementById('ins-tot-${tipo}-${i}').textContent=fmt2((${tipo==='calc'?'window.calcInsumos':'window.diagInsumos'}[${i}].qtd||0)*(${tipo==='calc'?'window.calcInsumos':'window.diagInsumos'}[${i}].custo||0));${cb}">
+      <div id="ins-tot-${tipo}-${i}" style="font-size:12px;font-weight:600;color:var(--terra);text-align:right">${fmt2(p.qtd*p.custo)}</div>
       ${arr.length>1
         ? `<button onclick="${tipo==='calc'?'window.calcInsumos':'window.diagInsumos'}.splice(${i},1);renderInsumos('${tipo}');${cb}"
             style="background:none;border:none;cursor:pointer;color:var(--rubi);font-size:16px;padding:0;line-height:1">✕</button>`
