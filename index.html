@@ -1424,6 +1424,13 @@ function applyPrecNicho(key){
     extra_pct:false,
   },
 
+
+// Expose pricing functions to global scope for onclick handlers
+window.addInsumo = addInsumo;
+window.switchPrecTab = switchPrecTab;
+window.calcPreco = calcPreco;
+window.calcDiag = calcDiag;
+window.renderInsumos = renderInsumos;
 </script>
 
 </div><!-- /shell -->
@@ -1864,6 +1871,7 @@ function go(id) {
   document.getElementById('tb-right').innerHTML   = m.btns||'';
   // Render dinâmico por página
   if(id==='estoque') setTimeout(renderEstoque, 50);
+  if(id==='precificacao'){ setTimeout(()=>{ renderInsumos('calc'); calcPreco(); }, 50); }
 }
 
 /* ══════════ MODAIS ══════════ */
