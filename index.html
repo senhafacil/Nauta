@@ -1294,6 +1294,8 @@ function applyPrecNicho(key){
   renderInsumos('diag');
 }
 
+const nichos_prec = {
+  confeitaria:{
     lbl_prod:'Ingredientes / insumos do produto',
     lbl_fixo:'Custo fixo por pedido (R$)',
     lbl_comissao:'Entrega / parceria (%)',
@@ -1419,7 +1421,7 @@ function applyPrecNicho(key){
     sim_label:'atend./mês',
     extra_pct:false,
   },
-
+};
 
 // Expose pricing functions to global scope for onclick handlers
 window.addInsumo = addInsumo;
