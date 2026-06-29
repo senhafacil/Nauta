@@ -948,74 +948,71 @@ textarea.fi{resize:vertical;min-height:70px}
 
   <!-- ABAS -->
   <div style="display:flex;gap:4px;background:var(--cream2);border-radius:var(--r-l);padding:4px;width:fit-content">
-    <button id="prec-tab1" onclick="switchPrecTab('calc')" style="padding:7px 18px;border-radius:var(--r);border:none;background:var(--branco);font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;color:var(--carvao);box-shadow:var(--sombra)">💰 Calculadora de Preço</button>
-    <button id="prec-tab2" onclick="switchPrecTab('diag')" style="padding:7px 18px;border-radius:var(--r);border:none;background:transparent;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;color:var(--carvao)">🔍 Diagnóstico do Preço Atual</button>
+    <button id="prec-tab1"
+      onclick="document.getElementById('prec-calc').style.display='grid';document.getElementById('prec-diag').style.display='none';document.getElementById('prec-tab1').style.cssText='padding:7px 18px;border-radius:var(--r);border:none;background:var(--branco);font-size:12px;font-weight:600;cursor:pointer;font-family:DM Sans,sans-serif;color:var(--carvao);box-shadow:0 1px 4px rgba(0,0,0,.1)';document.getElementById('prec-tab2').style.cssText='padding:7px 18px;border-radius:var(--r);border:none;background:transparent;font-size:12px;font-weight:500;cursor:pointer;font-family:DM Sans,sans-serif;color:var(--cinza)';window.renderInsumos&&renderInsumos('calc');window.calcPreco&&calcPreco();"
+      style="padding:7px 18px;border-radius:var(--r);border:none;background:var(--branco);font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;color:var(--carvao);box-shadow:0 1px 4px rgba(0,0,0,.1)">💰 Calculadora de Preço</button>
+    <button id="prec-tab2"
+      onclick="document.getElementById('prec-diag').style.display='grid';document.getElementById('prec-calc').style.display='none';document.getElementById('prec-tab2').style.cssText='padding:7px 18px;border-radius:var(--r);border:none;background:var(--branco);font-size:12px;font-weight:600;cursor:pointer;font-family:DM Sans,sans-serif;color:var(--carvao);box-shadow:0 1px 4px rgba(0,0,0,.1)';document.getElementById('prec-tab1').style.cssText='padding:7px 18px;border-radius:var(--r);border:none;background:transparent;font-size:12px;font-weight:500;cursor:pointer;font-family:DM Sans,sans-serif;color:var(--cinza)';window.renderInsumos&&renderInsumos('diag');window.calcDiag&&calcDiag();"
+      style="padding:7px 18px;border-radius:var(--r);border:none;background:transparent;font-size:12px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;color:var(--cinza)">🔍 Diagnóstico do Preço Atual</button>
   </div>
 
   <!-- ── CALCULADORA ── -->
-  <div id="prec-calc" class="g2">
+  <div id="prec-calc" style="display:grid" class="g2">
     <div class="card">
       <div class="card-t">Insumos / Produtos utilizados
-        <button class="btn btn-p btn-xs" onclick="addInsumo('calc')">+ Adicionar</button>
+        <button class="btn btn-p btn-xs" onclick="window.addInsumo&&addInsumo('calc')">+ Adicionar</button>
       </div>
-
-      <!-- cabeçalho da tabela -->
       <div style="display:grid;grid-template-columns:1fr 70px 90px 60px 24px;gap:6px;font-size:10px;font-weight:700;color:var(--cinza);text-transform:uppercase;letter-spacing:.05em;padding:0 0 6px;border-bottom:1px solid var(--cream3);margin-bottom:8px">
         <span>Produto / Insumo</span><span style="text-align:center">Qtd</span><span style="text-align:right">Custo unit.</span><span style="text-align:right">Total</span><span></span>
       </div>
-
       <div id="calc-insumos-wrap"></div>
-
       <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-top:2px solid var(--cream3);margin-top:6px;font-size:13px">
         <span style="font-weight:600;color:var(--carvao)">Total insumos</span>
         <span style="font-weight:700;color:var(--rubi);font-size:16px" id="prec-total-ins">R$ 0,00</span>
       </div>
-
       <div style="margin-top:16px;padding-top:14px;border-top:2px solid var(--cream3)">
         <div style="font-size:12px;font-weight:700;color:var(--carvao);margin-bottom:12px;text-transform:uppercase;letter-spacing:.05em">Custos e percentuais</div>
         <div class="fr2">
           <div class="fg">
             <div class="fl">Custo fixo por pedido (R$)</div>
-            <input class="fi" type="number" id="prec-fixo" step="0.01" placeholder="Ex: 15,00" oninput="calcPreco()" value="0">
+            <input class="fi" type="number" id="prec-fixo" step="0.01" placeholder="Ex: 15,00" oninput="window.calcPreco&&calcPreco()" value="0">
             <div style="font-size:10px;color:var(--cinza);margin-top:3px">Aluguel, energia etc. ÷ nº de pedidos do mês</div>
           </div>
           <div class="fg">
             <div class="fl">Lucro desejado (%)</div>
-            <input class="fi" type="number" id="prec-lucro" step="1" placeholder="Ex: 30" oninput="calcPreco()" value="30">
+            <input class="fi" type="number" id="prec-lucro" step="1" placeholder="Ex: 30" oninput="window.calcPreco&&calcPreco()" value="30">
           </div>
         </div>
         <div class="fr2">
           <div class="fg">
             <div class="fl">Taxa de cartão (%)</div>
-            <input class="fi" type="number" id="prec-cartao" step="0.01" placeholder="Ex: 2.99" oninput="calcPreco()" value="2.99">
+            <input class="fi" type="number" id="prec-cartao" step="0.01" placeholder="Ex: 2.99" oninput="window.calcPreco&&calcPreco()" value="0">
           </div>
           <div class="fg">
-            <div class="fl">Comissão / Parceria (%)</div>
-            <input class="fi" type="number" id="prec-comissao" step="1" placeholder="Ex: 40" oninput="calcPreco()" value="0">
+            <div class="fl" id="lbl-prec-comissao">Comissão / parceria (%)</div>
+            <input class="fi" type="number" id="prec-comissao" step="0.01" placeholder="Ex: 10" oninput="window.calcPreco&&calcPreco()" value="0">
           </div>
         </div>
         <div class="fr2">
           <div class="fg">
             <div class="fl">Imposto (%)</div>
-            <input class="fi" type="number" id="prec-imposto" step="0.01" placeholder="Ex: 6" oninput="calcPreco()" value="0">
+            <input class="fi" type="number" id="prec-imposto" step="0.01" placeholder="Ex: 6" oninput="window.calcPreco&&calcPreco()" value="0">
           </div>
           <div class="fg">
-            <div class="fl">Outro custo % (ex: frete)</div>
-            <input class="fi" type="number" id="prec-outro-pct" step="0.01" placeholder="0" oninput="calcPreco()" value="0">
+            <div class="fl" id="lbl-prec-outro">Outro custo % (ex: frete)</div>
+            <input class="fi" type="number" id="prec-outro" step="0.01" placeholder="Ex: 5" oninput="window.calcPreco&&calcPreco()" value="0">
           </div>
         </div>
       </div>
     </div>
-
     <div class="card">
       <div class="card-t">Resultado — preço sugerido</div>
       <div id="prec-resultado">
-        <div style="text-align:center;padding:40px 20px;color:var(--cinza)">
-          <div style="font-size:40px;margin-bottom:10px">💲</div>
+        <div style="text-align:center;padding:30px;color:var(--cinza)">
+          <div style="font-size:48px;margin-bottom:10px">💲</div>
           <div style="font-size:13px">Adicione os insumos e preencha os custos ao lado para calcular</div>
         </div>
       </div>
-      <div id="prec-simulacao" style="margin-top:16px;padding-top:14px;border-top:1px solid var(--cream2)"></div>
     </div>
   </div>
 
@@ -1025,11 +1022,10 @@ textarea.fi{resize:vertical;min-height:70px}
       <div class="card-t">Diagnóstico — preço que você cobra hoje</div>
       <div class="fg">
         <div class="fl">Preço que você cobra (R$)</div>
-        <input class="fi" type="number" id="diag-preco" step="0.01" placeholder="Ex: 80,00" oninput="calcDiag()">
+        <input class="fi" type="number" id="diag-preco" step="0.01" placeholder="Ex: 80,00" oninput="window.calcDiag&&calcDiag()">
       </div>
-
       <div class="card-t" style="margin-top:14px;margin-bottom:8px">Insumos / Produtos
-        <button class="btn btn-p btn-xs" onclick="addInsumo('diag')">+ Adicionar</button>
+        <button class="btn btn-p btn-xs" onclick="window.addInsumo&&addInsumo('diag')">+ Adicionar</button>
       </div>
       <div style="display:grid;grid-template-columns:1fr 70px 90px 60px 24px;gap:6px;font-size:10px;font-weight:700;color:var(--cinza);text-transform:uppercase;letter-spacing:.05em;padding:0 0 6px;border-bottom:1px solid var(--cream3);margin-bottom:8px">
         <span>Produto / Insumo</span><span style="text-align:center">Qtd</span><span style="text-align:right">Custo unit.</span><span style="text-align:right">Total</span><span></span>
@@ -1039,33 +1035,32 @@ textarea.fi{resize:vertical;min-height:70px}
         <span style="font-weight:600">Total insumos</span>
         <span style="font-weight:700;color:var(--rubi)" id="diag-total-ins">R$ 0,00</span>
       </div>
-
       <div class="fr2" style="margin-top:14px">
         <div class="fg">
           <div class="fl">Custo fixo por atend. (R$)</div>
-          <input class="fi" type="number" id="diag-fixo" step="0.01" placeholder="Ex: 15,00" oninput="calcDiag()" value="0">
+          <input class="fi" type="number" id="diag-fixo" step="0.01" placeholder="Ex: 15,00" oninput="window.calcDiag&&calcDiag()" value="0">
         </div>
         <div class="fg">
           <div class="fl">Taxa de cartão (%)</div>
-          <input class="fi" type="number" id="diag-cartao" step="0.01" placeholder="Ex: 2.99" oninput="calcDiag()" value="0">
+          <input class="fi" type="number" id="diag-cartao" step="0.01" placeholder="Ex: 2.99" oninput="window.calcDiag&&calcDiag()" value="0">
         </div>
       </div>
       <div class="fr2">
         <div class="fg">
           <div class="fl" id="lbl-diag-comissao">Comissão (%)</div>
-          <input class="fi" type="number" id="diag-comissao" step="1" placeholder="Ex: 40" oninput="calcDiag()" value="0">
+          <input class="fi" type="number" id="diag-comissao" step="0.01" placeholder="Ex: 10" oninput="window.calcDiag&&calcDiag()" value="0">
         </div>
         <div class="fg">
           <div class="fl">Imposto (%)</div>
-          <input class="fi" type="number" id="diag-imposto" step="0.01" placeholder="Ex: 6" oninput="calcDiag()" value="0">
+          <input class="fi" type="number" id="diag-imposto" step="0.01" placeholder="Ex: 6" oninput="window.calcDiag&&calcDiag()" value="0">
         </div>
       </div>
     </div>
     <div class="card">
-      <div class="card-t">Situação atual do seu preço</div>
+      <div class="card-t">Resultado do Diagnóstico</div>
       <div id="diag-resultado">
-        <div style="text-align:center;padding:40px 20px;color:var(--cinza)">
-          <div style="font-size:36px;margin-bottom:10px">🔍</div>
+        <div style="text-align:center;padding:30px;color:var(--cinza)">
+          <div style="font-size:48px;margin-bottom:10px">🔍</div>
           <div style="font-size:13px">Informe o preço que cobra hoje para ver o diagnóstico</div>
         </div>
       </div>
