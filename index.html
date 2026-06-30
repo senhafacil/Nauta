@@ -2497,12 +2497,21 @@ async function supaGet(){
 async function supaSet(dados){
   if(!NEGOCIO_ID || SUPA_URL.includes('SEU_PROJETO')) return false;
   try{
-    const r = await fetch(`${SUPA_URL}/rest/v1/${NAUTA_TABELA}`,{
+    const payload = { negocio_id:NEGOCIO_ID, dados, atualizado_em:new Date().toISOString() };
+    // Tenta INSERT primeiro
+    const r1 = await fetch(`${SUPA_URL}/rest/v1/${NAUTA_TABELA}`,{
       method:'POST',
-      headers:{...SUPA_HDR,'Prefer':'resolution=merge-duplicates'},
-      body: JSON.stringify({ negocio_id:NEGOCIO_ID, dados, atualizado_em:new Date().toISOString() })
+      headers:{...SUPA_HDR,'Prefer':'return=minimal'},
+      body: JSON.stringify(payload)
     });
-    return r.ok;
+    if(r1.ok) return true;
+    // Se linha já existe, faz PATCH
+    const r2 = await fetch(`${SUPA_URL}/rest/v1/${NAUTA_TABELA}?negocio_id=eq.${encodeURIComponent(NEGOCIO_ID)}`,{
+      method:'PATCH',
+      headers:{...SUPA_HDR,'Prefer':'return=minimal'},
+      body: JSON.stringify({ dados, atualizado_em:new Date().toISOString() })
+    });
+    return r2.ok;
   }catch(e){ return false; }
 }
 
