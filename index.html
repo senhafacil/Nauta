@@ -1621,9 +1621,9 @@ window.renderInsumos = renderInsumos;
 
 <div class="modal-bg" id="m-func"><div class="modal" style="width:440px"><div class="modal-hdr"><div class="modal-title">Nova Funcionária</div><button class="modal-x" onclick="closeM('m-func')">×</button></div><div class="fr2"><div class="fg"><div class="fl">Nome completo</div><input class="fi" placeholder="Nome"></div><div class="fg"><div class="fl">Cargo</div><input class="fi" placeholder="Ex: Confeiteira, Atendente..."></div></div><div class="fr2"><div class="fg"><div class="fl">WhatsApp</div><input class="fi" placeholder="(11) 99999-9999"></div><div class="fg"><div class="fl">Nível de acesso</div><select class="fi"><option>Produção</option><option>Vendas</option><option>Gerente</option></select></div></div><div class="fg"><div class="fl">E-mail de acesso</div><input class="fi" type="email" placeholder="email@exemplo.com"></div><div class="brow" style="justify-content:flex-end;margin-top:8px"><button class="btn btn-sm" onclick="closeM('m-func')">Cancelar</button><button class="btn btn-p btn-sm" onclick="salvarM('m-func','Funcionária cadastrada!')">Salvar</button></div></div></div>
 
-<div class="modal-bg" id="m-receita"><div class="modal" style="width:400px"><div class="modal-hdr"><div class="modal-title">Registrar Receita</div><button class="modal-x" onclick="closeM('m-receita')">×</button></div><div class="fg"><div class="fl">Descrição</div><input class="fi" placeholder="Ex: Pedido #52 — saldo final"></div><div class="fr2"><div class="fg"><div class="fl">Valor (R$)</div><input class="fi" type="number" step="0.01" placeholder="0,00"></div><div class="fg"><div class="fl">Data</div><input class="fi" type="date" id="input-data-hoje"></div></div><div class="fg"><div class="fl">Forma de pagamento</div><select class="fi"><option>Pix</option><option>Dinheiro</option><option>Débito</option><option>Crédito</option></select></div><div class="brow" style="justify-content:flex-end;margin-top:8px"><button class="btn btn-sm" onclick="closeM('m-receita')">Cancelar</button><button class="btn btn-v btn-sm" onclick="salvarM('m-receita','Receita registrada!')">Salvar</button></div></div></div>
+<div class="modal-bg" id="m-receita"><div class="modal" style="width:400px"><div class="modal-hdr"><div class="modal-title">Registrar Receita</div><button class="modal-x" onclick="closeM('m-receita')">×</button></div><div class="fg"><div class="fl">Descrição</div><input class="fi" id="rec-desc" placeholder="Ex: Pedido #52 — saldo final"></div><div class="fr2"><div class="fg"><div class="fl">Valor (R$)</div><input class="fi" id="rec-valor" type="number" step="0.01" placeholder="0,00"></div><div class="fg"><div class="fl">Data</div><input class="fi" id="rec-data" type="date"></div></div><div class="fg"><div class="fl">Forma de pagamento</div><select class="fi" id="rec-forma"><option>Pix</option><option>Dinheiro</option><option>Débito</option><option>Crédito</option></select></div><div class="brow" style="justify-content:flex-end;margin-top:8px"><button class="btn btn-sm" onclick="closeM('m-receita')">Cancelar</button><button class="btn btn-v btn-sm" onclick="salvarReceita()">Salvar</button></div></div></div>
 
-<div class="modal-bg" id="m-despesa"><div class="modal" style="width:400px"><div class="modal-hdr"><div class="modal-title">Registrar Despesa</div><button class="modal-x" onclick="closeM('m-despesa')">×</button></div><div class="fg"><div class="fl">Descrição</div><input class="fi" placeholder="Ex: Compra de embalagens"></div><div class="fr2"><div class="fg"><div class="fl">Valor (R$)</div><input class="fi" type="number" step="0.01" placeholder="0,00"></div><div class="fg"><div class="fl">Data</div><input class="fi" type="date" id="input-data-hoje"></div></div><div class="fg"><div class="fl">Categoria</div><select class="fi"><option>Matéria-prima</option><option>Embalagens</option><option>Aluguel</option><option>Marketing</option><option>Equipamentos</option><option>Pessoal</option><option>Outro</option></select></div><div class="brow" style="justify-content:flex-end;margin-top:8px"><button class="btn btn-sm" onclick="closeM('m-despesa')">Cancelar</button><button class="btn btn-r btn-sm" onclick="salvarM('m-despesa','Despesa registrada!')">Salvar</button></div></div></div>
+<div class="modal-bg" id="m-despesa"><div class="modal" style="width:400px"><div class="modal-hdr"><div class="modal-title">Registrar Despesa</div><button class="modal-x" onclick="closeM('m-despesa')">×</button></div><div class="fg"><div class="fl">Descrição</div><input class="fi" id="desp-desc" placeholder="Ex: Compra de embalagens"></div><div class="fr2"><div class="fg"><div class="fl">Valor (R$)</div><input class="fi" id="desp-valor" type="number" step="0.01" placeholder="0,00"></div><div class="fg"><div class="fl">Data</div><input class="fi" id="desp-data" type="date"></div></div><div class="fg"><div class="fl">Categoria</div><select class="fi" id="desp-cat"><option>Matéria-prima</option><option>Embalagens</option><option>Aluguel</option><option>Marketing</option><option>Equipamentos</option><option>Pessoal</option><option>Outro</option></select></div><div class="brow" style="justify-content:flex-end;margin-top:8px"><button class="btn btn-sm" onclick="closeM('m-despesa')">Cancelar</button><button class="btn btn-r btn-sm" onclick="salvarDespesa()">Salvar</button></div></div></div>
 
 <!-- MODAL PERMISSÕES -->
 <div class="modal-bg" id="m-perm"><div class="modal" style="width:440px"><div class="modal-hdr"><div class="modal-title" id="mp-title">Editar Permissões</div><button class="modal-x" onclick="closeM('m-perm')">×</button></div><div id="mp-body"></div><div class="brow" style="justify-content:flex-end;margin-top:14px"><button class="btn btn-sm" onclick="closeM('m-perm')">Cancelar</button><button class="btn btn-p btn-sm" id="mp-save">Salvar permissões</button></div></div></div>
@@ -2984,6 +2984,59 @@ window.filtroEstoque = function(f, btn){
   renderEstoque();
 };
 
+
+
+/* ══════════ FINANCEIRO SAVE ══════════ */
+window.salvarReceita = function(){
+  const desc  = document.getElementById('rec-desc')?.value.trim();
+  const valor = parseFloat(document.getElementById('rec-valor')?.value)||0;
+  const data  = document.getElementById('rec-data')?.value || new Date().toISOString().split('T')[0];
+  const forma = document.getElementById('rec-forma')?.value || 'Pix';
+  if(!desc){alert('Informe a descrição');return;}
+  if(!valor){alert('Informe o valor');return;}
+  if(!DB.financeiro) DB.financeiro={entradas:[],saidas:[]};
+  if(!DB.financeiro.entradas) DB.financeiro.entradas=[];
+  if(!DB.nextId) DB.nextId={financeiro:1};
+  if(!DB.nextId.financeiro) DB.nextId.financeiro=1;
+  DB.financeiro.entradas.push({
+    id:DB.nextId.financeiro++,
+    desc, valor, data, forma,
+    tipo:'receita',
+    criado:new Date().toISOString()
+  });
+  salvarDados();
+  closeM('m-receita');
+  toast('✅ Receita registrada!');
+  // Resetar campos
+  document.getElementById('rec-desc').value='';
+  document.getElementById('rec-valor').value='';
+  document.getElementById('rec-data').value='';
+};
+
+window.salvarDespesa = function(){
+  const desc  = document.getElementById('desp-desc')?.value.trim();
+  const valor = parseFloat(document.getElementById('desp-valor')?.value)||0;
+  const data  = document.getElementById('desp-data')?.value || new Date().toISOString().split('T')[0];
+  const cat   = document.getElementById('desp-cat')?.value || 'Outro';
+  if(!desc){alert('Informe a descrição');return;}
+  if(!valor){alert('Informe o valor');return;}
+  if(!DB.financeiro) DB.financeiro={entradas:[],saidas:[]};
+  if(!DB.financeiro.saidas) DB.financeiro.saidas=[];
+  if(!DB.nextId) DB.nextId={financeiro:1};
+  if(!DB.nextId.financeiro) DB.nextId.financeiro=1;
+  DB.financeiro.saidas.push({
+    id:DB.nextId.financeiro++,
+    desc, valor, data, cat,
+    tipo:'despesa',
+    criado:new Date().toISOString()
+  });
+  salvarDados();
+  closeM('m-despesa');
+  toast('✅ Despesa registrada!');
+  document.getElementById('desp-desc').value='';
+  document.getElementById('desp-valor').value='';
+  document.getElementById('desp-data').value='';
+};
 
 // Inicia com tela de login — deploy forced
 buildLoginScreen();
