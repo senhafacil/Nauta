@@ -1998,6 +1998,8 @@ function go(id) {
   // Render dinâmico por página
   if(id==='dashboard') setTimeout(renderDashboard, 50);
   if(id==='tarefas') setTimeout(renderTarefas, 50);
+  if(id==='gestao'){setTimeout(()=>{renderMetas();renderInfos();},50);}
+  if(id==='compras') setTimeout(renderCompras, 50);
   if(id==='estoque') setTimeout(renderEstoque, 50);
   if(id==='financeiro') setTimeout(renderFinanceiro, 50);
   if(id==='precificacao'){ setTimeout(()=>{ renderInsumos('calc'); calcPreco(); }, 50); }
@@ -2132,16 +2134,20 @@ function atualizarCompras(){
   if(document.getElementById('comp-prog'))document.getElementById('comp-prog').style.width=pct+'%';
 }
 function addCompra(){
-  const nome=document.getElementById('mc-nome').value.trim();
+  const nome = document.getElementById('mc-nome')?.value.trim();
+  const qty  = document.getElementById('mc-qty')?.value.trim()||'';
+  const pri  = document.getElementById('mc-pri')?.value||'Normal';
+  const forn = document.getElementById('mc-forn')?.value.trim()||'';
   if(!nome){toast('Informe o item!');return;}
-  const qty=document.getElementById('mc-qty').value;
-  const pri=document.getElementById('mc-pri').value;
-  const pc={Urgente:'pr-a',Normal:'pr-m',Baixa:'pr-b'}[pri];
-  const el=document.createElement('div');el.className='comp-item';
-  el.innerHTML=`<input type="checkbox" class="comp-chk" onchange="toggleCompra(this)"><div class="comp-name">${nome}</div><div class="comp-qty">${qty||'—'}</div><span class="comp-pri ${pc}">${pri}</span>`;
-  document.getElementById('compra-list').appendChild(el);
-  document.getElementById('mc-nome').value='';document.getElementById('mc-qty').value='';
-  closeM('m-compra');atualizarCompras();toast('✅ Item adicionado à lista!');
+  if(!DB.compras) DB.compras=[];
+  if(!DB.nextId.compra) DB.nextId.compra=1;
+  DB.compras.push({id:DB.nextId.compra++, nome, qty, pri, forn, feito:false, criado:new Date().toISOString()});
+  salvarDados();
+  closeM('m-compra');
+  renderCompras();
+  toast('✅ Item adicionado à lista!');
+  document.getElementById('mc-nome').value='';
+  document.getElementById('mc-qty').value='';
 }
 
 /* ══════════ FUNCIONÁRIOS / PERMISSÕES ══════════ */
@@ -3406,6 +3412,120 @@ window.excluirTarefa = function(id){
   DB.tarefas = (DB.tarefas||[]).filter(t=>t.id!==id);
   salvarDados();
   renderTarefas();
+};
+
+
+/* ══════════ METAS ══════════ */
+window.salvarMeta = function(){
+  const titulo = document.getElementById('mm-titulo')?.value.trim();
+  const cat    = document.getElementById('mm-cat')?.value||'💰 Financeiro';
+  const mes    = document.getElementById('mm-mes')?.value||new Date().toISOString().slice(0,7);
+  const valor  = document.getElementById('mm-valor')?.value.trim()||'';
+  if(!titulo){alert('Informe o título da meta');return;}
+  if(!DB.metas) DB.metas=[];
+  if(!DB.nextId.meta) DB.nextId.meta=1;
+  DB.metas.push({id:DB.nextId.meta++, titulo, cat, mes, valor, progresso:0, criado:new Date().toISOString()});
+  salvarDados();
+  closeM('m-meta');
+  renderMetas();
+  toast('🎯 Meta cadastrada!');
+  document.getElementById('mm-titulo').value='';
+  document.getElementById('mm-valor').value='';
+};
+
+function renderMetas(){
+  const lista = document.getElementById('metas-lista');
+  if(!lista) return;
+  const metas = DB.metas||[];
+  if(!metas.length){
+    lista.innerHTML='<div style="text-align:center;color:var(--cinza);padding:20px;font-size:13px">Nenhuma meta cadastrada</div>';
+    return;
+  }
+  lista.innerHTML = metas.map(m=>`
+    <div style="padding:12px;border:1px solid var(--borda);border-radius:var(--r);margin-bottom:8px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+        <div style="font-size:13px;font-weight:600">${m.titulo}</div>
+        <div style="display:flex;gap:6px;align-items:center">
+          <span style="font-size:11px;color:var(--cinza)">${m.cat} · ${m.mes}</span>
+          <button onclick="excluirMeta(${m.id})" style="border:none;background:none;cursor:pointer;color:var(--cinza);font-size:13px">✕</button>
+        </div>
+      </div>
+      ${m.valor?`<div style="font-size:12px;color:var(--terra);font-weight:600">Meta: ${m.valor}</div>`:''}
+    </div>`).join('');
+}
+
+window.excluirMeta = function(id){
+  DB.metas=(DB.metas||[]).filter(m=>m.id!==id);
+  salvarDados(); renderMetas();
+};
+
+/* ══════════ INFORMAÇÕES ══════════ */
+window.salvarInfo = function(){
+  const tipo   = document.getElementById('mi-tipo')?.value||'💡 Dica';
+  const texto  = document.getElementById('mi-texto')?.value.trim();
+  const visivel= document.getElementById('mi-visivel')?.value||'Toda equipe';
+  if(!texto){alert('Escreva o conteúdo da informação');return;}
+  if(!DB.informacoes) DB.informacoes=[];
+  DB.informacoes.push({id:Date.now(), tipo, texto, visivel, criado:new Date().toISOString()});
+  salvarDados();
+  closeM('m-info');
+  renderInfos();
+  toast('📌 Informação salva!');
+  document.getElementById('mi-texto').value='';
+};
+
+function renderInfos(){
+  const lista = document.getElementById('infos-lista');
+  if(!lista) return;
+  const infos = DB.informacoes||[];
+  if(!infos.length){
+    lista.innerHTML='<div style="text-align:center;color:var(--cinza);padding:20px;font-size:13px">Nenhuma informação cadastrada</div>';
+    return;
+  }
+  lista.innerHTML = infos.slice().reverse().map(i=>`
+    <div style="padding:10px 12px;border-left:3px solid var(--terra);background:var(--cream);border-radius:0 var(--r) var(--r) 0;margin-bottom:8px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+        <span style="font-size:11px;font-weight:700;color:var(--terra)">${i.tipo}</span>
+        <button onclick="excluirInfo(${i.id})" style="border:none;background:none;cursor:pointer;color:var(--cinza);font-size:13px">✕</button>
+      </div>
+      <div style="font-size:13px;color:var(--carvao)">${i.texto}</div>
+    </div>`).join('');
+}
+
+window.excluirInfo = function(id){
+  DB.informacoes=(DB.informacoes||[]).filter(i=>i.id!==id);
+  salvarDados(); renderInfos();
+};
+
+/* ══════════ COMPRAS ══════════ */
+function renderCompras(){
+  const lista = document.getElementById('compra-list');
+  if(!lista) return;
+  const compras = DB.compras||[];
+  if(!compras.length){
+    lista.innerHTML='<div style="text-align:center;color:var(--cinza);padding:20px;font-size:13px">Lista vazia. Clique em + Item para adicionar.</div>';
+    atualizarCompras(); return;
+  }
+  const pc={Urgente:'pr-a',Normal:'pr-m',Baixa:'pr-b'};
+  lista.innerHTML = compras.map(c=>`
+    <div class="comp-item">
+      <input type="checkbox" class="comp-chk" ${c.feito?'checked':''} onchange="toggleCompraDB(${c.id},this.checked)">
+      <div class="comp-name" style="${c.feito?'text-decoration:line-through;color:var(--cinza)':''}">${c.nome}</div>
+      <div class="comp-qty">${c.qty||'—'}</div>
+      <span class="comp-pri ${pc[c.pri]||'pr-m'}">${c.pri}</span>
+      <button onclick="excluirCompra(${c.id})" style="border:none;background:none;cursor:pointer;color:var(--cinza);font-size:13px;margin-left:4px">✕</button>
+    </div>`).join('');
+  atualizarCompras();
+}
+
+window.toggleCompraDB = function(id, feito){
+  DB.compras=(DB.compras||[]).map(c=>c.id===id?{...c,feito}:c);
+  salvarDados(); renderCompras();
+};
+
+window.excluirCompra = function(id){
+  DB.compras=(DB.compras||[]).filter(c=>c.id!==id);
+  salvarDados(); renderCompras();
 };
 
 // Inicia com tela de login — deploy forced
