@@ -1616,12 +1616,13 @@ window.renderInsumos = renderInsumos;
 <select class="fi" id="desp-tipo">
   <option value="Custo Fixo">💰 Custo Fixo — pago todo mês independente das vendas</option>
   <option value="Custo Variável">📦 Custo Variável — muda conforme a produção</option>
-  <option value="Investimento">🏦 Investimento — gera retorno futuro</option>
-  <option value="Manutenção">🔧 Manutenção — conserto ou conservação</option>
   <option value="Outros">➕ Outros custos</option>
 </select>
 </div>
-<div class="fg"><div class="fl">Categoria <span style="font-size:10px;color:var(--cinza);font-weight:400">(o que é especificamente?)</span></div>
+<div class="fg"><div class="fl" style="display:flex;align-items:center;justify-content:space-between">
+  <span>Categoria <span style="font-size:10px;color:var(--cinza);font-weight:400">(o que é?)</span></span>
+  <button type="button" onclick="gerenciarCategorias()" style="font-size:10px;color:var(--terra);background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600">✏️ Gerenciar</button>
+</div>
 <div style="display:flex;gap:6px">
   <select class="fi" id="desp-cat" style="flex:1" onchange="if(this.value==='+ Nova categoria')abrirNovaCategoria()">
     <option>Aluguel</option><option>Energia/Água/Internet</option><option>Salários/Pró-labore</option>
@@ -3040,6 +3041,56 @@ window.salvarReceita = function(){
   document.getElementById('rec-desc').value='';
   document.getElementById('rec-valor').value='';
   document.getElementById('rec-data').value='';
+};
+
+window.gerenciarCategorias = function(){
+  const cats = DB.categoriasDesp || [];
+  const padrao = ['Aluguel','Energia/Água/Internet','Salários/Pró-labore','Matéria-prima','Embalagens','Frete/Entrega','Marketing','Taxas e Impostos','Equipamentos','Contador/Serviços','Comissões','Cursos/Capacitação','Outro'];
+  
+  if(!cats.length){
+    alert('Você ainda não tem categorias personalizadas.
+Crie uma nova selecionando "+ Nova categoria".');
+    return;
+  }
+  
+  // Mostrar modal de gerenciar categorias
+  let existing = document.getElementById('m-gerenciar-cats');
+  if(existing) existing.remove();
+  
+  const div = document.createElement('div');
+  div.id = 'm-gerenciar-cats';
+  div.className = 'modal-bg open';
+  div.onclick = function(e){ if(e.target===this) this.remove(); };
+  div.innerHTML = `
+    <div class="modal" style="max-width:400px">
+      <div class="modal-hdr"><div class="modal-title">✏️ Gerenciar categorias</div><button class="modal-x" onclick="document.getElementById('m-gerenciar-cats').remove()">×</button></div>
+      <div style="font-size:12px;color:var(--cinza);margin-bottom:12px">Suas categorias personalizadas:</div>
+      <div id="cats-lista">
+        ${cats.map((c,i)=>`
+          <div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--cream2)">
+            <span style="flex:1;font-size:13px">${c}</span>
+            <button onclick="excluirCategoria(${i})" style="padding:3px 8px;border-radius:6px;border:none;background:var(--rubi-l);color:var(--rubi);font-size:11px;font-weight:600;cursor:pointer">Excluir</button>
+          </div>`).join('')}
+      </div>
+      <div style="margin-top:14px;font-size:11px;color:var(--cinza)">As categorias padrão não podem ser excluídas.</div>
+    </div>`;
+  document.body.appendChild(div);
+};
+
+window.excluirCategoria = function(idx){
+  if(!DB.categoriasDesp) return;
+  const nome = DB.categoriasDesp[idx];
+  if(!confirm('Excluir categoria "'+nome+'"?')) return;
+  DB.categoriasDesp.splice(idx,1);
+  salvarDados();
+  // Remove do select
+  const s = document.getElementById('desp-cat');
+  if(s){
+    Array.from(s.options).forEach(o=>{ if(o.value===nome) o.remove(); });
+  }
+  // Atualizar modal
+  gerenciarCategorias();
+  toast('Categoria excluída!');
 };
 
 window.abrirNovaCategoria = function(){
