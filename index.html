@@ -3247,13 +3247,7 @@ function renderFinanceiro(){
       recLista.innerHTML='<div style="text-align:center;color:var(--cinza);padding:16px;font-size:13px">Nenhuma conta a receber</div>';
     } else {
       recLista.innerHTML=`<div class="tw"><table class="tbl"><thead><tr><th>#</th><th>Cliente</th><th>Produto</th><th>Valor</th><th>Status</th></tr></thead><tbody>
-      ${aReceber.map(p=>`<tr>
-        <td>${p.id||'-'}</td>
-        <td>${p.cliente||p.nome_cliente||'-'}</td>
-        <td>${p.produto||p.nome_produto||'-'}</td>
-        <td style="font-weight:600;color:var(--dourado)">${fmtR(parseFloat(p.valor_total||p.total||0))}</td>
-        <td><span class="bp bp-d" style="font-size:10px">${p.status||'-'}</span></td>
-      </tr>`).join('')}
+      ${aReceber.map(p=>'<tr><td>'+(p.id||'-')+'</td><td>'+(p.cliente||p.nome_cliente||'-')+'</td><td>'+(p.produto||p.nome_produto||'-')+'</td><td style="font-weight:600;color:var(--dourado)">'+fmtR(parseFloat(p.valor_total||p.total||0))+'</td><td><span class="bp bp-d" style="font-size:10px">'+(p.status||'-')+'</span></td></tr>').join('')}
       </tbody></table></div>`;
     }
   }
@@ -3274,10 +3268,7 @@ function renderFinanceiro(){
         <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:12px;font-weight:700;color:${cores[t]||'var(--cinza)'};border-bottom:2px solid ${cores[t]||'var(--cinza)'}22">
           <span>${t}</span><span>${fmtR(g.total)}</span>
         </div>
-        ${g.itens.map(s=>`<div style="display:flex;justify-content:space-between;padding:5px 0 5px 10px;font-size:12px;border-bottom:1px solid var(--cream2)">
-          <span style="color:var(--carvao2)">${s.cat||'Outro'} — ${s.desc||''}</span>
-          <span style="color:var(--rubi);font-weight:600">${fmtR(s.valor||0)}</span>
-        </div>`).join('')}
+        ${g.itens.map(s=>'<div style="display:flex;justify-content:space-between;padding:5px 0 5px 10px;font-size:12px;border-bottom:1px solid var(--cream2)"><span style="color:var(--carvao2)">'+(s.cat||'Outro')+' — '+(s.desc||'')+'</span><span style="color:var(--rubi);font-weight:600">'+fmtR(s.valor||0)+'</span></div>').join('')}
       </div>`).join('');
   } else if(cats){
     cats.innerHTML='<div style="font-size:13px;color:var(--cinza);padding:12px 0">Sem despesas este mês</div>';
