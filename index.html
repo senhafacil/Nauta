@@ -3044,19 +3044,11 @@ window.salvarReceita = function(){
 };
 
 window.gerenciarCategorias = function(){
-  const cats = DB.categoriasDesp || [];
-  const padrao = ['Aluguel','Energia/Água/Internet','Salários/Pró-labore','Matéria-prima','Embalagens','Frete/Entrega','Marketing','Taxas e Impostos','Equipamentos','Contador/Serviços','Comissões','Cursos/Capacitação','Outro'];
-  
-  if(!cats.length){
-    alert('Você ainda não tem categorias personalizadas.
-Crie uma nova selecionando "+ Nova categoria".');
-    return;
-  }
-  
-  // Mostrar modal de gerenciar categorias
   let existing = document.getElementById('m-gerenciar-cats');
   if(existing) existing.remove();
-  
+  const s = document.getElementById('desp-cat');
+  const todasCats = s ? Array.from(s.options).map(o=>o.value).filter(v=>v!=='+ Nova categoria') : [];
+  if(!todasCats.length){ alert('Nenhuma categoria cadastrada.'); return; }
   const div = document.createElement('div');
   div.id = 'm-gerenciar-cats';
   div.className = 'modal-bg open';
@@ -3064,31 +3056,27 @@ Crie uma nova selecionando "+ Nova categoria".');
   div.innerHTML = `
     <div class="modal" style="max-width:400px">
       <div class="modal-hdr"><div class="modal-title">✏️ Gerenciar categorias</div><button class="modal-x" onclick="document.getElementById('m-gerenciar-cats').remove()">×</button></div>
-      <div style="font-size:12px;color:var(--cinza);margin-bottom:12px">Suas categorias personalizadas:</div>
+      <div style="font-size:12px;color:var(--cinza);margin-bottom:12px">Todas podem ser excluídas:</div>
       <div id="cats-lista">
-        ${cats.map((c,i)=>`
+        ${todasCats.map(c=>`
           <div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--cream2)">
             <span style="flex:1;font-size:13px">${c}</span>
-            <button onclick="excluirCategoria(${i})" style="padding:3px 8px;border-radius:6px;border:none;background:var(--rubi-l);color:var(--rubi);font-size:11px;font-weight:600;cursor:pointer">Excluir</button>
+            <button onclick="excluirCategoria('${c}')" style="padding:3px 8px;border-radius:6px;border:none;background:var(--rubi-l);color:var(--rubi);font-size:11px;font-weight:600;cursor:pointer">Excluir</button>
           </div>`).join('')}
       </div>
-      <div style="margin-top:14px;font-size:11px;color:var(--cinza)">As categorias padrão não podem ser excluídas.</div>
     </div>`;
   document.body.appendChild(div);
 };
 
-window.excluirCategoria = function(idx){
-  if(!DB.categoriasDesp) return;
-  const nome = DB.categoriasDesp[idx];
+
+window.excluirCategoria = function(nome){
   if(!confirm('Excluir categoria "'+nome+'"?')) return;
-  DB.categoriasDesp.splice(idx,1);
-  salvarDados();
   // Remove do select
   const s = document.getElementById('desp-cat');
-  if(s){
-    Array.from(s.options).forEach(o=>{ if(o.value===nome) o.remove(); });
-  }
-  // Atualizar modal
+  if(s){ Array.from(s.options).forEach(o=>{ if(o.value===nome) o.remove(); }); }
+  // Remove de categoriasDesp se existir
+  if(DB.categoriasDesp) DB.categoriasDesp = DB.categoriasDesp.filter(c=>c!==nome);
+  salvarDados();
   gerenciarCategorias();
   toast('Categoria excluída!');
 };
