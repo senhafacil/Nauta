@@ -2510,19 +2510,18 @@ async function supaGet(){
 async function supaSet(dados){
   if(!NEGOCIO_ID || SUPA_URL.includes('SEU_PROJETO')) return false;
   try{
-    const payload = { negocio_id:NEGOCIO_ID, dados, atualizado_em:new Date().toISOString() };
-    // Tenta INSERT primeiro
-    const r1 = await fetch(`${SUPA_URL}/rest/v1/${NAUTA_TABELA}`,{
-      method:'POST',
-      headers:{...SUPA_HDR,'Prefer':'return=minimal'},
-      body: JSON.stringify(payload)
-    });
-    if(r1.ok) return true;
-    // Se linha já existe, faz PATCH
-    const r2 = await fetch(`${SUPA_URL}/rest/v1/${NAUTA_TABELA}?negocio_id=eq.${encodeURIComponent(NEGOCIO_ID)}`,{
+    // Tenta PATCH primeiro (linha já deve existir)
+    const r1 = await fetch(`${SUPA_URL}/rest/v1/${NAUTA_TABELA}?negocio_id=eq.${encodeURIComponent(NEGOCIO_ID)}`,{
       method:'PATCH',
       headers:{...SUPA_HDR,'Prefer':'return=minimal'},
       body: JSON.stringify({ dados, atualizado_em:new Date().toISOString() })
+    });
+    if(r1.ok) return true;
+    // Fallback: INSERT (primeira vez ou linha não existe)
+    const r2 = await fetch(`${SUPA_URL}/rest/v1/${NAUTA_TABELA}`,{
+      method:'POST',
+      headers:{...SUPA_HDR,'Prefer':'return=minimal'},
+      body: JSON.stringify({ negocio_id:NEGOCIO_ID, dados, atualizado_em:new Date().toISOString() })
     });
     return r2.ok;
   }catch(e){ return false; }
@@ -2919,6 +2918,20 @@ window.cadastrarMentoradaNauta = async function(){
     });
     msg.style.display='block'; msg.style.color='#1A7A4A';
     msg.innerHTML='✓ <strong>'+nome+'</strong> cadastrada!<br>Login: <strong>'+login+'</strong> · Senha: <strong>'+senha+'</strong>';
+    // Criar dados iniciais em nauta_dados
+    const nicho = document.getElementById('adm-nicho')?.value || 'confeitaria';
+    const dadosIniciais = {
+      config:{nome_negocio:nome,nome_proprietaria:nome,whatsapp:'',meta_mensal:0,nicho,negocio_id:login},
+      clientes:[],pedidos:[],financeiro:{entradas:[],saidas:[]},tarefas:[],compras:[],
+      metas:[],informacoes:[],funcionarios:[],estoque:[],
+      taxas:{pix:0,debito:1.49,credito1:2.99,credito2:3.49,credito3:3.99,credito6:4.99,credito12:6.99,dinheiro:0},
+      nextId:{cliente:1,pedido:1,financeiro:1,tarefa:1,compra:1,meta:1,estoque:1}
+    };
+    await fetch(`${SUPA_URL}/rest/v1/nauta_dados`,{
+      method:'POST',
+      headers:{...SUPA_HDR,'Prefer':'return=minimal'},
+      body:JSON.stringify({negocio_id:login, dados:dadosIniciais, atualizado_em:new Date().toISOString()})
+    });
     document.getElementById('adm-nome').value='';
     document.getElementById('adm-login').value='';
     document.getElementById('adm-senha').value='';
