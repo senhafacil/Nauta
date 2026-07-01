@@ -379,10 +379,10 @@ textarea.fi{resize:vertical;min-height:70px}
     <div class="card">
       <div class="card-t" id="dash-caixa-titulo">Fluxo de Caixa</div>
       <div class="g2" style="gap:10px;margin-bottom:13px">
-        <div style="background:var(--verde-l);border-radius:var(--r);padding:12px"><div style="font-size:10px;color:var(--verde);font-weight:700;margin-bottom:4px">ENTRADAS</div><div style="font-size:20px;font-weight:700;color:var(--verde)"><span class="mc-zero">—</span></div></div>
-        <div style="background:var(--rubi-l);border-radius:var(--r);padding:12px"><div style="font-size:10px;color:var(--rubi);font-weight:700;margin-bottom:4px">SAÍDAS</div><div style="font-size:20px;font-weight:700;color:var(--rubi)">R$0,00</div></div>
+        <div style="background:var(--verde-l);border-radius:var(--r);padding:12px"><div style="font-size:10px;color:var(--verde);font-weight:700;margin-bottom:4px">ENTRADAS</div><div style="font-size:20px;font-weight:700;color:var(--verde)" id="dash-entr">R$0,00</div></div>
+        <div style="background:var(--rubi-l);border-radius:var(--r);padding:12px"><div style="font-size:10px;color:var(--rubi);font-weight:700;margin-bottom:4px">SAÍDAS</div><div style="font-size:20px;font-weight:700;color:var(--rubi)" id="dash-sai">R$0,00</div></div>
       </div>
-      <div style="display:flex;justify-content:space-between;font-size:14px;font-weight:700;padding:11px 0;border-top:1px solid var(--borda)"><span>Saldo</span><span style="color:var(--verde)">+ R$0,00</span></div>
+      <div style="display:flex;justify-content:space-between;font-size:14px;font-weight:700;padding:11px 0;border-top:1px solid var(--borda)"><span>Saldo</span><span style="color:var(--verde)" id="dash-saldo">+ R$0,00</span></div>
       <div class="prog"><div class="prog-f" style="width:0%"></div></div>
       <div style="font-size:11px;color:var(--cinza);margin-top:5px">0% da meta — configure nas Configurações</div>
       <button class="btn btn-sm" style="width:100%;justify-content:center;margin-top:11px" onclick="go('financeiro')">Ver financeiro →</button>
