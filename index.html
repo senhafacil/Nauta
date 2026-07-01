@@ -662,7 +662,7 @@ textarea.fi{resize:vertical;min-height:70px}
       </div>
       <div class="card">
         <div class="card-t">Tarefas de amanhã <button class="btn btn-xs" onclick="openM('m-tarefa')">+</button></div>
-        <div style="text-align:center;color:var(--cinza);padding:14px;font-size:13px">Sem tarefas para amanhã</div>
+        <div id="amanha-list"><div style="text-align:center;color:var(--cinza);padding:14px;font-size:13px">Sem tarefas para amanhã</div></div>
       </div>
       <div class="card">
         <div class="card-t">Por funcionária</div>
@@ -1596,15 +1596,15 @@ window.renderInsumos = renderInsumos;
 
 <div class="modal-bg" id="m-evento"><div class="modal" style="width:440px"><div class="modal-hdr"><div class="modal-title">Novo Evento</div><button class="modal-x" onclick="closeM('m-evento')">×</button></div><div class="fg"><div class="fl">Título</div><input class="fi" placeholder="Ex: Entrega pedido — Nome da cliente"></div><div class="fr2"><div class="fg"><div class="fl">Data</div><input class="fi" type="date" id="input-data-hoje"></div><div class="fg"><div class="fl">Horário</div><input class="fi" type="time"></div></div><div class="fr2"><div class="fg"><div class="fl">Tipo</div><select class="fi"><option>Entrega</option><option>Retirada</option><option>Reunião</option><option>Compra</option><option>Aniversário</option><option>Gestão</option></select></div><div class="fg"><div class="fl">Responsável</div><select class="fi"><option>Proprietária</option></select></div></div><div class="fg"><div class="fl">Detalhes</div><textarea class="fi" rows="2" placeholder="Informações adicionais..."></textarea></div><div class="brow" style="justify-content:flex-end;margin-top:8px"><button class="btn btn-sm" onclick="closeM('m-evento')">Cancelar</button><button class="btn btn-p btn-sm" onclick="salvarM('m-evento','Evento adicionado!')">Salvar</button></div></div></div>
 
-<div class="modal-bg" id="m-tarefa"><div class="modal" style="width:440px"><div class="modal-hdr"><div class="modal-title">Nova Tarefa</div><button class="modal-x" onclick="closeM('m-tarefa')">×</button></div><div class="fg"><div class="fl">Descrição da tarefa</div><textarea class="fi" id="mt-txt" rows="2" placeholder="O que precisa ser feito?"></textarea></div><div class="fr2"><div class="fg"><div class="fl">Data</div><input class="fi" type="date" id="input-data-hoje"></div><div class="fg"><div class="fl">Horário</div><input class="fi" type="time"></div></div><div class="fr2"><div class="fg"><div class="fl">Para quem</div><select class="fi" id="mt-resp"><option>Proprietária</option></select></div><div class="fg"><div class="fl">Prioridade</div><select class="fi" id="mt-pri"><option>Alta</option><option>Média</option><option>Baixa</option></select></div></div><div class="brow" style="justify-content:flex-end;margin-top:8px"><button class="btn btn-sm" onclick="closeM('m-tarefa')">Cancelar</button><button class="btn btn-p btn-sm" onclick="addTarefa()">Adicionar</button></div></div></div>
+<div class="modal-bg" id="m-tarefa"><div class="modal" style="width:440px"><div class="modal-hdr"><div class="modal-title">Nova Tarefa</div><button class="modal-x" onclick="closeM('m-tarefa')">×</button></div><div class="fg"><div class="fl">Descrição da tarefa</div><textarea class="fi" id="mt-txt" rows="2" placeholder="O que precisa ser feito?"></textarea></div><div class="fr2"><div class="fg"><div class="fl">Data</div><input class="fi" type="date" id="mt-data"></div><div class="fg"><div class="fl">Horário</div><input class="fi" type="time" id="mt-hora"></div></div><div class="fr2"><div class="fg"><div class="fl">Para quem</div><select class="fi" id="mt-resp"><option>Proprietária</option></select></div><div class="fg"><div class="fl">Prioridade</div><select class="fi" id="mt-pri"><option>Alta</option><option>Média</option><option>Baixa</option></select></div></div><div class="brow" style="justify-content:flex-end;margin-top:8px"><button class="btn btn-sm" onclick="closeM('m-tarefa')">Cancelar</button><button class="btn btn-p btn-sm" onclick="addTarefa()">Adicionar</button></div></div></div>
 
-<div class="modal-bg" id="m-compra"><div class="modal" style="width:420px"><div class="modal-hdr"><div class="modal-title">Adicionar Item</div><button class="modal-x" onclick="closeM('m-compra')">×</button></div><div class="fg"><div class="fl">Item</div><input class="fi" id="mc-nome" placeholder="Ex: Farinha de trigo"></div><div class="fr2"><div class="fg"><div class="fl">Quantidade</div><input class="fi" id="mc-qty" placeholder="Ex: 2 sacos"></div><div class="fg"><div class="fl">Prioridade</div><select class="fi" id="mc-pri"><option>Urgente</option><option>Normal</option><option>Baixa</option></select></div></div><div class="fg"><div class="fl">Fornecedor (opcional)</div><input class="fi" placeholder="Nome do fornecedor"></div><div class="brow" style="justify-content:flex-end;margin-top:8px"><button class="btn btn-sm" onclick="closeM('m-compra')">Cancelar</button><button class="btn btn-p btn-sm" onclick="addCompra()">Adicionar</button></div></div></div>
+<div class="modal-bg" id="m-compra"><div class="modal" style="width:420px"><div class="modal-hdr"><div class="modal-title">Adicionar Item</div><button class="modal-x" onclick="closeM('m-compra')">×</button></div><div class="fg"><div class="fl">Item</div><input class="fi" id="mc-nome" placeholder="Ex: Farinha de trigo"></div><div class="fr2"><div class="fg"><div class="fl">Quantidade</div><input class="fi" id="mc-qty" placeholder="Ex: 2 sacos"></div><div class="fg"><div class="fl">Prioridade</div><select class="fi" id="mc-pri"><option>Urgente</option><option>Normal</option><option>Baixa</option></select></div></div><div class="fg"><div class="fl">Fornecedor (opcional)</div><input class="fi" id="mc-forn" placeholder="Nome do fornecedor"></div><div class="brow" style="justify-content:flex-end;margin-top:8px"><button class="btn btn-sm" onclick="closeM('m-compra')">Cancelar</button><button class="btn btn-p btn-sm" onclick="addCompra()">Adicionar</button></div></div></div>
 
-<div class="modal-bg" id="m-meta"><div class="modal" style="width:460px"><div class="modal-hdr"><div class="modal-title">Nova Meta</div><button class="modal-x" onclick="closeM('m-meta')">×</button></div><div class="fg"><div class="fl">Título</div><input class="fi" placeholder="Ex: Meta de faturamento de maio"></div><div class="fr2"><div class="fg"><div class="fl">Categoria</div><select class="fi"><option>💰 Financeiro</option><option>👥 Clientes</option><option>📦 Produtos</option><option>📢 Marketing</option><option>🏭 Produção</option></select></div><div class="fg"><div class="fl">Mês</div><input class="fi" type="month" id="input-mes-hoje"></div></div><div class="fr2"><div class="fg"><div class="fl">Meta (valor ou qtd)</div><input class="fi" placeholder="Ex: R$15.000 ou 10 clientes"></div><div class="fg"><div class="fl">Alcançado até agora</div><input class="fi" placeholder="Ex: R$5.000"></div></div><div class="fg"><div class="fl">Estratégia</div><textarea class="fi" placeholder="Como vai alcançar essa meta?"></textarea></div><div class="brow" style="justify-content:flex-end;margin-top:8px"><button class="btn btn-sm" onclick="closeM('m-meta')">Cancelar</button><button class="btn btn-p btn-sm" onclick="salvarM('m-meta','Meta cadastrada!')">Salvar</button></div></div></div>
+<div class="modal-bg" id="m-meta"><div class="modal" style="width:460px"><div class="modal-hdr"><div class="modal-title">Nova Meta</div><button class="modal-x" onclick="closeM('m-meta')">×</button></div><div class="fg"><div class="fl">Título</div><input class="fi" id="mm-titulo" placeholder="Ex: Meta de faturamento de maio"></div><div class="fr2"><div class="fg"><div class="fl">Categoria</div><select class="fi" id="mm-cat"><option>💰 Financeiro</option><option>👥 Clientes</option><option>📦 Produtos</option><option>📢 Marketing</option><option>🏭 Produção</option></select></div><div class="fg"><div class="fl">Mês</div><input class="fi" type="month" id="mm-mes"></div></div><div class="fr2"><div class="fg"><div class="fl">Meta (valor ou qtd)</div><input class="fi" id="mm-valor" placeholder="Ex: R$15.000 ou 10 clientes"></div><div class="fg"><div class="fl">Alcançado até agora</div><input class="fi" placeholder="Ex: R$5.000"></div></div><div class="fg"><div class="fl">Estratégia</div><textarea class="fi" placeholder="Como vai alcançar essa meta?"></textarea></div><div class="brow" style="justify-content:flex-end;margin-top:8px"><button class="btn btn-sm" onclick="closeM('m-meta')">Cancelar</button><button class="btn btn-p btn-sm" onclick="salvarM('m-meta','Meta cadastrada!')">Salvar</button></div></div></div>
 
-<div class="modal-bg" id="m-info"><div class="modal" style="width:440px"><div class="modal-hdr"><div class="modal-title">Informação Importante</div><button class="modal-x" onclick="closeM('m-info')">×</button></div><div class="fg"><div class="fl">Tipo</div><select class="fi"><option>⚠️ Alerta</option><option>💡 Dica</option><option>✅ Conquista</option><option>🎯 Oportunidade</option><option>📌 Lembrete</option></select></div><div class="fg"><div class="fl">Conteúdo</div><textarea class="fi" rows="3" placeholder="Escreva a informação importante..."></textarea></div><div class="fg"><div class="fl">Visível para</div><select class="fi"><option>Toda equipe</option><option>Somente gerentes</option><option>Somente eu</option></select></div><div class="brow" style="justify-content:flex-end;margin-top:8px"><button class="btn btn-sm" onclick="closeM('m-info')">Cancelar</button><button class="btn btn-p btn-sm" onclick="salvarM('m-info','Informação salva!')">Salvar</button></div></div></div>
+<div class="modal-bg" id="m-info"><div class="modal" style="width:440px"><div class="modal-hdr"><div class="modal-title">Informação Importante</div><button class="modal-x" onclick="closeM('m-info')">×</button></div><div class="fg"><div class="fl">Tipo</div><select class="fi" id="mi-tipo"><option>⚠️ Alerta</option><option>💡 Dica</option><option>✅ Conquista</option><option>🎯 Oportunidade</option><option>📌 Lembrete</option></select></div><div class="fg"><div class="fl">Conteúdo</div><textarea class="fi" id="mi-texto" rows="3" placeholder="Escreva a informação importante..."></textarea></div><div class="fg"><div class="fl">Visível para</div><select class="fi" id="mi-visivel"><option>Toda equipe</option><option>Somente gerentes</option><option>Somente eu</option></select></div><div class="brow" style="justify-content:flex-end;margin-top:8px"><button class="btn btn-sm" onclick="closeM('m-info')">Cancelar</button><button class="btn btn-p btn-sm" onclick="salvarInfo()">Salvar</button></div></div></div>
 
-<div class="modal-bg" id="m-direcao"><div class="modal" style="width:460px"><div class="modal-hdr"><div class="modal-title">Direcionamento do Mês</div><button class="modal-x" onclick="closeM('m-direcao')">×</button></div><div class="fg"><div class="fl">Foco principal</div><textarea class="fi" rows="3" placeholder="Qual o foco e objetivo principal deste mês?"></textarea></div><div class="fg"><div class="fl">Processos obrigatórios (um por linha)</div><textarea class="fi" rows="4" placeholder="Ex: Confirmar pedidos por WhatsApp até 8h&#10;Postar no Instagram 4x por semana..."></textarea></div><div class="fg"><div class="fl">Pontos de atenção</div><textarea class="fi" rows="3" placeholder="Alertas, riscos, situações para resolver..."></textarea></div><div class="brow" style="justify-content:flex-end;margin-top:8px"><button class="btn btn-sm" onclick="closeM('m-direcao')">Cancelar</button><button class="btn btn-p btn-sm" onclick="salvarM('m-direcao','Direcionamento salvo!')">Salvar</button></div></div></div>
+<div class="modal-bg" id="m-direcao"><div class="modal" style="width:460px"><div class="modal-hdr"><div class="modal-title">Direcionamento do Mês</div><button class="modal-x" onclick="closeM('m-direcao')">×</button></div><div class="fg"><div class="fl">Foco principal</div><textarea class="fi" rows="3" placeholder="Qual o foco e objetivo principal deste mês?"></textarea></div><div class="fg"><div class="fl">Processos obrigatórios (um por linha)</div><textarea class="fi" rows="4" placeholder="Ex: Confirmar pedidos por WhatsApp até 8h&#10;Postar no Instagram 4x por semana..."></textarea></div><div class="fg"><div class="fl">Pontos de atenção</div><textarea class="fi" rows="3" placeholder="Alertas, riscos, situações para resolver..."></textarea></div><div class="brow" style="justify-content:flex-end;margin-top:8px"><button class="btn btn-sm" onclick="closeM('m-direcao')">Cancelar</button><button class="btn btn-p btn-sm" onclick="salvarDirecao()">Salvar</button></div></div></div>
 
 <div class="modal-bg" id="m-forn"><div class="modal" style="width:420px"><div class="modal-hdr"><div class="modal-title">Novo Fornecedor</div><button class="modal-x" onclick="closeM('m-forn')">×</button></div><div class="fg"><div class="fl">Nome</div><input class="fi" placeholder="Nome do fornecedor"></div><div class="fr2"><div class="fg"><div class="fl">WhatsApp</div><input class="fi" placeholder="(11) 99999-9999"></div><div class="fg"><div class="fl">Categoria</div><select class="fi"><option>Embalagens</option><option>Matéria-prima</option><option>Equipamentos</option><option>Serviços</option><option>Outro</option></select></div></div><div class="fg"><div class="fl">Observações</div><textarea class="fi" rows="2" placeholder="Prazo, condições de pagamento, descontos..."></textarea></div><div class="brow" style="justify-content:flex-end;margin-top:8px"><button class="btn btn-sm" onclick="closeM('m-forn')">Cancelar</button><button class="btn btn-p btn-sm" onclick="salvarM('m-forn','Fornecedor cadastrado!')">Salvar</button></div></div></div>
 
@@ -1997,6 +1997,7 @@ function go(id) {
   document.getElementById('tb-right').innerHTML   = m.btns||'';
   // Render dinâmico por página
   if(id==='dashboard') setTimeout(renderDashboard, 50);
+  if(id==='tarefas') setTimeout(renderTarefas, 50);
   if(id==='estoque') setTimeout(renderEstoque, 50);
   if(id==='financeiro') setTimeout(renderFinanceiro, 50);
   if(id==='precificacao'){ setTimeout(()=>{ renderInsumos('calc'); calcPreco(); }, 50); }
@@ -2091,16 +2092,26 @@ function atualizarProg(){
   document.getElementById('prog-tot').textContent=tot;
 }
 function addTarefa(){
-  const txt=document.getElementById('mt-txt').value.trim();
+  const txt  = document.getElementById('mt-txt')?.value.trim();
+  const data = document.getElementById('mt-data')?.value || new Date().toISOString().split('T')[0];
+  const hora = document.getElementById('mt-hora')?.value || '';
+  const resp = document.getElementById('mt-resp')?.value || 'Proprietária';
+  const pri  = document.getElementById('mt-pri')?.value  || 'Alta';
   if(!txt){toast('Informe a descrição da tarefa!');return;}
-  const resp=document.getElementById('mt-resp').value;
-  const pri=document.getElementById('mt-pri').value;
-  const pc={Alta:'pr-a',Média:'pr-m',Baixa:'pr-b'}[pri];
-  const el=document.createElement('div');el.className='task';
-  el.innerHTML=`<div class="tchk" onclick="toggleTask(this)"></div><div style="flex:1"><div class="ttxt">${txt}</div><div style="font-size:11px;color:var(--cinza);margin-top:2px">Hoje · ${resp}</div></div><span class="tpr ${pc}">${pri}</span>`;
-  document.getElementById('task-list').appendChild(el);
+  if(!DB.tarefas) DB.tarefas=[];
+  if(!DB.nextId) DB.nextId={tarefa:1};
+  if(!DB.nextId.tarefa) DB.nextId.tarefa=1;
+  DB.tarefas.push({
+    id: DB.nextId.tarefa++,
+    txt, data, hora, resp, pri,
+    feita: false,
+    criado: new Date().toISOString()
+  });
+  salvarDados();
+  closeM('m-tarefa');
+  renderTarefas();
+  toast('✅ Tarefa adicionada!');
   document.getElementById('mt-txt').value='';
-  closeM('m-tarefa');atualizarProg();toast('✅ Tarefa adicionada!');
 }
 
 /* ══════════ COMPRAS ══════════ */
@@ -3324,6 +3335,78 @@ function renderDashboard(){
   if(elSai)  elSai.textContent  = fmtR(totalSai);
   if(elSaldo){ elSaldo.textContent = (saldo>=0?'+ ':'')+fmtR(saldo); elSaldo.style.color = saldo>=0?'var(--verde)':'var(--rubi)'; }
 }
+
+
+/* ══════════ RENDER TAREFAS ══════════ */
+function renderTarefas(){
+  const hoje = new Date().toISOString().split('T')[0];
+  const amanha = new Date(Date.now()+86400000).toISOString().split('T')[0];
+  const tarefas = DB.tarefas || [];
+
+  const hoje_list  = tarefas.filter(t=>t.data===hoje);
+  const amanha_list= tarefas.filter(t=>t.data===amanha);
+  const feitas     = hoje_list.filter(t=>t.feita).length;
+  const total      = hoje_list.length;
+  const pct        = total>0?Math.round(feitas/total*100):0;
+
+  // Progresso
+  const elPct = document.getElementById('prog-pct');
+  const elBar = document.getElementById('prog-bar');
+  const elSub = document.getElementById('prog-sub');
+  if(elPct) elPct.textContent = pct+'%';
+  if(elBar) elBar.style.width = pct+'%';
+  if(elSub) elSub.textContent = feitas+' de '+total+' tarefas';
+
+  // Lista de hoje
+  const taskList = document.getElementById('task-list');
+  if(taskList){
+    if(!hoje_list.length){
+      taskList.innerHTML='<div style="text-align:center;color:var(--cinza);padding:20px;font-size:13px">Nenhuma tarefa para hoje.<br>Clique em + Tarefa para começar.</div>';
+    } else {
+      const pc = {Alta:'pr-a',Média:'pr-m',Baixa:'pr-b'};
+      taskList.innerHTML = hoje_list.map(t=>`
+        <div class="task ${t.feita?'done':''}">
+          <div class="tchk ${t.feita?'done':''}" onclick="toggleTarefa(${t.id})" style="cursor:pointer"></div>
+          <div style="flex:1">
+            <div class="ttxt" style="${t.feita?'text-decoration:line-through;color:var(--cinza)':''}">${t.txt}</div>
+            <div style="font-size:11px;color:var(--cinza);margin-top:2px">${t.hora||'Hoje'} · ${t.resp}</div>
+          </div>
+          <span class="tpr ${pc[t.pri]||'pr-m'}">${t.pri}</span>
+          <button onclick="excluirTarefa(${t.id})" style="border:none;background:none;cursor:pointer;color:var(--cinza);font-size:14px;padding:4px">✕</button>
+        </div>`).join('');
+    }
+  }
+
+  // Lista de amanhã
+  const amanhaList = document.getElementById('amanha-list');
+  if(amanhaList){
+    if(!amanha_list.length){
+      amanhaList.innerHTML='<div id="amanha-list"><div style="text-align:center;color:var(--cinza);padding:14px;font-size:13px">Sem tarefas para amanhã</div></div>';
+    } else {
+      const pc = {Alta:'pr-a',Média:'pr-m',Baixa:'pr-b'};
+      amanhaList.innerHTML = amanha_list.map(t=>`
+        <div class="task">
+          <div style="flex:1">
+            <div class="ttxt">${t.txt}</div>
+            <div style="font-size:11px;color:var(--cinza);margin-top:2px">${t.hora||''} · ${t.resp}</div>
+          </div>
+          <span class="tpr ${pc[t.pri]||'pr-m'}">${t.pri}</span>
+        </div>`).join('');
+    }
+  }
+}
+
+window.toggleTarefa = function(id){
+  DB.tarefas = (DB.tarefas||[]).map(t=>t.id===id?{...t,feita:!t.feita}:t);
+  salvarDados();
+  renderTarefas();
+};
+
+window.excluirTarefa = function(id){
+  DB.tarefas = (DB.tarefas||[]).filter(t=>t.id!==id);
+  salvarDados();
+  renderTarefas();
+};
 
 // Inicia com tela de login — deploy forced
 buildLoginScreen();
