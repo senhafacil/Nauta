@@ -11873,12 +11873,17 @@ window.excluirCompra = function(id){
   salvarDados(); renderCompras();
 };
 
-// Deploy 1782925183
-buildLoginScreen();
-
-</script>
-</body>
-</html>
+// Deploy final - com error catching
+window.onerror = function(msg, src, line, col, err) {
+  console.error('JS Error:', msg, 'line:', line, 'col:', col);
+  document.title = 'ERRO JS: ' + msg.substring(0,50);
+};
+try {
+  buildLoginScreen();
+} catch(e) {
+  document.body.innerHTML = '<div style="padding:20px;font-family:monospace;background:red;color:white">' +
+    '<h2>Erro ao iniciar:</h2><pre>' + e.message + '</pre><pre>' + e.stack + '</pre></div>';
+}
 
 </script>
 </body>
