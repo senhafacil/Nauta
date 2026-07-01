@@ -544,35 +544,24 @@ textarea.fi{resize:vertical;min-height:70px}
 <!-- ══════════ FINANCEIRO ══════════ -->
 <div class="page" id="pg-financeiro">
   <div class="mrow">
-    <div class="mc mc-v"><div class="mc-lbl">Entradas</div><div class="mc-val" style="color:var(--verde)">R$0,00</div></div>
-    <div class="mc mc-r"><div class="mc-lbl">Saídas</div><div class="mc-val" style="color:var(--rubi)">R$0,00</div></div>
-    <div class="mc mc-t"><div class="mc-lbl">Lucro Líquido</div><div class="mc-val">R$0,00</div></div>
-    <div class="mc mc-d"><div class="mc-lbl">A Receber</div><div class="mc-val" style="color:var(--dourado)">R$0,00</div></div>
+    <div class="mc mc-v"><div class="mc-lbl">Entradas</div><div class="mc-val" style="color:var(--verde)" id="fin-entradas">R$0,00</div></div>
+    <div class="mc mc-r"><div class="mc-lbl">Saídas</div><div class="mc-val" style="color:var(--rubi)" id="fin-saidas">R$0,00</div></div>
+    <div class="mc mc-t"><div class="mc-lbl">Lucro Líquido</div><div class="mc-val" id="fin-lucro">R$0,00</div></div>
+    <div class="mc mc-d"><div class="mc-lbl">A Receber</div><div class="mc-val" style="color:var(--dourado)" id="fin-receber">R$0,00</div></div>
   </div>
   <div class="g2">
     <div class="card">
       <div class="card-t">Movimentações <div class="brow"><button class="btn btn-xs" onclick="openM('m-despesa')">+ Despesa</button><button class="btn btn-p btn-xs" onclick="openM('m-receita')">+ Receita</button></div></div>
-      <div style="text-align:center;color:var(--cinza);padding:20px;font-size:13px">Nenhuma movimentação registrada</div>
+      <div id="fin-lista"><div style="text-align:center;color:var(--cinza);padding:20px;font-size:13px">Nenhuma movimentação registrada</div></div>
     </div>
     <div class="card">
       <div class="card-t">Despesas por categoria</div>
-      <div style="display:flex;align-items:center;gap:18px">
-        <div class="rw"><svg width="100" height="100" viewBox="0 0 100 100"><circle cx="50" cy="50" r="38" fill="none" stroke="#EAE3D6" stroke-width="13"/><circle cx="50" cy="50" r="38" fill="none" stroke="#C17B4E" stroke-width="13" stroke-dasharray="89 150" stroke-dashoffset="0"/><circle cx="50" cy="50" r="38" fill="none" stroke="#F0DDD0" stroke-width="13" stroke-dasharray="75 164" stroke-dashoffset="-89"/><circle cx="50" cy="50" r="38" fill="none" stroke="#B8952A" stroke-width="13" stroke-dasharray="43 196" stroke-dashoffset="-164"/></svg><div class="rc"><div class="rv">R$3.2k</div><div class="rl">saídas</div></div></div>
-        <div class="dleg">
-          <div class="dli"><div class="dld" style="background:#C17B4E"></div>Aluguel (37%)</div>
-          <div class="dli"><div class="dld" style="background:#F0DDD0;border:1px solid var(--borda)"></div>Mat.-prima (31%)</div>
-          <div class="dli"><div class="dld" style="background:#B8952A"></div>Embalagens (18%)</div>
-          <div class="dli"><div class="dld" style="background:#EAE3D6;border:1px solid var(--borda)"></div>Outros (14%)</div>
-        </div>
-      </div>
+      <div id="fin-categorias" style="font-size:13px;color:var(--cinza)">Sem despesas ainda</div>
     </div>
   </div>
   <div class="card">
     <div class="card-t">Contas a receber</div>
-    <div class="tw"><table class="tbl"><thead><tr><th>#</th><th>Cliente</th><th>Produto</th><th>Vencimento</th><th>Valor</th><th>Status</th><th></th></tr></thead>
-    <tbody>
-      <tr><td colspan="7" style="text-align:center;color:var(--cinza);padding:16px;font-size:13px">Nenhuma conta a receber</td></tr>
-    </tbody></table></div>
+    <div id="fin-receber-lista"><div style="text-align:center;color:var(--cinza);padding:16px;font-size:13px">Nenhuma conta a receber</div></div>
   </div>
 </div>
 
@@ -1987,6 +1976,7 @@ function go(id) {
   document.getElementById('tb-right').innerHTML   = m.btns||'';
   // Render dinâmico por página
   if(id==='estoque') setTimeout(renderEstoque, 50);
+  if(id==='financeiro') setTimeout(renderFinanceiro, 50);
   if(id==='precificacao'){ setTimeout(()=>{ renderInsumos('calc'); calcPreco(); }, 50); }
 }
 
@@ -3006,6 +2996,7 @@ window.salvarReceita = function(){
   });
   salvarDados();
   closeM('m-receita');
+  renderFinanceiro();
   toast('✅ Receita registrada!');
   // Resetar campos
   document.getElementById('rec-desc').value='';
@@ -3032,10 +3023,96 @@ window.salvarDespesa = function(){
   });
   salvarDados();
   closeM('m-despesa');
+  renderFinanceiro();
   toast('✅ Despesa registrada!');
   document.getElementById('desp-desc').value='';
   document.getElementById('desp-valor').value='';
   document.getElementById('desp-data').value='';
+};
+
+
+/* ══════════ RENDER FINANCEIRO ══════════ */
+function renderFinanceiro(){
+  const fin = DB.financeiro || {entradas:[], saidas:[]};
+  const entradas = fin.entradas || [];
+  const saidas   = fin.saidas   || [];
+  
+  // Mês atual
+  const now = new Date();
+  const mes = now.getMonth();
+  const ano = now.getFullYear();
+  
+  const entradasMes = entradas.filter(e=>{
+    if(!e.data) return true;
+    const d = new Date(e.data);
+    return d.getMonth()===mes && d.getFullYear()===ano;
+  });
+  const saidasMes = saidas.filter(s=>{
+    if(!s.data) return true;
+    const d = new Date(s.data);
+    return d.getMonth()===mes && d.getFullYear()===ano;
+  });
+  
+  const totalEnt = entradasMes.reduce((a,e)=>a+(e.valor||0),0);
+  const totalSai = saidasMes.reduce((a,s)=>a+(s.valor||0),0);
+  const lucro    = totalEnt - totalSai;
+  
+  // Atualizar métricas
+  const fmtR = v=>'R$'+v.toFixed(2).replace('.',',');
+  const elE = document.getElementById('fin-entradas'); if(elE) elE.textContent = fmtR(totalEnt);
+  const elS = document.getElementById('fin-saidas');   if(elS) elS.textContent = fmtR(totalSai);
+  const elL = document.getElementById('fin-lucro');
+  if(elL){ elL.textContent = fmtR(lucro); elL.style.color = lucro>=0?'var(--verde)':'var(--rubi)'; }
+  
+  // Movimentações
+  const lista = document.getElementById('fin-lista');
+  if(lista){
+    const todas = [
+      ...entradasMes.map(e=>({...e,tipo:'receita'})),
+      ...saidasMes.map(s=>({...s,tipo:'despesa'}))
+    ].sort((a,b)=>new Date(b.data||b.criado||0)-new Date(a.data||a.criado||0));
+    
+    if(!todas.length){
+      lista.innerHTML='<div style="text-align:center;color:var(--cinza);padding:20px;font-size:13px">Nenhuma movimentação registrada</div>';
+    } else {
+      lista.innerHTML = todas.map(m=>`
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--cream2)">
+          <div style="width:32px;height:32px;border-radius:50%;background:${m.tipo==='receita'?'var(--verde-l)':'var(--rubi-l)'};display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">
+            ${m.tipo==='receita'?'↑':'↓'}
+          </div>
+          <div style="flex:1">
+            <div style="font-size:13px;font-weight:600;color:var(--carvao)">${m.desc||'Sem descrição'}</div>
+            <div style="font-size:11px;color:var(--cinza)">${m.data||''} ${m.forma||m.cat||''}</div>
+          </div>
+          <div style="font-size:14px;font-weight:700;color:${m.tipo==='receita'?'var(--verde)':'var(--rubi)'}">
+            ${m.tipo==='receita'?'+':'-'}${fmtR(m.valor||0)}
+          </div>
+          <button onclick="excluirMovimentacao('${m.tipo}',${m.id})" style="border:none;background:none;cursor:pointer;color:var(--cinza);font-size:16px;padding:4px">✕</button>
+        </div>`).join('');
+    }
+  }
+  
+  // Categorias de despesa
+  const cats = document.getElementById('fin-categorias');
+  if(cats && saidasMes.length){
+    const grupos = {};
+    saidasMes.forEach(s=>{ const c=s.cat||'Outro'; grupos[c]=(grupos[c]||0)+(s.valor||0); });
+    cats.innerHTML = Object.entries(grupos).sort((a,b)=>b[1]-a[1]).map(([c,v])=>`
+      <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--cream2);font-size:13px">
+        <span>${c}</span><span style="font-weight:600;color:var(--rubi)">${fmtR(v)}</span>
+      </div>`).join('');
+  } else if(cats){
+    cats.innerHTML='<div style="font-size:13px;color:var(--cinza);padding:12px 0">Sem despesas este mês</div>';
+  }
+}
+
+window.excluirMovimentacao = function(tipo, id){
+  if(!confirm('Excluir esta movimentação?')) return;
+  if(tipo==='receita') DB.financeiro.entradas = (DB.financeiro.entradas||[]).filter(e=>e.id!==id);
+  else DB.financeiro.saidas = (DB.financeiro.saidas||[]).filter(s=>s.id!==id);
+  salvarDados();
+  renderFinanceiro();
+  toast('Movimentação excluída');
 };
 
 // Inicia com tela de login — deploy forced
