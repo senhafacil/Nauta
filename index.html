@@ -341,7 +341,7 @@ textarea.fi{resize:vertical;min-height:70px}
 <!-- ══════════ DASHBOARD ══════════ -->
 <div class="page active" id="pg-dashboard">
   <div class="mrow">
-    <div class="mc mc-t"><div class="mc-lbl">Receita do Mês</div><div class="mc-val">R$0</div></div>
+    <div class="mc mc-t"><div class="mc-lbl">Receita do Mês</div><div class="mc-val" id="dash-receita">R$0</div></div>
     <div class="mc mc-v"><div class="mc-lbl" id="dash-lbl-pedidos">Pedidos Abertos</div><div class="mc-val">0</div></div>
     <div class="mc mc-d"><div class="mc-lbl" id="dash-lbl-clientes">Clientes Ativos</div><div class="mc-val">0</div></div>
     <div class="mc mc-r"><div class="mc-lbl">Ticket Médio</div><div class="mc-val">R$0</div></div>
@@ -1995,6 +1995,7 @@ function go(id) {
   document.getElementById('tb-sub').textContent   = m.sub||'';
   document.getElementById('tb-right').innerHTML   = m.btns||'';
   // Render dinâmico por página
+  if(id==='dashboard') setTimeout(renderDashboard, 50);
   if(id==='estoque') setTimeout(renderEstoque, 50);
   if(id==='financeiro') setTimeout(renderFinanceiro, 50);
   if(id==='precificacao'){ setTimeout(()=>{ renderInsumos('calc'); calcPreco(); }, 50); }
@@ -2455,6 +2456,7 @@ async function iniciarSistema(){
 
   // Topbar
   document.getElementById('tb-title').textContent = 'Bem-vinda, '+propNome.split(' ')[0]+'! 👋';
+  setTimeout(renderDashboard, 200);
 
   // Atualiza nome da proprietária nos funcionários
   atualizarFuncProprietaria(propNome);
@@ -2862,6 +2864,7 @@ window.fazerLoginNauta = async function(){
         if(sbn) sbn.textContent = nichoInfo.ico+' '+nichoInfo.nome;
       }
       document.getElementById('tb-title').textContent = 'Bem-vinda, '+propNome.split(' ')[0]+'! 👋';
+  setTimeout(renderDashboard, 200);
       atualizarFuncProprietaria(propNome);
       setSaveStatus('☁ Sincronizado');
       if(USUARIO_ADMIN){
@@ -3031,6 +3034,7 @@ window.salvarReceita = function(){
   salvarDados();
   closeM('m-receita');
   renderFinanceiro();
+  renderDashboard();
   toast('✅ Receita registrada!');
   // Resetar campos
   document.getElementById('rec-desc').value='';
@@ -3085,6 +3089,7 @@ window.salvarDespesa = function(){
   salvarDados();
   closeM('m-despesa');
   renderFinanceiro();
+  renderDashboard();
   toast('✅ Despesa registrada!');
   document.getElementById('desp-desc').value='';
   document.getElementById('desp-valor').value='';
@@ -3218,6 +3223,55 @@ window.excluirMovimentacao = function(tipo, id){
   renderFinanceiro();
   toast('Movimentação excluída');
 };
+
+
+/* ══════════ RENDER DASHBOARD ══════════ */
+function renderDashboard(){
+  const now = new Date();
+  const mes = now.getMonth();
+  const ano = now.getFullYear();
+  const fmtR = v=>'R$'+v.toFixed(2).replace('.',',');
+
+  // Receita do mês
+  const entradas = (DB.financeiro?.entradas||[]).filter(e=>{
+    if(!e.data) return false;
+    const d = new Date(e.data);
+    return d.getMonth()===mes && d.getFullYear()===ano;
+  });
+  const totalRec = entradas.reduce((a,e)=>a+(e.valor||0),0);
+  const elR = document.getElementById('dash-receita');
+  if(elR) elR.textContent = fmtR(totalRec);
+
+  // Pedidos abertos
+  const pedAbertos = (DB.pedidos||[]).filter(p=>p.status && !['entregue','cancelado','pago'].includes((p.status||'').toLowerCase())).length;
+  const elP = document.getElementById('dash-pedidos');
+  if(elP) elP.textContent = pedAbertos;
+
+  // Clientes ativos
+  const elC = document.getElementById('dash-clientes');
+  if(elC) elC.textContent = (DB.clientes||[]).length;
+
+  // Ticket médio
+  const pedFechados = (DB.pedidos||[]).filter(p=>p.valor_total||p.total);
+  const ticket = pedFechados.length ? pedFechados.reduce((a,p)=>a+parseFloat(p.valor_total||p.total||0),0)/pedFechados.length : 0;
+  const elT = document.getElementById('dash-ticket');
+  if(elT) elT.textContent = fmtR(ticket);
+
+  // Fluxo de caixa no dashboard
+  const saidas = (DB.financeiro?.saidas||[]).filter(s=>{
+    if(!s.data) return false;
+    const d = new Date(s.data);
+    return d.getMonth()===mes && d.getFullYear()===ano;
+  });
+  const totalSai = saidas.reduce((a,s)=>a+(s.valor||0),0);
+  const saldo = totalRec - totalSai;
+  const elEntr = document.getElementById('dash-entr');
+  const elSai  = document.getElementById('dash-sai');
+  const elSaldo = document.getElementById('dash-saldo');
+  if(elEntr) elEntr.textContent = fmtR(totalRec);
+  if(elSai)  elSai.textContent  = fmtR(totalSai);
+  if(elSaldo){ elSaldo.textContent = (saldo>=0?'+ ':'')+fmtR(saldo); elSaldo.style.color = saldo>=0?'var(--verde)':'var(--rubi)'; }
+}
 
 // Inicia com tela de login — deploy forced
 buildLoginScreen();
