@@ -3409,6 +3409,37 @@ window.excluirCompra = function(id){
   salvarDados(); renderCompras();
 };
 
+
+/* ══════════ ESTOQUE SAVE ══════════ */
+window.salvarItemEstoque = function(){
+  const nome  = document.getElementById('est-nome')?.value.trim();
+  const qtd   = parseFloat(document.getElementById('est-qtd')?.value)||0;
+  const min   = parseFloat(document.getElementById('est-min')?.value)||1;
+  const unid  = document.getElementById('est-unid')?.value||'un.';
+  const preco = parseFloat(document.getElementById('est-preco')?.value)||0;
+  const obs   = document.getElementById('est-obs')?.value.trim()||'';
+  if(!nome){ toast('Informe o nome do item!'); return; }
+  if(!DB.estoque) DB.estoque=[];
+  if(!DB.nextId.estoque) DB.nextId.estoque=1;
+  DB.estoque.push({id:DB.nextId.estoque++, nome, qtd, min, unid, preco, obs});
+  salvarDados();
+  closeM('m-estoque');
+  renderEstoque();
+  toast('✅ Item adicionado ao estoque!');
+};
+
+/* ══════════ DIRECAO SAVE ══════════ */
+window.salvarDirecao = function(){
+  const texto = document.getElementById('md-texto')?.value.trim()||'';
+  const procs = document.getElementById('md-processos')?.value.trim()||'';
+  if(!DB.direcao) DB.direcao={};
+  DB.direcao.texto = texto;
+  DB.direcao.processos = procs ? procs.split('\n').filter(p=>p.trim()) : [];
+  salvarDados();
+  closeM('m-direcao');
+  toast('🌟 Direcionamento salvo!');
+};
+
 // Deploy final - com error catching
 window.onerror = function(msg, src, line, col, err) {
   console.error('JS Error:', msg, 'line:', line, 'col:', col);
