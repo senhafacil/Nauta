@@ -620,7 +620,7 @@ textarea.fi{resize:vertical;min-height:70px}
     <div style="display:flex;flex-direction:column;gap:16px">
       <!-- DIRECIONAMENTO -->
       <div class="card">
-        <div class="card-t">🌟 Direcionamento do Mês <button class="btn btn-xs" onclick="openM('m-direcao')">+ Editar</button></div>
+        <div class="card-t">🌟 Direcionamento do Mês <button class="btn btn-xs" onclick="abrirEditarDirecao()">+ Editar</button></div>
         <div id="direcao-display" style="background:var(--cream);border-radius:var(--r);padding:13px;border-left:3px solid var(--terra);font-size:13px;color:var(--carvao2);line-height:1.7;margin-bottom:12px">
           Nenhum direcionamento cadastrado ainda.<br>Clique em <strong>+ Editar</strong> para adicionar o foco do mês.
         </div>
@@ -1958,7 +1958,10 @@ function buildCalendario(){
   // Dias do mês atual
   for(let d = 1; d <= diasNoMes; d++){
     const cls = d === diaHoje ? 'cd cd-td' : 'cd';
-    html += `<div class="${cls}">${d}</div>`;
+    const dataStr = `${ano}-${String(mes+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const evsDia = (DB.eventos||[]).filter(e=>e.data===dataStr);
+    const evHtml = evsDia.map(e=>`<div style="font-size:9px;background:var(--terra);color:#fff;border-radius:3px;padding:1px 3px;margin-top:2px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis" title="${e.titulo}">${e.tipo[0]} ${e.titulo}</div>`).join('');
+    html += `<div class="${cls}" onclick="abrirDiaCalendario('${dataStr}')" style="cursor:pointer;min-height:44px">${d}${evHtml}</div>`;
   }
   // Dias do próximo mês
   const total = primeiroDia + diasNoMes;
@@ -3441,31 +3444,65 @@ function salvarItemEstoque(){
 
 /* ══════════ DIRECAO SAVE ══════════ */
 
+
+function abrirEditarDirecao(){
+  const d = DB.direcao || {};
+  const el = document.getElementById('md-texto');
+  const ep = document.getElementById('md-processos');
+  const ea = document.getElementById('md-atencao');
+  if(el) el.value = d.texto||'';
+  if(ep) ep.value = (d.processos||[]).join('\n');
+  if(ea) ea.value = (d.atencao||[]).join('\n');
+  openM('m-direcao');
+}
 function renderDirecao(){
   const el = document.getElementById('direcao-display');
   if(!el) return;
   const d = DB.direcao || {};
-  if(!d.texto && (!d.processos || !d.processos.length)){
-    el.innerHTML = 'Nenhum direcionamento cadastrado ainda.<br>Clique em <strong>+ Editar</strong> para adicionar o foco do mês.';
+  if(!d.texto && (!d.processos||!d.processos.length) && (!d.atencao||!d.atencao.length)){
+    el.innerHTML = '<span style="color:var(--cinza);font-size:13px">Nenhum direcionamento cadastrado ainda. Clique em <strong>+ Editar</strong>.</span>';
     return;
   }
   let html = '';
-  if(d.texto){
-    html += '<div style="font-weight:600;color:var(--carvao);margin-bottom:8px">🎯 ' + d.texto + '</div>';
+  if(d.texto) html += '<div style="font-weight:600;color:var(--carvao);margin-bottom:10px;font-size:14px">🎯 '+d.texto+'</div>';
+  if(d.processos&&d.processos.length){
+    html += '<div style="font-size:11px;font-weight:700;color:var(--verde);text-transform:uppercase;margin-bottom:5px">✅ Processos</div>';
+    html += d.processos.map((p,i)=>'<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--cream2);font-size:13px"><span>'+p+'</span><button onclick="excluirProcesso('+i+')" style="border:none;background:none;cursor:pointer;color:var(--cinza);font-size:12px">✕</button></div>').join('');
   }
-  if(d.processos && d.processos.length){
-    html += '<div style="font-size:12px;font-weight:700;color:var(--cinza);margin-bottom:6px;text-transform:uppercase">Processos</div>';
-    html += d.processos.map(p => '<div style="padding:4px 0;border-bottom:1px solid var(--cream2)">✅ ' + p + '</div>').join('');
+  if(d.atencao&&d.atencao.length){
+    html += '<div style="font-size:11px;font-weight:700;color:var(--rubi);text-transform:uppercase;margin:10px 0 5px">⚠️ Pontos de Atenção</div>';
+    html += d.atencao.map((a,i)=>'<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--cream2);font-size:13px"><span>'+a+'</span><button onclick="excluirAtencao('+i+')" style="border:none;background:none;cursor:pointer;color:var(--cinza);font-size:12px">✕</button></div>').join('');
   }
   el.innerHTML = html;
 }
 
+function excluirProcesso(i){
+  if(!DB.direcao||!DB.direcao.processos) return;
+  DB.direcao.processos.splice(i,1);
+  salvarDados(); renderDirecao();
+}
+
+function excluirAtencao(i){
+  if(!DB.direcao||!DB.direcao.atencao) return;
+  DB.direcao.atencao.splice(i,1);
+  salvarDados(); renderDirecao();
+}
+
+function abrirDiaCalendario(dataStr){
+  // Preencher data no modal de evento
+  const evData = document.getElementById('ev-data');
+  if(evData) evData.value = dataStr;
+  openM('m-evento');
+}
+
 function salvarDirecao(){
-  const texto = document.getElementById('md-texto')?.value.trim()||'';
-  const procs = document.getElementById('md-processos')?.value.trim()||'';
+  const texto   = document.getElementById('md-texto')?.value.trim()||'';
+  const procs   = document.getElementById('md-processos')?.value.trim()||'';
+  const atencao = document.getElementById('md-atencao')?.value.trim()||'';
   if(!DB.direcao) DB.direcao={};
-  DB.direcao.texto = texto;
-  DB.direcao.processos = procs ? procs.split('\n').filter(p=>p.trim()) : [];
+  DB.direcao.texto    = texto;
+  DB.direcao.processos= procs   ? procs.split('\n').filter(p=>p.trim())   : [];
+  DB.direcao.atencao  = atencao ? atencao.split('\n').filter(a=>a.trim()) : [];
   salvarDados();
   closeM('m-direcao');
   renderDirecao();
