@@ -1604,7 +1604,7 @@ window.renderInsumos = renderInsumos;
 
 <div class="modal-bg" id="m-info"><div class="modal" style="width:440px"><div class="modal-hdr"><div class="modal-title">Informação Importante</div><button class="modal-x" onclick="closeM('m-info')">×</button></div><div class="fg"><div class="fl">Tipo</div><select class="fi" id="mi-tipo"><option>⚠️ Alerta</option><option>💡 Dica</option><option>✅ Conquista</option><option>🎯 Oportunidade</option><option>📌 Lembrete</option></select></div><div class="fg"><div class="fl">Conteúdo</div><textarea class="fi" id="mi-texto" rows="3" placeholder="Escreva a informação importante..."></textarea></div><div class="fg"><div class="fl">Visível para</div><select class="fi" id="mi-visivel"><option>Toda equipe</option><option>Somente gerentes</option><option>Somente eu</option></select></div><div class="brow" style="justify-content:flex-end;margin-top:8px"><button class="btn btn-sm" onclick="closeM('m-info')">Cancelar</button><button class="btn btn-p btn-sm" onclick="salvarInfo()">Salvar</button></div></div></div>
 
-<div class="modal-bg" id="m-direcao"><div class="modal" style="width:460px"><div class="modal-hdr"><div class="modal-title">Direcionamento do Mês</div><button class="modal-x" onclick="closeM('m-direcao')">×</button></div><div class="fg"><div class="fl">Foco principal</div><textarea class="fi" rows="3" placeholder="Qual o foco e objetivo principal deste mês?"></textarea></div><div class="fg"><div class="fl">Processos obrigatórios (um por linha)</div><textarea class="fi" rows="4" placeholder="Ex: Confirmar pedidos por WhatsApp até 8h&#10;Postar no Instagram 4x por semana..."></textarea></div><div class="fg"><div class="fl">Pontos de atenção</div><textarea class="fi" rows="3" placeholder="Alertas, riscos, situações para resolver..."></textarea></div><div class="brow" style="justify-content:flex-end;margin-top:8px"><button class="btn btn-sm" onclick="closeM('m-direcao')">Cancelar</button><button class="btn btn-p btn-sm" onclick="salvarDirecao()">Salvar</button></div></div></div>
+<div class="modal-bg" id="m-direcao"><div class="modal" style="width:460px"><div class="modal-hdr"><div class="modal-title">Direcionamento do Mês</div><button class="modal-x" onclick="closeM('m-direcao')">×</button></div><div class="fg"><div class="fl">Foco principal</div><textarea class="fi" id="md-texto" rows="3" placeholder="Qual o foco e objetivo principal deste mês?"></textarea></div><div class="fg"><div class="fl">Processos obrigatórios (um por linha)</div><textarea class="fi" id="md-processos" rows="4" placeholder="Ex: Confirmar pedidos por WhatsApp até 8h&#10;Postar no Instagram 4x por semana..."></textarea></div><div class="fg"><div class="fl">Pontos de atenção</div><textarea class="fi" id="md-atencao" rows="3" placeholder="Alertas, riscos, situações para resolver..."></textarea></div><div class="brow" style="justify-content:flex-end;margin-top:8px"><button class="btn btn-sm" onclick="closeM('m-direcao')">Cancelar</button><button class="btn btn-p btn-sm" onclick="salvarDirecao()">Salvar</button></div></div></div>
 
 <div class="modal-bg" id="m-forn"><div class="modal" style="width:420px"><div class="modal-hdr"><div class="modal-title">Novo Fornecedor</div><button class="modal-x" onclick="closeM('m-forn')">×</button></div><div class="fg"><div class="fl">Nome</div><input class="fi" placeholder="Nome do fornecedor"></div><div class="fr2"><div class="fg"><div class="fl">WhatsApp</div><input class="fi" placeholder="(11) 99999-9999"></div><div class="fg"><div class="fl">Categoria</div><select class="fi"><option>Embalagens</option><option>Matéria-prima</option><option>Equipamentos</option><option>Serviços</option><option>Outro</option></select></div></div><div class="fg"><div class="fl">Observações</div><textarea class="fi" rows="2" placeholder="Prazo, condições de pagamento, descontos..."></textarea></div><div class="brow" style="justify-content:flex-end;margin-top:8px"><button class="btn btn-sm" onclick="closeM('m-forn')">Cancelar</button><button class="btn btn-p btn-sm" onclick="salvarM('m-forn','Fornecedor cadastrado!')">Salvar</button></div></div></div>
 
@@ -2531,17 +2531,20 @@ async function supaGet(){
 async function supaSet(dados){
   if(!NEGOCIO_ID || SUPA_URL.includes('SEU_PROJETO')) return false;
   try{
-    // Tenta PATCH primeiro (linha já deve existir)
+    // Tenta PATCH - verifica se realmente atualizou alguma linha
     const r1 = await fetch(`${SUPA_URL}/rest/v1/${NAUTA_TABELA}?negocio_id=eq.${encodeURIComponent(NEGOCIO_ID)}`,{
       method:'PATCH',
-      headers:{...SUPA_HDR,'Prefer':'return=minimal'},
+      headers:{...SUPA_HDR,'Prefer':'return=representation','Content-Type':'application/json'},
       body: JSON.stringify({ dados, atualizado_em:new Date().toISOString() })
     });
-    if(r1.ok) return true;
-    // Fallback: INSERT (primeira vez ou linha não existe)
+    if(r1.ok){
+      const updated = await r1.json();
+      if(updated && updated.length > 0) return true;
+    }
+    // Linha não existe - faz INSERT
     const r2 = await fetch(`${SUPA_URL}/rest/v1/${NAUTA_TABELA}`,{
       method:'POST',
-      headers:{...SUPA_HDR,'Prefer':'return=minimal'},
+      headers:{...SUPA_HDR,'Prefer':'return=minimal','Content-Type':'application/json'},
       body: JSON.stringify({ negocio_id:NEGOCIO_ID, dados, atualizado_em:new Date().toISOString() })
     });
     return r2.ok;
@@ -2955,8 +2958,10 @@ window.salvarReceita = function(){
   });
   salvarDados();
   closeM('m-receita');
-  renderFinanceiro();
-  renderDashboard();
+  setTimeout(()=>{
+    if(document.getElementById('fin-lista')) renderFinanceiro();
+    renderDashboard();
+  }, 100);
   toast('✅ Receita registrada!');
   // Resetar campos
   document.getElementById('rec-desc').value='';
@@ -3048,8 +3053,10 @@ window.salvarDespesa = function(){
   });
   salvarDados();
   closeM('m-despesa');
-  renderFinanceiro();
-  renderDashboard();
+  setTimeout(()=>{
+    if(document.getElementById('fin-lista')) renderFinanceiro();
+    renderDashboard();
+  }, 100);
   toast('✅ Despesa registrada!');
   document.getElementById('desp-desc').value='';
   document.getElementById('desp-valor').value='';
