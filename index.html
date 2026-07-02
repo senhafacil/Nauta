@@ -621,8 +621,8 @@ textarea.fi{resize:vertical;min-height:70px}
       <!-- DIRECIONAMENTO -->
       <div class="card">
         <div class="card-t">🌟 Direcionamento do Mês <button class="btn btn-xs" onclick="openM('m-direcao')">+ Editar</button></div>
-        <div style="background:var(--cream);border-radius:var(--r);padding:13px;border-left:3px solid var(--terra);font-size:13px;color:var(--carvao2);line-height:1.7;margin-bottom:12px">
-          Nenhum direcionamento cadastrado ainda.<br>Clique em Editar para adicionar o foco do mês.
+        <div id="direcao-display" style="background:var(--cream);border-radius:var(--r);padding:13px;border-left:3px solid var(--terra);font-size:13px;color:var(--carvao2);line-height:1.7;margin-bottom:12px">
+          Nenhum direcionamento cadastrado ainda.<br>Clique em <strong>+ Editar</strong> para adicionar o foco do mês.
         </div>
 
         <div style="font-size:11px;font-weight:700;color:var(--verde);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">✅ Processos obrigatórios</div>
@@ -2000,7 +2000,7 @@ function go(id) {
   // Render dinâmico por página
   if(id==='dashboard') setTimeout(renderDashboard, 50);
   if(id==='tarefas') setTimeout(renderTarefas, 50);
-  if(id==='gestao'){setTimeout(()=>{renderMetas();renderInfos();},50);}
+  if(id==='gestao'){setTimeout(()=>{renderMetas();renderInfos();renderDirecao();},50);}
   if(id==='compras') setTimeout(renderCompras, 50);
   if(id==='estoque') setTimeout(renderEstoque, 50);
   if(id==='financeiro') setTimeout(renderFinanceiro, 50);
@@ -3434,6 +3434,26 @@ function salvarItemEstoque(){
 };
 
 /* ══════════ DIRECAO SAVE ══════════ */
+
+function renderDirecao(){
+  const el = document.getElementById('direcao-display');
+  if(!el) return;
+  const d = DB.direcao || {};
+  if(!d.texto && (!d.processos || !d.processos.length)){
+    el.innerHTML = 'Nenhum direcionamento cadastrado ainda.<br>Clique em <strong>+ Editar</strong> para adicionar o foco do mês.';
+    return;
+  }
+  let html = '';
+  if(d.texto){
+    html += '<div style="font-weight:600;color:var(--carvao);margin-bottom:8px">🎯 ' + d.texto + '</div>';
+  }
+  if(d.processos && d.processos.length){
+    html += '<div style="font-size:12px;font-weight:700;color:var(--cinza);margin-bottom:6px;text-transform:uppercase">Processos</div>';
+    html += d.processos.map(p => '<div style="padding:4px 0;border-bottom:1px solid var(--cream2)">✅ ' + p + '</div>').join('');
+  }
+  el.innerHTML = html;
+}
+
 function salvarDirecao(){
   const texto = document.getElementById('md-texto')?.value.trim()||'';
   const procs = document.getElementById('md-processos')?.value.trim()||'';
@@ -3442,6 +3462,7 @@ function salvarDirecao(){
   DB.direcao.processos = procs ? procs.split('\n').filter(p=>p.trim()) : [];
   salvarDados();
   closeM('m-direcao');
+  renderDirecao();
   toast('🌟 Direcionamento salvo!');
 };
 
