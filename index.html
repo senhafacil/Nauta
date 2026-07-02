@@ -1641,10 +1641,8 @@ window.renderInsumos = renderInsumos;
 <div id="toast"></div>
 
 <script>
-/* ══ DEBUG ══ */
-try {
-  console.log("Script2 iniciando...");
-} catch(e) { alert("Erro no inicio: " + e.message); }
+/* ══ DEBUG v2 ══ */
+console.log("Script2 v2 carregado");
 /* ══════════════════════════════════════════════════
    NICHO DEFINITIONS
 ══════════════════════════════════════════════════ */
@@ -2738,7 +2736,7 @@ function buildAdminScreen(){
   carregarListaNauta();
 }
 
-window.fazerLoginNauta = async function(){
+async function fazerLoginNauta(){
   const login = document.getElementById('nauta-login-user')?.value.trim();
   const senha  = document.getElementById('nauta-login-pass')?.value.trim();
   const err    = document.getElementById('nauta-login-err');
@@ -2805,19 +2803,19 @@ window.fazerLoginNauta = async function(){
   }
 };
 
-window.sairAdmin = function(){
+function sairAdmin(){
   document.getElementById('admin-screen')?.remove();
   NEGOCIO_ID=''; USUARIO_ADMIN=false;
   buildLoginScreen();
 };
 
-window.sairNauta = function(){
+function sairNauta(){
   if(!confirm('Sair da conta?')) return;
   NEGOCIO_ID=''; USUARIO_ADMIN=false;
   buildLoginScreen();
 };
 
-window.cadastrarMentoradaNauta = async function(){
+async function cadastrarMentoradaNauta(){
   const nome  = document.getElementById('adm-nome')?.value.trim();
   const login = document.getElementById('adm-login')?.value.trim().toLowerCase().replace(/\s/g,'');
   const senha = document.getElementById('adm-senha')?.value.trim();
@@ -2871,7 +2869,7 @@ async function carregarListaNauta(){
     </div>`).join('');
 }
 
-window.excluirMentoradaNauta = async function(login,nome){
+async function excluirMentoradaNauta(login,nome){
   if(!confirm('Excluir acesso de '+nome+'? Os dados dela também serão apagados.')) return;
   await fetch(`${SUPA_URL}/rest/v1/nauta_dados?negocio_id=eq.${login}`,{method:'DELETE',headers:SUPA_HDR});
   await fetch(`${SUPA_URL}/rest/v1/nauta_usuarios?login=eq.${login}`,{method:'DELETE',headers:SUPA_HDR});
@@ -2939,7 +2937,7 @@ window.filtroEstoque = function(f, btn){
 
 
 /* ══════════ FINANCEIRO SAVE ══════════ */
-window.salvarReceita = function(){
+function salvarReceita(){
   const desc  = document.getElementById('rec-desc')?.value.trim();
   const valor = parseFloat(document.getElementById('rec-valor')?.value)||0;
   const data  = document.getElementById('rec-data')?.value || new Date().toISOString().split('T')[0];
@@ -2969,7 +2967,7 @@ window.salvarReceita = function(){
   document.getElementById('rec-data').value='';
 };
 
-window.gerenciarCategorias = function(){
+function gerenciarCategorias(){
   let existing = document.getElementById('m-gerenciar-cats');
   if(existing) existing.remove();
   const s = document.getElementById('desp-cat');
@@ -2995,7 +2993,7 @@ window.gerenciarCategorias = function(){
 };
 
 
-window.excluirCategoria = function(nome){
+function excluirCategoria(nome){
   if(!confirm('Excluir categoria "'+nome+'"?')) return;
   // Remove do select
   const s = document.getElementById('desp-cat');
@@ -3007,13 +3005,13 @@ window.excluirCategoria = function(nome){
   toast('Categoria excluída!');
 };
 
-window.abrirNovaCategoria = function(){
+function abrirNovaCategoria(){
   const nova = document.getElementById('desp-cat-nova');
   if(nova) nova.style.display='block';
   setTimeout(()=>document.getElementById('desp-cat-input')?.focus(), 50);
 };
 
-window.salvarDespesa = function(){
+function salvarDespesa(){
   const desc  = document.getElementById('desp-desc')?.value.trim();
   const valor = parseFloat(document.getElementById('desp-valor')?.value)||0;
   const data  = document.getElementById('desp-data')?.value || new Date().toISOString().split('T')[0];
@@ -3173,7 +3171,7 @@ function renderFinanceiro(){
   }
 }
 
-window.excluirMovimentacao = function(tipo, id){
+function excluirMovimentacao(tipo, id){
   if(!confirm('Excluir esta movimentação?')) return;
   if(tipo==='receita') DB.financeiro.entradas = (DB.financeiro.entradas||[]).filter(e=>e.id!==id);
   else DB.financeiro.saidas = (DB.financeiro.saidas||[]).filter(s=>s.id!==id);
@@ -3291,13 +3289,13 @@ function renderTarefas(){
   }
 }
 
-window.toggleTarefa = function(id){
+function toggleTarefa(id){
   DB.tarefas = (DB.tarefas||[]).map(t=>t.id===id?{...t,feita:!t.feita}:t);
   salvarDados();
   renderTarefas();
 };
 
-window.excluirTarefa = function(id){
+function excluirTarefa(id){
   DB.tarefas = (DB.tarefas||[]).filter(t=>t.id!==id);
   salvarDados();
   renderTarefas();
@@ -3305,7 +3303,7 @@ window.excluirTarefa = function(id){
 
 
 /* ══════════ METAS ══════════ */
-window.salvarMeta = function(){
+function salvarMeta(){
   const titulo = document.getElementById('mm-titulo')?.value.trim();
   const cat    = document.getElementById('mm-cat')?.value||'💰 Financeiro';
   const mes    = document.getElementById('mm-mes')?.value||new Date().toISOString().slice(0,7);
@@ -3342,13 +3340,13 @@ function renderMetas(){
   }).join('');
 }
 
-window.excluirMeta = function(id){
+function excluirMeta(id){
   DB.metas=(DB.metas||[]).filter(m=>m.id!==id);
   salvarDados(); renderMetas();
 };
 
 /* ══════════ INFORMAÇÕES ══════════ */
-window.salvarInfo = function(){
+function salvarInfo(){
   const tipo   = document.getElementById('mi-tipo')?.value||'💡 Dica';
   const texto  = document.getElementById('mi-texto')?.value.trim();
   const visivel= document.getElementById('mi-visivel')?.value||'Toda equipe';
@@ -3380,7 +3378,7 @@ function renderInfos(){
     </div>`).join('');
 }
 
-window.excluirInfo = function(id){
+function excluirInfo(id){
   DB.informacoes=(DB.informacoes||[]).filter(i=>i.id!==id);
   salvarDados(); renderInfos();
 };
@@ -3406,19 +3404,19 @@ function renderCompras(){
   atualizarCompras();
 }
 
-window.toggleCompraDB = function(id, feito){
+function toggleCompraDB(id, feito){
   DB.compras=(DB.compras||[]).map(c=>c.id===id?{...c,feito}:c);
   salvarDados(); renderCompras();
 };
 
-window.excluirCompra = function(id){
+function excluirCompra(id){
   DB.compras=(DB.compras||[]).filter(c=>c.id!==id);
   salvarDados(); renderCompras();
 };
 
 
 /* ══════════ ESTOQUE SAVE ══════════ */
-window.salvarItemEstoque = function(){
+function salvarItemEstoque(){
   const nome  = document.getElementById('est-nome')?.value.trim();
   const qtd   = parseFloat(document.getElementById('est-qtd')?.value)||0;
   const min   = parseFloat(document.getElementById('est-min')?.value)||1;
@@ -3436,7 +3434,7 @@ window.salvarItemEstoque = function(){
 };
 
 /* ══════════ DIRECAO SAVE ══════════ */
-window.salvarDirecao = function(){
+function salvarDirecao(){
   const texto = document.getElementById('md-texto')?.value.trim()||'';
   const procs = document.getElementById('md-processos')?.value.trim()||'';
   if(!DB.direcao) DB.direcao={};
@@ -3449,7 +3447,7 @@ window.salvarDirecao = function(){
 
 
 /* ══════════ EVENTO SAVE ══════════ */
-window.salvarEvento = function(){
+function salvarEvento(){
   const titulo = document.getElementById('ev-titulo')?.value.trim();
   const data   = document.getElementById('ev-data')?.value || new Date().toISOString().split('T')[0];
   const hora   = document.getElementById('ev-hora')?.value || '';
@@ -3468,13 +3466,13 @@ window.salvarEvento = function(){
 };
 
 /* ══════════ ESTOQUE ACTIONS ══════════ */
-window.atualizarQtdEstoque = function(id, qtd){
+function atualizarQtdEstoque(id, qtd){
   DB.estoque = (DB.estoque||[]).map(i => i.id===id ? {...i, qtd:parseFloat(qtd)||0} : i);
   salvarDados();
   renderEstoque();
 };
 
-window.excluirEstoque = function(id){
+function excluirEstoque(id){
   if(!confirm('Excluir este item do estoque?')) return;
   DB.estoque = (DB.estoque||[]).filter(i => i.id !== id);
   salvarDados();
@@ -3482,7 +3480,7 @@ window.excluirEstoque = function(id){
   toast('Item removido do estoque');
 };
 
-window.filtroEstoque = function(tipo){
+function filtroEstoque(tipo){
   const btns = document.querySelectorAll('.est-f-btn');
   btns.forEach(b => b.classList.remove('on'));
   event?.target?.classList?.add('on');
