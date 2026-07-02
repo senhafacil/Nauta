@@ -1594,7 +1594,7 @@ window.renderInsumos = renderInsumos;
   </div>
 </div>
 
-<div class="modal-bg" id="m-evento"><div class="modal" style="width:440px"><div class="modal-hdr"><div class="modal-title">Novo Evento</div><button class="modal-x" onclick="closeM('m-evento')">×</button></div><div class="fg"><div class="fl">Título</div><input class="fi" placeholder="Ex: Entrega pedido — Nome da cliente"></div><div class="fr2"><div class="fg"><div class="fl">Data</div><input class="fi" type="date" id="input-data-hoje"></div><div class="fg"><div class="fl">Horário</div><input class="fi" type="time"></div></div><div class="fr2"><div class="fg"><div class="fl">Tipo</div><select class="fi"><option>Entrega</option><option>Retirada</option><option>Reunião</option><option>Compra</option><option>Aniversário</option><option>Gestão</option></select></div><div class="fg"><div class="fl">Responsável</div><select class="fi"><option>Proprietária</option></select></div></div><div class="fg"><div class="fl">Detalhes</div><textarea class="fi" rows="2" placeholder="Informações adicionais..."></textarea></div><div class="brow" style="justify-content:flex-end;margin-top:8px"><button class="btn btn-sm" onclick="closeM('m-evento')">Cancelar</button><button class="btn btn-p btn-sm" onclick="salvarM('m-evento','Evento adicionado!')">Salvar</button></div></div></div>
+<div class="modal-bg" id="m-evento"><div class="modal" style="width:440px"><div class="modal-hdr"><div class="modal-title">Novo Evento</div><button class="modal-x" onclick="closeM('m-evento')">×</button></div><div class="fg"><div class="fl">Título</div><input class="fi" id="ev-titulo" placeholder="Ex: Entrega pedido — Nome da cliente"></div><div class="fr2"><div class="fg"><div class="fl">Data</div><input class="fi" type="date" id="ev-data"></div><div class="fg"><div class="fl">Horário</div><input class="fi" type="time" id="ev-hora"></div></div><div class="fr2"><div class="fg"><div class="fl">Tipo</div><select class="fi" id="ev-tipo"><option>Entrega</option><option>Retirada</option><option>Reunião</option><option>Compra</option><option>Aniversário</option><option>Gestão</option></select></div><div class="fg"><div class="fl">Responsável</div><select class="fi" id="ev-resp"><option>Proprietária</option></select></div></div><div class="fg"><div class="fl">Detalhes</div><textarea class="fi" id="ev-detalhe" rows="2" placeholder="Informações adicionais..."></textarea></div><div class="brow" style="justify-content:flex-end;margin-top:8px"><button class="btn btn-sm" onclick="closeM('m-evento')">Cancelar</button><button class="btn btn-p btn-sm" onclick="salvarEvento()">Salvar</button></div></div></div>
 
 <div class="modal-bg" id="m-tarefa"><div class="modal" style="width:440px"><div class="modal-hdr"><div class="modal-title">Nova Tarefa</div><button class="modal-x" onclick="closeM('m-tarefa')">×</button></div><div class="fg"><div class="fl">Descrição da tarefa</div><textarea class="fi" id="mt-txt" rows="2" placeholder="O que precisa ser feito?"></textarea></div><div class="fr2"><div class="fg"><div class="fl">Data</div><input class="fi" type="date" id="mt-data"></div><div class="fg"><div class="fl">Horário</div><input class="fi" type="time" id="mt-hora"></div></div><div class="fr2"><div class="fg"><div class="fl">Para quem</div><select class="fi" id="mt-resp"><option>Proprietária</option></select></div><div class="fg"><div class="fl">Prioridade</div><select class="fi" id="mt-pri"><option>Alta</option><option>Média</option><option>Baixa</option></select></div></div><div class="brow" style="justify-content:flex-end;margin-top:8px"><button class="btn btn-sm" onclick="closeM('m-tarefa')">Cancelar</button><button class="btn btn-p btn-sm" onclick="addTarefa()">Adicionar</button></div></div></div>
 
@@ -3445,6 +3445,50 @@ window.salvarDirecao = function(){
   salvarDados();
   closeM('m-direcao');
   toast('🌟 Direcionamento salvo!');
+};
+
+
+/* ══════════ EVENTO SAVE ══════════ */
+window.salvarEvento = function(){
+  const titulo = document.getElementById('ev-titulo')?.value.trim();
+  const data   = document.getElementById('ev-data')?.value || new Date().toISOString().split('T')[0];
+  const hora   = document.getElementById('ev-hora')?.value || '';
+  const tipo   = document.getElementById('ev-tipo')?.value || 'Entrega';
+  const resp   = document.getElementById('ev-resp')?.value || 'Proprietária';
+  const detalhe= document.getElementById('ev-detalhe')?.value.trim() || '';
+  if(!titulo){ toast('Informe o título do evento!'); return; }
+  if(!DB.eventos) DB.eventos = [];
+  if(!DB.nextId.evento) DB.nextId.evento = 1;
+  DB.eventos.push({ id:DB.nextId.evento++, titulo, data, hora, tipo, resp, detalhe, criado:new Date().toISOString() });
+  salvarDados();
+  closeM('m-evento');
+  buildCalendario();
+  toast('📅 Evento adicionado!');
+  document.getElementById('ev-titulo').value = '';
+};
+
+/* ══════════ ESTOQUE ACTIONS ══════════ */
+window.atualizarQtdEstoque = function(id, qtd){
+  DB.estoque = (DB.estoque||[]).map(i => i.id===id ? {...i, qtd:parseFloat(qtd)||0} : i);
+  salvarDados();
+  renderEstoque();
+};
+
+window.excluirEstoque = function(id){
+  if(!confirm('Excluir este item do estoque?')) return;
+  DB.estoque = (DB.estoque||[]).filter(i => i.id !== id);
+  salvarDados();
+  renderEstoque();
+  toast('Item removido do estoque');
+};
+
+window.filtroEstoque = function(tipo){
+  const btns = document.querySelectorAll('.est-f-btn');
+  btns.forEach(b => b.classList.remove('on'));
+  event?.target?.classList?.add('on');
+  const lista = document.getElementById('est-lista');
+  if(!lista) return;
+  renderEstoque(tipo);
 };
 
 // Deploy final - com error catching
