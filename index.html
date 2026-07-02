@@ -3552,7 +3552,7 @@ function renderDirecao(){
     return;
   }
   let html = '';
-  if(d.texto) html += '<div style="font-weight:600;color:var(--carvao);margin-bottom:10px;font-size:14px">🎯 '+d.texto+'</div>';
+  if(d.texto) html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><div style="font-weight:600;color:var(--carvao);font-size:14px">🎯 '+d.texto+'</div><button onclick="excluirFoco()" style="border:none;background:none;cursor:pointer;color:var(--cinza);font-size:13px">✕</button></div>';
   if(d.processos&&d.processos.length){
     html += '<div style="font-size:11px;font-weight:700;color:var(--verde);text-transform:uppercase;margin-bottom:5px">✅ Processos</div>';
     html += d.processos.map((p,i)=>'<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--cream2);font-size:13px"><span>'+p+'</span><button onclick="excluirProcesso('+i+')" style="border:none;background:none;cursor:pointer;color:var(--cinza);font-size:12px">✕</button></div>').join('');
@@ -3562,6 +3562,12 @@ function renderDirecao(){
     html += d.atencao.map((a,i)=>'<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--cream2);font-size:13px"><span>'+a+'</span><button onclick="excluirAtencao('+i+')" style="border:none;background:none;cursor:pointer;color:var(--cinza);font-size:12px">✕</button></div>').join('');
   }
   el.innerHTML = html;
+}
+
+function excluirFoco(){
+  if(!DB.direcao) return;
+  DB.direcao.texto='';
+  salvarDados(); renderDirecao();
 }
 
 function excluirProcesso(i){
