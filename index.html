@@ -2529,22 +2529,26 @@ async function supaGet(){
 async function supaSet(dados){
   if(!NEGOCIO_ID || SUPA_URL.includes('SEU_PROJETO')) return false;
   try{
-    // Tenta PATCH - verifica se realmente atualizou alguma linha
-    const r1 = await fetch(`${SUPA_URL}/rest/v1/${NAUTA_TABELA}?negocio_id=eq.${encodeURIComponent(NEGOCIO_ID)}`,{
-      method:'PATCH',
-      headers:{...SUPA_HDR,'Prefer':'return=representation','Content-Type':'application/json'},
-      body: JSON.stringify({ dados, atualizado_em:new Date().toISOString() })
-    });
+    const payload = { dados, atualizado_em: new Date().toISOString() };
+    // PATCH com count=exact para saber se atualizou sem precisar de SELECT
+    const r1 = await fetch(
+      `${SUPA_URL}/rest/v1/${NAUTA_TABELA}?negocio_id=eq.${encodeURIComponent(NEGOCIO_ID)}`,
+      { method:'PATCH',
+        headers:{...SUPA_HDR,'Prefer':'count=exact','Content-Type':'application/json'},
+        body: JSON.stringify(payload) }
+    );
     if(r1.ok){
-      const updated = await r1.json();
-      if(updated && updated.length > 0) return true;
+      // content-range: 0-0/1 = atualizou 1 linha; */0 = nenhuma linha
+      const range = r1.headers.get('content-range') || '';
+      if(!range.endsWith('/0') && range !== '') return true;
     }
-    // Linha não existe - faz INSERT
-    const r2 = await fetch(`${SUPA_URL}/rest/v1/${NAUTA_TABELA}`,{
-      method:'POST',
-      headers:{...SUPA_HDR,'Prefer':'return=minimal','Content-Type':'application/json'},
-      body: JSON.stringify({ negocio_id:NEGOCIO_ID, dados, atualizado_em:new Date().toISOString() })
-    });
+    // Nenhuma linha encontrada - faz INSERT
+    const r2 = await fetch(
+      `${SUPA_URL}/rest/v1/${NAUTA_TABELA}`,
+      { method:'POST',
+        headers:{...SUPA_HDR,'Prefer':'return=minimal','Content-Type':'application/json'},
+        body: JSON.stringify({ negocio_id:NEGOCIO_ID, ...payload }) }
+    );
     return r2.ok;
   }catch(e){ return false; }
 }
