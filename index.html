@@ -410,7 +410,7 @@ textarea.fi{resize:vertical;min-height:70px}
     <div class="card">
       <div class="card-t"><span id="cal-hoje-titulo">Hoje</span> <button class="btn btn-p btn-xs" onclick="openM('m-evento')">+ Evento</button></div>
       <div class="ev-list">
-        
+        <div id="agenda-hoje-lista"></div>
         <div style="text-align:center;color:var(--cinza);padding:14px;font-size:13px" id="agenda-empty">Nenhum evento hoje</div>
         
         
@@ -2002,6 +2002,7 @@ function go(id) {
   document.getElementById('tb-right').innerHTML   = m.btns||'';
   // Render dinâmico por página
   if(id==='dashboard') setTimeout(renderDashboard, 50);
+  if(id==='agenda'){ setTimeout(()=>{buildCalendario();renderAgenda();},50); }
   if(id==='tarefas') setTimeout(renderTarefas, 50);
   if(id==='gestao'){setTimeout(()=>{renderMetas();renderInfos();renderDirecao();},50);}
   if(id==='compras') setTimeout(renderCompras, 50);
@@ -3455,6 +3456,93 @@ function abrirEditarDirecao(){
   if(ea) ea.value = (d.atencao||[]).join('\n');
   openM('m-direcao');
 }
+
+function renderAgenda(){
+  const hoje = getTodayISO();
+  const eventos = (DB.eventos||[]).sort((a,b)=>a.data.localeCompare(b.data));
+  
+  // Eventos de hoje
+  const evHoje = eventos.filter(e=>e.data===hoje);
+  const listaHoje = document.getElementById('agenda-hoje-lista');
+  const emptyMsg = document.getElementById('agenda-empty');
+  if(listaHoje){
+    if(evHoje.length){
+      if(emptyMsg) emptyMsg.style.display='none';
+      listaHoje.innerHTML = evHoje.map(e=>`
+        <div style="display:flex;align-items:center;gap:10px;padding:10px;border-radius:var(--r);background:var(--cream);margin-bottom:6px">
+          <div style="width:36px;height:36px;border-radius:50%;background:var(--terra);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0">${e.hora||'--'}</div>
+          <div style="flex:1">
+            <div style="font-size:13px;font-weight:600">${e.titulo}</div>
+            <div style="font-size:11px;color:var(--cinza)">${e.tipo} · ${e.resp}</div>
+          </div>
+          <div style="display:flex;gap:6px">
+            <button onclick="editarEvento(${e.id})" style="border:none;background:none;cursor:pointer;color:var(--terra);font-size:13px">✏️</button>
+            <button onclick="excluirEvento(${e.id})" style="border:none;background:none;cursor:pointer;color:var(--cinza);font-size:13px">✕</button>
+          </div>
+        </div>`).join('');
+    } else {
+      if(emptyMsg) emptyMsg.style.display='block';
+      listaHoje.innerHTML = '';
+    }
+  } else if(emptyMsg){
+    // fallback: substituir o empty msg
+    if(evHoje.length){
+      emptyMsg.style.display='none';
+      const div = document.createElement('div');
+      div.id = 'agenda-hoje-lista';
+      emptyMsg.parentNode.insertBefore(div, emptyMsg);
+      renderAgenda();
+      return;
+    }
+  }
+  
+  // Próximos eventos (após hoje)
+  const proximos = eventos.filter(e=>e.data>hoje).slice(0,10);
+  const tblBody = document.getElementById('agenda-proximos');
+  if(tblBody){
+    tblBody.innerHTML = proximos.length ? proximos.map(e=>`
+      <tr>
+        <td>${e.data.split('-').reverse().join('/')}</td>
+        <td>${e.hora||'—'}</td>
+        <td style="font-weight:600">${e.titulo}</td>
+        <td><span class="bp bp-d" style="font-size:10px">${e.tipo}</span></td>
+        <td>${e.resp}</td>
+        <td>
+          <button onclick="editarEvento(${e.id})" style="border:none;background:none;cursor:pointer;color:var(--terra);font-size:12px">✏️</button>
+          <button onclick="excluirEvento(${e.id})" style="border:none;background:none;cursor:pointer;color:var(--cinza);font-size:12px">✕</button>
+        </td>
+      </tr>`).join('') 
+      : '<tr><td colspan="6" style="text-align:center;color:var(--cinza);padding:16px">Nenhum evento cadastrado</td></tr>';
+  }
+}
+
+function editarEvento(id){
+  const ev = (DB.eventos||[]).find(e=>e.id===id);
+  if(!ev) return;
+  // Preencher modal
+  const fields = {
+    'ev-titulo': ev.titulo, 'ev-data': ev.data,
+    'ev-hora': ev.hora||'', 'ev-tipo': ev.tipo,
+    'ev-resp': ev.resp, 'ev-detalhe': ev.detalhe||''
+  };
+  Object.entries(fields).forEach(([id,val])=>{
+    const el = document.getElementById(id);
+    if(el) el.value = val;
+  });
+  // Guardar id para atualizar em vez de criar
+  window._editandoEventoId = id;
+  openM('m-evento');
+}
+
+function excluirEvento(id){
+  if(!confirm('Excluir este evento?')) return;
+  DB.eventos = (DB.eventos||[]).filter(e=>e.id!==id);
+  salvarDados();
+  renderAgenda();
+  buildCalendario();
+  toast('Evento excluído!');
+}
+
 function renderDirecao(){
   const el = document.getElementById('direcao-display');
   if(!el) return;
@@ -3512,20 +3600,29 @@ function salvarDirecao(){
 
 /* ══════════ EVENTO SAVE ══════════ */
 function salvarEvento(){
-  const titulo = document.getElementById('ev-titulo')?.value.trim();
-  const data   = document.getElementById('ev-data')?.value || new Date().toISOString().split('T')[0];
-  const hora   = document.getElementById('ev-hora')?.value || '';
-  const tipo   = document.getElementById('ev-tipo')?.value || 'Entrega';
-  const resp   = document.getElementById('ev-resp')?.value || 'Proprietária';
-  const detalhe= document.getElementById('ev-detalhe')?.value.trim() || '';
+  const titulo  = document.getElementById('ev-titulo')?.value.trim();
+  const data    = document.getElementById('ev-data')?.value || getTodayISO();
+  const hora    = document.getElementById('ev-hora')?.value || '';
+  const tipo    = document.getElementById('ev-tipo')?.value || 'Entrega';
+  const resp    = document.getElementById('ev-resp')?.value || 'Proprietária';
+  const detalhe = document.getElementById('ev-detalhe')?.value.trim() || '';
   if(!titulo){ toast('Informe o título do evento!'); return; }
   if(!DB.eventos) DB.eventos = [];
+  if(!DB.nextId) DB.nextId = {};
   if(!DB.nextId.evento) DB.nextId.evento = 1;
-  DB.eventos.push({ id:DB.nextId.evento++, titulo, data, hora, tipo, resp, detalhe, criado:new Date().toISOString() });
+  const editId = window._editandoEventoId;
+  if(editId){
+    DB.eventos = DB.eventos.map(e=>e.id===editId?{...e,titulo,data,hora,tipo,resp,detalhe}:e);
+    window._editandoEventoId = null;
+    toast('📅 Evento atualizado!');
+  } else {
+    DB.eventos.push({ id:DB.nextId.evento++, titulo, data, hora, tipo, resp, detalhe, criado:new Date().toISOString() });
+    toast('📅 Evento adicionado!');
+  }
   salvarDados();
   closeM('m-evento');
   buildCalendario();
-  toast('📅 Evento adicionado!');
+  renderAgenda();
   document.getElementById('ev-titulo').value = '';
 };
 
