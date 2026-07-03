@@ -3769,6 +3769,7 @@ function salvarCliente(){
   ['cli-nome','cli-fone','cli-end','cli-obs'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
 }
 
+// v1783120506
 // Deploy final - com error catching
 window.onerror = function(msg, src, line, col, err) {
   console.error('JS Error:', msg, 'line:', line, 'col:', col);
