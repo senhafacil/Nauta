@@ -1557,25 +1557,25 @@ window.renderInsumos = renderInsumos;
   <div class="modal">
     <div class="modal-hdr"><div class="modal-title">Novo Pedido</div><button class="modal-x" onclick="closeM('m-pedido')">×</button></div>
     <div class="fr2">
-      <div class="fg"><div class="fl" id="mp-lbl-cli">Cliente</div><select class="fi"><option>Selecione...</option><option>+ Nova cliente</option></select></div>
-      <div class="fg"><div class="fl">Responsável</div><select class="fi"><option>Proprietária</option></select></div>
+      <div class="fg"><div class="fl" id="mp-lbl-cli">Cliente</div><select class="fi" id="mp-cliente"><option>Selecione...</option><option>+ Nova cliente</option></select></div>
+      <div class="fg"><div class="fl">Responsável</div><select class="fi" id="mp-resp"><option>Proprietária</option></select></div>
     </div>
     <div class="fr2">
-      <div class="fg"><div class="fl">Data do pedido</div><input class="fi" type="date" id="input-data-hoje"></div>
-      <div class="fg"><div class="fl" id="mp-lbl-ent">Data de entrega</div><input class="fi" type="date"></div>
+      <div class="fg"><div class="fl">Data do pedido</div><input class="fi" type="date" id="mp-data"></div>
+      <div class="fg"><div class="fl" id="mp-lbl-ent">Data de entrega</div><input class="fi" type="date" id="mp-entrega"></div>
     </div>
     <div class="fg"><div class="fl" id="mp-lbl-prod">Produto / Serviço</div><input class="fi" id="mp-prod" placeholder="Descreva o produto ou serviço"></div>
     <!-- NICHO FIELDS INJETADOS AQUI -->
     <div id="mp-nicho-fields"></div>
     <div class="fr2">
-      <div class="fg"><div class="fl">Valor total (R$)</div><input class="fi" type="number" step="0.01" placeholder="0,00"></div>
-      <div class="fg"><div class="fl">Sinal recebido (R$)</div><input class="fi" type="number" step="0.01" placeholder="0,00"></div>
+      <div class="fg"><div class="fl">Valor total (R$)</div><input class="fi" type="number" id="mp-valor" step="0.01" placeholder="0,00"></div>
+      <div class="fg"><div class="fl">Sinal recebido (R$)</div><input class="fi" type="number" id="mp-sinal" step="0.01" placeholder="0,00"></div>
     </div>
-    <div class="fg"><div class="fl">Pagamento do sinal</div><select class="fi"><option>Pix</option><option>Dinheiro</option><option>Débito</option><option>Crédito 1x</option></select></div>
+    <div class="fg"><div class="fl">Pagamento do sinal</div><select class="fi" id="mp-pagto"><option>Pix</option><option>Dinheiro</option><option>Débito</option><option>Crédito 1x</option></select></div>
     <div class="fg"><div class="fl">Observações</div><textarea class="fi" id="mp-obs" placeholder="Detalhes importantes..."></textarea></div>
     <div class="brow" style="justify-content:flex-end;margin-top:8px">
       <button class="btn btn-sm" onclick="closeM('m-pedido')">Cancelar</button>
-      <button class="btn btn-p btn-sm" onclick="salvarM('m-pedido','Pedido registrado com sucesso!')">Salvar pedido</button>
+      <button class="btn btn-p btn-sm" onclick="salvarPedido()">Salvar pedido</button>
     </div>
   </div>
 </div>
@@ -3702,6 +3702,44 @@ function filtroEstoque(tipo){
 };
 
 // Deploy 1782997138
+
+/* ══════════ PEDIDOS SAVE ══════════ */
+function salvarPedido(){
+  const cliente  = document.getElementById('mp-cliente')?.value || '';
+  const resp     = document.getElementById('mp-resp')?.value || 'Proprietária';
+  const data     = document.getElementById('mp-data')?.value || getTodayISO();
+  const entrega  = document.getElementById('mp-entrega')?.value || '';
+  const produto  = document.getElementById('mp-prod')?.value.trim() || '';
+  const valor    = parseFloat(document.getElementById('mp-valor')?.value)||0;
+  const sinal    = parseFloat(document.getElementById('mp-sinal')?.value)||0;
+  const pagto    = document.getElementById('mp-pagto')?.value || 'Pix';
+  const obs      = document.getElementById('mp-obs')?.value.trim() || '';
+  
+  if(!produto){ toast('Informe o produto/serviço!'); return; }
+  if(!DB.pedidos) DB.pedidos = [];
+  if(!DB.nextId) DB.nextId = {};
+  if(!DB.nextId.pedido) DB.nextId.pedido = 1;
+  
+  DB.pedidos.push({
+    id: DB.nextId.pedido++,
+    cliente, resp, data, entrega, produto,
+    valor_total: valor, sinal, pagto, obs,
+    status: 'Novo',
+    criado: new Date().toISOString()
+  });
+  
+  salvarDados();
+  closeM('m-pedido');
+  toast('✅ Pedido registrado!');
+  // Atualizar dashboard
+  renderDashboard && renderDashboard();
+  // Limpar campos
+  ['mp-prod','mp-obs','mp-valor','mp-sinal'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.value='';
+  });
+}
+
 // Deploy final - com error catching
 window.onerror = function(msg, src, line, col, err) {
   console.error('JS Error:', msg, 'line:', line, 'col:', col);
