@@ -2014,10 +2014,10 @@ function go(id) {
 /* ══════════ MODAIS ══════════ */
 function openM(id){
   document.getElementById(id).classList.add('open');
-  // Pré-preencher data de hoje nos modais de tarefa e evento
+  // Pré-preencher data com hoje quando abre modal
   if(id==='m-tarefa'){
     const dt=document.getElementById('mt-data');
-    if(dt&&!dt.value) dt.value=getTodayISO();
+    if(dt) dt.value=getTodayISO();
   }
   if(id==='m-evento'){
     const de=document.getElementById('ev-data');
@@ -2131,6 +2131,10 @@ function addTarefa(){
   renderTarefas();
   toast('✅ Tarefa adicionada!');
   document.getElementById('mt-txt').value='';
+  const dtField = document.getElementById('mt-data');
+  if(dtField) dtField.value='';
+  const hrField = document.getElementById('mt-hora');
+  if(hrField) hrField.value='';
 }
 
 /* ══════════ COMPRAS ══════════ */
