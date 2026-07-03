@@ -1588,24 +1588,24 @@ window.renderInsumos = renderInsumos;
   <div class="modal">
     <div class="modal-hdr"><div class="modal-title">Nova Cliente</div><button class="modal-x" onclick="closeM('m-cliente')">×</button></div>
     <div class="fr2">
-      <div class="fg"><div class="fl">Nome completo</div><input class="fi" placeholder="Maria da Silva"></div>
-      <div class="fg"><div class="fl">WhatsApp</div><input class="fi" placeholder="(11) 99999-9999"></div>
+      <div class="fg"><div class="fl">Nome completo</div><input class="fi" id="cli-nome" placeholder="Maria da Silva"></div>
+      <div class="fg"><div class="fl">WhatsApp</div><input class="fi" id="cli-fone" placeholder="(11) 99999-9999"></div>
     </div>
     <div class="fr2">
-      <div class="fg"><div class="fl">Aniversário</div><input class="fi" type="date"></div>
-      <div class="fg"><div class="fl">Como conheceu</div><select class="fi"><option>Selecione...</option><option>Instagram</option><option>WhatsApp</option><option>Indicação</option><option>Google</option><option>TikTok</option><option>Evento/Feira</option><option>Outro</option></select></div>
+      <div class="fg"><div class="fl">Aniversário</div><input class="fi" id="cli-nasc" type="date"></div>
+      <div class="fg"><div class="fl">Como conheceu</div><select class="fi" id="cli-origem"><option>Selecione...</option><option>Instagram</option><option>WhatsApp</option><option>Indicação</option><option>Google</option><option>TikTok</option><option>Evento/Feira</option><option>Outro</option></select></div>
     </div>
-    <div class="fg"><div class="fl">Endereço</div><input class="fi" placeholder="Rua, número, bairro, cidade/UF"></div>
-    <div class="fg"><div class="fl" id="mc-obs-lbl">Observações / Alergias</div><textarea class="fi" placeholder="Restrições, preferências..."></textarea></div>
+    <div class="fg"><div class="fl">Endereço</div><input class="fi" id="cli-end" placeholder="Rua, número, bairro, cidade/UF"></div>
+    <div class="fg"><div class="fl" id="mc-obs-lbl">Observações / Alergias</div><textarea class="fi" id="cli-obs" placeholder="Restrições, preferências..."></textarea></div>
     <!-- nicho extra -->
     <div id="mc-nicho-fields"></div>
     <div class="fr2">
-      <div class="fg"><div class="fl">Classificação</div><select class="fi"><option>Cliente comum</option><option>VIP</option><option>Atacado</option></select></div>
-      <div class="fg"><div class="fl">Pgto preferido</div><select class="fi"><option>Sem preferência</option><option>Pix</option><option>Cartão</option><option>Dinheiro</option></select></div>
+      <div class="fg"><div class="fl">Classificação</div><select class="fi" id="cli-tipo"><option>Cliente comum</option><option>VIP</option><option>Atacado</option></select></div>
+      <div class="fg"><div class="fl">Pgto preferido</div><select class="fi" id="cli-pgto"><option>Sem preferência</option><option>Pix</option><option>Cartão</option><option>Dinheiro</option></select></div>
     </div>
     <div class="brow" style="justify-content:flex-end;margin-top:8px">
       <button class="btn btn-sm" onclick="closeM('m-cliente')">Cancelar</button>
-      <button class="btn btn-p btn-sm" onclick="salvarM('m-cliente','Cliente cadastrada!')">Salvar</button>
+      <button class="btn btn-p btn-sm" onclick="salvarCliente()">Salvar</button>
     </div>
   </div>
 </div>
@@ -3168,26 +3168,31 @@ function renderFinanceiro(){
     }
   }
   
-  // Contas a receber (pedidos com status "a receber" ou "pendente")
+  // Contas a receber: receitas futuras + pedidos pendentes
   const recLista = document.getElementById('fin-receber-lista');
   if(recLista){
-    const pedidos = DB.pedidos || [];
-    const aReceber = pedidos.filter(p => 
-      p.status && (p.status.toLowerCase().includes('receber') || 
-      p.status.toLowerCase().includes('pendente') ||
-      p.status.toLowerCase().includes('produção') ||
-      p.status.toLowerCase().includes('aguard'))
-    );
-    const totalRec = aReceber.reduce((a,p)=>a+(parseFloat(p.valor_total||p.total||0)),0);
+    const hoje2 = new Date().toISOString().split('T')[0];
+    // Receitas com data futura
+    const receitasFuturas = (DB.financeiro?.entradas||[]).filter(e=>e.data && e.data>hoje2);
+    // Pedidos em aberto (não entregue/cancelado)
+    const pedidosAbertos = (DB.pedidos||[]).filter(p=>p.status&&!['entregue','cancelado','pago'].includes((p.status||'').toLowerCase()));
+    
+    const totalRec = receitasFuturas.reduce((a,e)=>a+(e.valor||0),0) +
+                     pedidosAbertos.reduce((a,p)=>a+(parseFloat(p.valor_total||0)),0);
     const elRec = document.getElementById('fin-receber');
     if(elRec) elRec.textContent = fmtR(totalRec);
-    
-    if(!aReceber.length){
+
+    if(!receitasFuturas.length && !pedidosAbertos.length){
       recLista.innerHTML='<div style="text-align:center;color:var(--cinza);padding:16px;font-size:13px">Nenhuma conta a receber</div>';
     } else {
-      recLista.innerHTML=`<div class="tw"><table class="tbl"><thead><tr><th>#</th><th>Cliente</th><th>Produto</th><th>Valor</th><th>Status</th></tr></thead><tbody>
-      ${aReceber.map(p=>'<tr><td>'+(p.id||'-')+'</td><td>'+(p.cliente||p.nome_cliente||'-')+'</td><td>'+(p.produto||p.nome_produto||'-')+'</td><td style="font-weight:600;color:var(--dourado)">'+fmtR(parseFloat(p.valor_total||p.total||0))+'</td><td><span class="bp bp-d" style="font-size:10px">'+(p.status||'-')+'</span></td></tr>').join('')}
-      </tbody></table></div>`;
+      let rows = '';
+      receitasFuturas.forEach(e=>{
+        rows += '<tr><td>—</td><td>'+e.desc+'</td><td>'+e.data+'</td><td style="font-weight:600;color:var(--dourado)">'+fmtR(e.valor)+'</td><td><span style="font-size:10px;background:var(--cream2);padding:2px 6px;border-radius:4px">Receita futura</span></td></tr>';
+      });
+      pedidosAbertos.forEach(p=>{
+        rows += '<tr><td>#'+p.id+'</td><td>'+(p.cliente||'—')+'</td><td>'+(p.produto||'—')+'</td><td style="font-weight:600;color:var(--dourado)">'+fmtR(parseFloat(p.valor_total||0))+'</td><td><span style="font-size:10px;background:var(--cream2);padding:2px 6px;border-radius:4px">'+(p.status||'Novo')+'</span></td></tr>';
+      });
+      recLista.innerHTML='<div class="tw"><table class="tbl"><thead><tr><th>#</th><th>Descrição/Cliente</th><th>Data/Produto</th><th>Valor</th><th>Status</th></tr></thead><tbody>'+rows+'</tbody></table></div>';
     }
   }
 
@@ -3742,6 +3747,26 @@ function salvarPedido(){
     const el=document.getElementById(id);
     if(el) el.value='';
   });
+}
+
+
+function salvarCliente(){
+  const nome   = document.getElementById('cli-nome')?.value.trim();
+  const fone   = document.getElementById('cli-fone')?.value.trim()||'';
+  const nasc   = document.getElementById('cli-nasc')?.value||'';
+  const origem = document.getElementById('cli-origem')?.value||'';
+  const end    = document.getElementById('cli-end')?.value.trim()||'';
+  const obs    = document.getElementById('cli-obs')?.value.trim()||'';
+  const tipo   = document.getElementById('cli-tipo')?.value||'Cliente comum';
+  const pgto   = document.getElementById('cli-pgto')?.value||'Sem preferência';
+  if(!nome){ toast('Informe o nome da cliente!'); return; }
+  if(!DB.clientes) DB.clientes=[];
+  if(!DB.nextId.cliente) DB.nextId.cliente=1;
+  DB.clientes.push({ id:DB.nextId.cliente++, nome, fone, nasc, origem, end, obs, tipo, pgto, criado:new Date().toISOString() });
+  salvarDados();
+  closeM('m-cliente');
+  toast('✅ Cliente cadastrada!');
+  ['cli-nome','cli-fone','cli-end','cli-obs'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
 }
 
 // Deploy final - com error catching
