@@ -3300,20 +3300,411 @@ function renderTarefas(){
     }
   }
 
-  // Lista de amanhã + próximos dias
+  // Lista de amanhã
   const amanhaList = document.getElementById('amanha-list');
   if(amanhaList){
-    const pc = {Alta:'pr-a',Média:'pr-m',Baixa:'pr-b'};
-    const proximas = tarefas.filter(t=>t.data>=amanha && !t.feita);
-    if(!proximas.length){
-      amanhaList.innerHTML='<div style="text-align:center;color:var(--cinza);padding:14px;font-size:13px">Sem tarefas para os próximos dias</div>';
+    if(!amanha_list.length){
+      amanhaList.innerHTML='<div id="amanha-list"><div style="text-align:center;color:var(--cinza);padding:14px;font-size:13px">Sem tarefas para amanhã</div></div>';
     } else {
-      const grupos = {};
-      proximas.forEach(t=>{ if(!grupos[t.data]) grupos[t.data]=[]; grupos[t.data].push(t); });
-      amanhaList.innerHTML = Object.entries(grupos).sort(([a],[b])=>a.localeCompare(b)).map(([data,ts])=>{
-        const label = data===amanha?'📅 Amanhã':new Date(data+'T12:00:00').toLocaleDateString('pt-BR',{weekday:'short',day:'2-digit',month:'2-digit'});
-        return '<div style="font-size:11px;font-weight:700;color:var(--cinza);margin:8px 0 4px;text-transform:uppercase">'+label+'</div>'+
-          ts.map(t=>'<div class="task"><div style="flex:1"><div class="ttxt">'+t.txt+'</div><div style="font-size:11px;color:var(--cinza);margin-top:2px">'+(t.hora||'')+' · '+t.resp+'</div></div><span class="tpr '+(pc[t.pri]||'pr-m')+'">'+t.pri+'</span><button onclick="excluirTarefa('+t.id+')" style="border:none;background:none;cursor:pointer;color:var(--cinza);font-size:13px">✕</button></div>').join('');
-      }).join('');
+      const pc = {Alta:'pr-a',Média:'pr-m',Baixa:'pr-b'};
+      amanhaList.innerHTML = amanha_list.map(t=>`
+        <div class="task">
+          <div style="flex:1">
+            <div class="ttxt">${t.txt}</div>
+            <div style="font-size:11px;color:var(--cinza);margin-top:2px">${t.hora||''} · ${t.resp}</div>
+          </div>
+          <span class="tpr ${pc[t.pri]||'pr-m'}">${t.pri}</span>
+        </div>`).join('');
     }
-  }>
+  }
+}
+
+function toggleTarefa(id){
+  DB.tarefas = (DB.tarefas||[]).map(t=>t.id===id?{...t,feita:!t.feita}:t);
+  salvarDados();
+  renderTarefas();
+};
+
+function excluirTarefa(id){
+  DB.tarefas = (DB.tarefas||[]).filter(t=>t.id!==id);
+  salvarDados();
+  renderTarefas();
+};
+
+
+/* ══════════ METAS ══════════ */
+function salvarMeta(){
+  const titulo = document.getElementById('mm-titulo')?.value.trim();
+  const cat    = document.getElementById('mm-cat')?.value||'💰 Financeiro';
+  const mes    = document.getElementById('mm-mes')?.value||new Date().toISOString().slice(0,7);
+  const valor  = document.getElementById('mm-valor')?.value.trim()||'';
+  if(!titulo){alert('Informe o título da meta');return;}
+  if(!DB.metas) DB.metas=[];
+  if(!DB.nextId.meta) DB.nextId.meta=1;
+  DB.metas.push({id:DB.nextId.meta++, titulo, cat, mes, valor, progresso:0, criado:new Date().toISOString()});
+  salvarDados();
+  closeM('m-meta');
+  renderMetas();
+  toast('🎯 Meta cadastrada!');
+  document.getElementById('mm-titulo').value='';
+  document.getElementById('mm-valor').value='';
+};
+
+function renderMetas(){
+  const lista = document.getElementById('metas-lista');
+  if(!lista) return;
+  const metas = DB.metas||[];
+  if(!metas.length){
+    lista.innerHTML='<div style="text-align:center;color:var(--cinza);padding:20px;font-size:13px">Nenhuma meta cadastrada</div>';
+    return;
+  }
+  lista.innerHTML = metas.map(m=>{
+    const valorHtml = m.valor ? '<div style="font-size:12px;color:var(--terra);font-weight:600">Meta: '+m.valor+'</div>' : '';
+    return '<div style="padding:12px;border:1px solid var(--borda);border-radius:var(--r);margin-bottom:8px">'+
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">'+
+      '<div style="font-size:13px;font-weight:600">'+m.titulo+'</div>'+
+      '<div style="display:flex;gap:6px;align-items:center">'+
+      '<span style="font-size:11px;color:var(--cinza)">'+m.cat+' · '+m.mes+'</span>'+
+      '<button onclick="excluirMeta('+m.id+')" style="border:none;background:none;cursor:pointer;color:var(--cinza);font-size:13px">✕</button>'+
+      '</div></div>'+valorHtml+'</div>';
+  }).join('');
+}
+
+function excluirMeta(id){
+  DB.metas=(DB.metas||[]).filter(m=>m.id!==id);
+  salvarDados(); renderMetas();
+};
+
+/* ══════════ INFORMAÇÕES ══════════ */
+function salvarInfo(){
+  const tipo   = document.getElementById('mi-tipo')?.value||'💡 Dica';
+  const texto  = document.getElementById('mi-texto')?.value.trim();
+  const visivel= document.getElementById('mi-visivel')?.value||'Toda equipe';
+  if(!texto){alert('Escreva o conteúdo da informação');return;}
+  if(!DB.informacoes) DB.informacoes=[];
+  DB.informacoes.push({id:Date.now(), tipo, texto, visivel, criado:new Date().toISOString()});
+  salvarDados();
+  closeM('m-info');
+  renderInfos();
+  toast('📌 Informação salva!');
+  document.getElementById('mi-texto').value='';
+};
+
+function renderInfos(){
+  const lista = document.getElementById('infos-lista');
+  if(!lista) return;
+  const infos = DB.informacoes||[];
+  if(!infos.length){
+    lista.innerHTML='<div style="text-align:center;color:var(--cinza);padding:20px;font-size:13px">Nenhuma informação cadastrada</div>';
+    return;
+  }
+  lista.innerHTML = infos.slice().reverse().map(i=>`
+    <div style="padding:10px 12px;border-left:3px solid var(--terra);background:var(--cream);border-radius:0 var(--r) var(--r) 0;margin-bottom:8px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+        <span style="font-size:11px;font-weight:700;color:var(--terra)">${i.tipo}</span>
+        <button onclick="excluirInfo(${i.id})" style="border:none;background:none;cursor:pointer;color:var(--cinza);font-size:13px">✕</button>
+      </div>
+      <div style="font-size:13px;color:var(--carvao)">${i.texto}</div>
+    </div>`).join('');
+}
+
+function excluirInfo(id){
+  DB.informacoes=(DB.informacoes||[]).filter(i=>i.id!==id);
+  salvarDados(); renderInfos();
+};
+
+/* ══════════ COMPRAS ══════════ */
+function renderCompras(){
+  const lista = document.getElementById('compra-list');
+  if(!lista) return;
+  const compras = DB.compras||[];
+  if(!compras.length){
+    lista.innerHTML='<div style="text-align:center;color:var(--cinza);padding:20px;font-size:13px">Lista vazia. Clique em + Item para adicionar.</div>';
+    atualizarCompras(); return;
+  }
+  const pc={Urgente:'pr-a',Normal:'pr-m',Baixa:'pr-b'};
+  lista.innerHTML = compras.map(c=>`
+    <div class="comp-item">
+      <input type="checkbox" class="comp-chk" ${c.feito?'checked':''} onchange="toggleCompraDB(${c.id},this.checked)">
+      <div class="comp-name" style="${c.feito?'text-decoration:line-through;color:var(--cinza)':''}">${c.nome}</div>
+      <div class="comp-qty">${c.qty||'—'}</div>
+      <span class="comp-pri ${pc[c.pri]||'pr-m'}">${c.pri}</span>
+      <button onclick="excluirCompra(${c.id})" style="border:none;background:none;cursor:pointer;color:var(--cinza);font-size:13px;margin-left:4px">✕</button>
+    </div>`).join('');
+  atualizarCompras();
+}
+
+function toggleCompraDB(id, feito){
+  DB.compras=(DB.compras||[]).map(c=>c.id===id?{...c,feito}:c);
+  salvarDados(); renderCompras();
+};
+
+function excluirCompra(id){
+  DB.compras=(DB.compras||[]).filter(c=>c.id!==id);
+  salvarDados(); renderCompras();
+};
+
+
+/* ══════════ ESTOQUE SAVE ══════════ */
+function salvarItemEstoque(){
+  const nome  = document.getElementById('est-nome')?.value.trim();
+  const qtd   = parseFloat(document.getElementById('est-qtd')?.value)||0;
+  const min   = parseFloat(document.getElementById('est-min')?.value)||1;
+  const unid  = document.getElementById('est-unid')?.value||'un.';
+  const preco = parseFloat(document.getElementById('est-preco')?.value)||0;
+  const obs   = document.getElementById('est-obs')?.value.trim()||'';
+  if(!nome){ toast('Informe o nome do item!'); return; }
+  if(!DB.estoque) DB.estoque=[];
+  if(!DB.nextId.estoque) DB.nextId.estoque=1;
+  DB.estoque.push({id:DB.nextId.estoque++, nome, qtd, min, unid, preco, obs});
+  salvarDados();
+  closeM('m-estoque');
+  renderEstoque();
+  toast('✅ Item adicionado ao estoque!');
+};
+
+/* ══════════ DIRECAO SAVE ══════════ */
+
+
+function abrirEditarDirecao(){
+  const d = DB.direcao || {};
+  const el = document.getElementById('md-texto');
+  const ep = document.getElementById('md-processos');
+  const ea = document.getElementById('md-atencao');
+  if(el) el.value = d.texto||'';
+  if(ep) ep.value = (d.processos||[]).join('\n');
+  if(ea) ea.value = (d.atencao||[]).join('\n');
+  openM('m-direcao');
+}
+
+function renderAgenda(){
+  const hoje = getTodayISO();
+  const eventos = (DB.eventos||[]).sort((a,b)=>a.data.localeCompare(b.data));
+  
+  // Eventos de hoje
+  const evHoje = eventos.filter(e=>e.data===hoje);
+  const listaHoje = document.getElementById('agenda-hoje-lista');
+  const emptyMsg = document.getElementById('agenda-empty');
+  if(listaHoje){
+    if(evHoje.length){
+      if(emptyMsg) emptyMsg.style.display='none';
+      listaHoje.innerHTML = evHoje.map(e=>{
+        const status = e.status||'pendente';
+        const statusCor = status==='finalizado'?'var(--verde)':status==='cancelado'?'var(--rubi)':'var(--terra)';
+        const bgCard = status==='finalizado'?'var(--verde-l)':status==='cancelado'?'var(--rubi-l)':'var(--cream)';
+        const statusLabel = status==='finalizado'?'✅ Finalizado':status==='cancelado'?'❌ Cancelado':'⏳ Pendente';
+        return `
+        <div style="display:flex;align-items:center;gap:10px;padding:10px;border-radius:var(--r);background:${bgCard};margin-bottom:6px;opacity:${status==='cancelado'?'0.7':'1'}">
+          <div style="width:36px;height:36px;border-radius:50%;background:${statusCor};color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0">${e.hora||'--'}</div>
+          <div style="flex:1">
+            <div style="font-size:13px;font-weight:600;${status==='cancelado'?'text-decoration:line-through':''}">${e.titulo}</div>
+            <div style="font-size:11px;color:var(--cinza)">${e.tipo} · ${e.resp} · <span style="color:${statusCor};font-weight:600">${statusLabel}</span></div>
+          </div>
+          <div style="display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end">
+            ${status!=='finalizado'?`<button onclick="setStatusEvento(${e.id},'finalizado')" style="padding:3px 7px;border-radius:6px;border:none;background:var(--verde);color:#fff;font-size:10px;cursor:pointer;font-weight:600">✅ Finalizado</button>`:''}
+            ${status!=='cancelado'?`<button onclick="setStatusEvento(${e.id},'cancelado')" style="padding:3px 7px;border-radius:6px;border:none;background:var(--rubi);color:#fff;font-size:10px;cursor:pointer;font-weight:600">❌ Cancelar</button>`:''}
+            ${status!=='pendente'?`<button onclick="setStatusEvento(${e.id},'pendente')" style="padding:3px 7px;border-radius:6px;border:none;background:var(--cinza);color:#fff;font-size:10px;cursor:pointer;font-weight:600">↩ Reabrir</button>`:''}
+            <button onclick="editarEvento(${e.id})" style="border:none;background:none;cursor:pointer;color:var(--terra);font-size:13px">✏️</button>
+            <button onclick="excluirEvento(${e.id})" style="border:none;background:none;cursor:pointer;color:var(--cinza);font-size:13px">✕</button>
+          </div>
+        </div>`;
+      }).join('');
+    } else {
+      if(emptyMsg) emptyMsg.style.display='block';
+      listaHoje.innerHTML = '';
+    }
+  } else if(emptyMsg){
+    if(evHoje.length){
+      emptyMsg.style.display='none';
+      const div = document.createElement('div');
+      div.id = 'agenda-hoje-lista';
+      emptyMsg.parentNode.insertBefore(div, emptyMsg);
+      renderAgenda();
+      return;
+    }
+  }
+  
+  // Próximos eventos (após hoje)
+  const proximos = eventos.filter(e=>e.data>hoje).slice(0,10);
+  const tblBody = document.getElementById('agenda-proximos');
+  if(tblBody){
+    tblBody.innerHTML = proximos.length ? proximos.map(e=>`
+      <tr>
+        <td>${e.data.split('-').reverse().join('/')}</td>
+        <td>${e.hora||'—'}</td>
+        <td style="font-weight:600">${e.titulo}</td>
+        <td><span class="bp bp-d" style="font-size:10px">${e.tipo}</span></td>
+        <td>${e.resp}</td>
+        <td>
+          <button onclick="editarEvento(${e.id})" style="border:none;background:none;cursor:pointer;color:var(--terra);font-size:12px">✏️</button>
+          <button onclick="excluirEvento(${e.id})" style="border:none;background:none;cursor:pointer;color:var(--cinza);font-size:12px">✕</button>
+        </td>
+      </tr>`).join('') 
+      : '<tr><td colspan="6" style="text-align:center;color:var(--cinza);padding:16px">Nenhum evento cadastrado</td></tr>';
+  }
+}
+
+function editarEvento(id){
+  const ev = (DB.eventos||[]).find(e=>e.id===id);
+  if(!ev) return;
+  // Preencher modal
+  const fields = {
+    'ev-titulo': ev.titulo, 'ev-data': ev.data,
+    'ev-hora': ev.hora||'', 'ev-tipo': ev.tipo,
+    'ev-resp': ev.resp, 'ev-detalhe': ev.detalhe||''
+  };
+  Object.entries(fields).forEach(([id,val])=>{
+    const el = document.getElementById(id);
+    if(el) el.value = val;
+  });
+  // Guardar id para atualizar em vez de criar
+  window._editandoEventoId = id;
+  openM('m-evento');
+}
+
+function excluirEvento(id){
+  if(!confirm('Excluir este evento?')) return;
+  DB.eventos = (DB.eventos||[]).filter(e=>e.id!==id);
+  salvarDados();
+  renderAgenda();
+  buildCalendario();
+  toast('Evento excluído!');
+}
+
+function setStatusEvento(id, status){
+  DB.eventos = (DB.eventos||[]).map(e=>e.id===id?{...e,status}:e);
+  salvarDados();
+  renderAgenda();
+  buildCalendario();
+  toast(status==='finalizado'?'✅ Evento finalizado!':status==='cancelado'?'❌ Evento cancelado':'↩ Evento reaberto');
+}
+
+function renderDirecao(){
+  const el = document.getElementById('direcao-display');
+  if(!el) return;
+  const d = DB.direcao || {};
+  if(!d.texto && (!d.processos||!d.processos.length) && (!d.atencao||!d.atencao.length)){
+    el.innerHTML = '<span style="color:var(--cinza);font-size:13px">Nenhum direcionamento cadastrado ainda. Clique em <strong>+ Editar</strong>.</span>';
+    return;
+  }
+  let html = '';
+  if(d.texto) html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><div style="font-weight:600;color:var(--carvao);font-size:14px">🎯 '+d.texto+'</div><button onclick="excluirFoco()" style="border:none;background:none;cursor:pointer;color:var(--cinza);font-size:13px">✕</button></div>';
+  if(d.processos&&d.processos.length){
+    html += '<div style="font-size:11px;font-weight:700;color:var(--verde);text-transform:uppercase;margin-bottom:5px">✅ Processos</div>';
+    html += d.processos.map((p,i)=>'<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--cream2);font-size:13px"><span>'+p+'</span><button onclick="excluirProcesso('+i+')" style="border:none;background:none;cursor:pointer;color:var(--cinza);font-size:12px">✕</button></div>').join('');
+  }
+  if(d.atencao&&d.atencao.length){
+    html += '<div style="font-size:11px;font-weight:700;color:var(--rubi);text-transform:uppercase;margin:10px 0 5px">⚠️ Pontos de Atenção</div>';
+    html += d.atencao.map((a,i)=>'<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--cream2);font-size:13px"><span>'+a+'</span><button onclick="excluirAtencao('+i+')" style="border:none;background:none;cursor:pointer;color:var(--cinza);font-size:12px">✕</button></div>').join('');
+  }
+  el.innerHTML = html;
+}
+
+function excluirFoco(){
+  if(!DB.direcao) return;
+  DB.direcao.texto='';
+  salvarDados(); renderDirecao();
+}
+
+function excluirProcesso(i){
+  if(!DB.direcao||!DB.direcao.processos) return;
+  DB.direcao.processos.splice(i,1);
+  salvarDados(); renderDirecao();
+}
+
+function excluirAtencao(i){
+  if(!DB.direcao||!DB.direcao.atencao) return;
+  DB.direcao.atencao.splice(i,1);
+  salvarDados(); renderDirecao();
+}
+
+function abrirDiaCalendario(dataStr){
+  // Preencher data no modal de evento
+  const evData = document.getElementById('ev-data');
+  if(evData) evData.value = dataStr;
+  openM('m-evento');
+}
+
+function salvarDirecao(){
+  const texto   = document.getElementById('md-texto')?.value.trim()||'';
+  const procs   = document.getElementById('md-processos')?.value.trim()||'';
+  const atencao = document.getElementById('md-atencao')?.value.trim()||'';
+  if(!DB.direcao) DB.direcao={};
+  DB.direcao.texto    = texto;
+  DB.direcao.processos= procs   ? procs.split('\n').filter(p=>p.trim())   : [];
+  DB.direcao.atencao  = atencao ? atencao.split('\n').filter(a=>a.trim()) : [];
+  salvarDados();
+  closeM('m-direcao');
+  renderDirecao();
+  toast('🌟 Direcionamento salvo!');
+};
+
+
+/* ══════════ EVENTO SAVE ══════════ */
+function salvarEvento(){
+  const titulo  = document.getElementById('ev-titulo')?.value.trim();
+  const data    = document.getElementById('ev-data')?.value || getTodayISO();
+  const hora    = document.getElementById('ev-hora')?.value || '';
+  const tipo    = document.getElementById('ev-tipo')?.value || 'Entrega';
+  const resp    = document.getElementById('ev-resp')?.value || 'Proprietária';
+  const detalhe = document.getElementById('ev-detalhe')?.value.trim() || '';
+  if(!titulo){ toast('Informe o título do evento!'); return; }
+  if(!DB.eventos) DB.eventos = [];
+  if(!DB.nextId) DB.nextId = {};
+  if(!DB.nextId.evento) DB.nextId.evento = 1;
+  const editId = window._editandoEventoId;
+  if(editId){
+    DB.eventos = DB.eventos.map(e=>e.id===editId?{...e,titulo,data,hora,tipo,resp,detalhe}:e);
+    window._editandoEventoId = null;
+    toast('📅 Evento atualizado!');
+  } else {
+    DB.eventos.push({ id:DB.nextId.evento++, titulo, data, hora, tipo, resp, detalhe, criado:new Date().toISOString() });
+    toast('📅 Evento adicionado!');
+  }
+  salvarDados();
+  closeM('m-evento');
+  buildCalendario();
+  renderAgenda();
+  document.getElementById('ev-titulo').value = '';
+};
+
+/* ══════════ ESTOQUE ACTIONS ══════════ */
+function atualizarQtdEstoque(id, qtd){
+  DB.estoque = (DB.estoque||[]).map(i => i.id===id ? {...i, qtd:parseFloat(qtd)||0} : i);
+  salvarDados();
+  renderEstoque();
+};
+
+function excluirEstoque(id){
+  if(!confirm('Excluir este item do estoque?')) return;
+  DB.estoque = (DB.estoque||[]).filter(i => i.id !== id);
+  salvarDados();
+  renderEstoque();
+  toast('Item removido do estoque');
+};
+
+function filtroEstoque(tipo){
+  const btns = document.querySelectorAll('.est-f-btn');
+  btns.forEach(b => b.classList.remove('on'));
+  event?.target?.classList?.add('on');
+  const lista = document.getElementById('est-lista');
+  if(!lista) return;
+  renderEstoque(tipo);
+};
+
+// Deploy 1782997138
+// Deploy final - com error catching
+window.onerror = function(msg, src, line, col, err) {
+  console.error('JS Error:', msg, 'line:', line, 'col:', col);
+  document.title = 'ERRO JS: ' + msg.substring(0,50);
+};
+try {
+  buildLoginScreen();
+} catch(e) {
+  document.body.innerHTML = '<div style="padding:20px;font-family:monospace;background:red;color:white">' +
+    '<h2>Erro ao iniciar:</h2><pre>' + e.message + '</pre><pre>' + e.stack + '</pre></div>';
+}
+
+</script>
+</body>
+</html>
