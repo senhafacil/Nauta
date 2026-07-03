@@ -3244,13 +3244,14 @@ function renderDashboard(){
 function renderTarefas(){
   const hoje = new Date().toISOString().split('T')[0];
   const amanha = new Date(Date.now()+86400000).toISOString().split('T')[0];
-  const tarefas = DB.tarefas || [];
+  const tarefas = (DB.tarefas||[]).sort((a,b)=>(a.data||'').localeCompare(b.data||''));
 
-  const hoje_list  = tarefas.filter(t=>t.data===hoje);
-  const amanha_list= tarefas.filter(t=>t.data===amanha);
-  const feitas     = hoje_list.filter(t=>t.feita).length;
-  const total      = hoje_list.length;
-  const pct        = total>0?Math.round(feitas/total*100):0;
+  const hoje_list   = tarefas.filter(t=>t.data===hoje);
+  const amanha_list = tarefas.filter(t=>t.data===amanha);
+  const atrasadas   = tarefas.filter(t=>t.data<hoje && !t.feita);
+  const feitas      = hoje_list.filter(t=>t.feita).length;
+  const total       = hoje_list.length;
+  const pct         = total>0?Math.round(feitas/total*100):0;
 
   // Progresso
   const elPct = document.getElementById('prog-pct');
@@ -3259,6 +3260,25 @@ function renderTarefas(){
   if(elPct) elPct.textContent = pct+'%';
   if(elBar) elBar.style.width = pct+'%';
   if(elSub) elSub.textContent = feitas+' de '+total+' tarefas';
+  
+  // Tarefas atrasadas - mostrar alerta
+  const elTask = document.getElementById('task-list');
+  if(elTask && atrasadas.length){
+    const pc = {Alta:'pr-a',Média:'pr-m',Baixa:'pr-b'};
+    const atrasadasHtml = atrasadas.map(t=>`
+      <div class="task" style="border-left:3px solid var(--rubi)">
+        <div class="tchk ${t.feita?'done':''}" onclick="toggleTarefa(${t.id})" style="cursor:pointer"></div>
+        <div style="flex:1">
+          <div class="ttxt" style="color:var(--rubi)">${t.txt} <span style="font-size:10px">(${t.data})</span></div>
+          <div style="font-size:11px;color:var(--cinza);margin-top:2px">⚠️ Atrasada · ${t.resp}</div>
+        </div>
+        <span class="tpr ${pc[t.pri]||'pr-m'}">${t.pri}</span>
+        <button onclick="excluirTarefa(${t.id})" style="border:none;background:none;cursor:pointer;color:var(--cinza);font-size:14px;padding:4px">✕</button>
+      </div>`).join('');
+    // Inserir atrasadas no topo da lista
+    const existing = elTask.innerHTML;
+    elTask.innerHTML = atrasadasHtml + existing;
+  }
 
   // Lista de hoje
   const taskList = document.getElementById('task-list');
