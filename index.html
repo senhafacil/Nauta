@@ -2012,7 +2012,18 @@ function go(id) {
 }
 
 /* ══════════ MODAIS ══════════ */
-function openM(id){document.getElementById(id).classList.add('open')}
+function openM(id){
+  document.getElementById(id).classList.add('open');
+  // Pré-preencher data de hoje nos modais de tarefa e evento
+  if(id==='m-tarefa'){
+    const dt=document.getElementById('mt-data');
+    if(dt&&!dt.value) dt.value=getTodayISO();
+  }
+  if(id==='m-evento'){
+    const de=document.getElementById('ev-data');
+    if(de&&!de.value) de.value=getTodayISO();
+  }
+}
 function closeM(id){document.getElementById(id).classList.remove('open')}
 document.querySelectorAll('.modal-bg').forEach(bg=>{bg.addEventListener('click',function(e){if(e.target===this)this.classList.remove('open')})});
 
