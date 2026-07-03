@@ -959,6 +959,10 @@ textarea.fi{resize:vertical;min-height:70px}
         <span style="font-weight:600;color:var(--carvao)">Total insumos</span>
         <span style="font-weight:700;color:var(--rubi);font-size:16px" id="prec-total-ins">R$ 0,00</span>
       </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:var(--cream2);border-radius:var(--r);margin-top:4px">
+        <span style="font-size:13px;font-weight:700;color:var(--carvao)">💰 Total de custos</span>
+        <span style="font-weight:800;color:var(--rubi);font-size:18px" id="prec-total-custos">R$ 0,00</span>
+      </div>
       <div style="margin-top:16px;padding-top:14px;border-top:2px solid var(--cream3)">
         <div style="font-size:12px;font-weight:700;color:var(--carvao);margin-bottom:12px;text-transform:uppercase;letter-spacing:.05em">📦 Embalagens (R$)</div>
         <div class="fr2">
@@ -1065,6 +1069,10 @@ textarea.fi{resize:vertical;min-height:70px}
       <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-top:2px solid var(--cream3);margin-top:6px;font-size:13px">
         <span style="font-weight:600">Total insumos</span>
         <span style="font-weight:700;color:var(--rubi)" id="diag-total-ins">R$ 0,00</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:var(--cream2);border-radius:var(--r);margin-top:4px">
+        <span style="font-size:13px;font-weight:700;color:var(--carvao)">💰 Total de custos</span>
+        <span style="font-weight:800;color:var(--rubi);font-size:18px" id="diag-total-custos">R$ 0,00</span>
       </div>
 
       <!-- EMBALAGENS -->
@@ -1224,6 +1232,8 @@ function calcPreco(){
   const totalFixosR = custoProd + custoFixo + maoObra + totalEmb + frete + outroPct;
 
   const ti = document.getElementById('prec-total-ins');
+  const tc = document.getElementById('prec-total-custos');
+  if(tc) tc.textContent = fmt2(totalFixosR);
   if(ti) ti.textContent = fmt2(custoProd);
 
   const totalPct = txCartao + imposto + comissao + lucro;
@@ -1311,6 +1321,8 @@ function calcDiag(){
   const totalEmb = emb1 + emb2;
   const ti2 = document.getElementById('diag-total-ins');
   if(ti2) ti2.textContent = fmt2(custoProd);
+  const tc2 = document.getElementById('diag-total-custos');
+  if(tc2) tc2.textContent = fmt2(totalCustos);
 
   const res = document.getElementById('diag-resultado');
   if(!res) return;
