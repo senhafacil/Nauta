@@ -3100,15 +3100,17 @@ function renderFinanceiro(){
   const mes = now.getMonth();
   const ano = now.getFullYear();
   
+  // Usar split para evitar bug de timezone (new Date('yyyy-mm-dd') usa UTC)
+  const mesStr = String(mes+1).padStart(2,'0');
+  const anoStr = String(ano);
+  const prefixo = anoStr+'-'+mesStr; // ex: "2026-07"
   const entradasMes = entradas.filter(e=>{
     if(!e.data) return true;
-    const d = new Date(e.data);
-    return d.getMonth()===mes && d.getFullYear()===ano;
+    return e.data.startsWith(prefixo);
   });
   const saidasMes = saidas.filter(s=>{
     if(!s.data) return true;
-    const d = new Date(s.data);
-    return d.getMonth()===mes && d.getFullYear()===ano;
+    return s.data.startsWith(prefixo);
   });
   
   const totalEnt = entradasMes.reduce((a,e)=>a+(e.valor||0),0);
@@ -3214,10 +3216,11 @@ function renderDashboard(){
   const fmtR = v=>'R$'+v.toFixed(2).replace('.',',');
 
   // Receita do mês
+  const mesStr2 = String(mes+1).padStart(2,'0');
+  const prefixo2 = String(ano)+'-'+mesStr2;
   const entradas = (DB.financeiro?.entradas||[]).filter(e=>{
     if(!e.data) return false;
-    const d = new Date(e.data);
-    return d.getMonth()===mes && d.getFullYear()===ano;
+    return e.data.startsWith(prefixo2);
   });
   const totalRec = entradas.reduce((a,e)=>a+(e.valor||0),0);
   const elR = document.getElementById('dash-receita');
@@ -3241,8 +3244,7 @@ function renderDashboard(){
   // Fluxo de caixa no dashboard
   const saidas = (DB.financeiro?.saidas||[]).filter(s=>{
     if(!s.data) return false;
-    const d = new Date(s.data);
-    return d.getMonth()===mes && d.getFullYear()===ano;
+    return s.data.startsWith(prefixo2);
   });
   const totalSai = saidas.reduce((a,s)=>a+(s.valor||0),0);
   const saldo = totalRec - totalSai;
