@@ -3283,18 +3283,18 @@ function renderTarefas(){
   // Lista de amanhã
   const amanhaList = document.getElementById('amanha-list');
   if(amanhaList){
-    if(!amanha_list.length){
-      amanhaList.innerHTML='<div id="amanha-list"><div style="text-align:center;color:var(--cinza);padding:14px;font-size:13px">Sem tarefas para amanhã</div></div>';
+    const pc2={Alta:'pr-a',Média:'pr-m',Baixa:'pr-b'};
+    const proximas=tarefas.filter(t=>t.data>hoje&&!t.feita);
+    if(!proximas.length){
+      amanhaList.innerHTML='<div style="text-align:center;color:var(--cinza);padding:14px;font-size:13px">Sem tarefas para os próximos dias</div>';
     } else {
-      const pc = {Alta:'pr-a',Média:'pr-m',Baixa:'pr-b'};
-      amanhaList.innerHTML = amanha_list.map(t=>`
-        <div class="task">
-          <div style="flex:1">
-            <div class="ttxt">${t.txt}</div>
-            <div style="font-size:11px;color:var(--cinza);margin-top:2px">${t.hora||''} · ${t.resp}</div>
-          </div>
-          <span class="tpr ${pc[t.pri]||'pr-m'}">${t.pri}</span>
-        </div>`).join('');
+      const gps={};
+      proximas.forEach(t=>{if(!gps[t.data])gps[t.data]=[];gps[t.data].push(t);});
+      amanhaList.innerHTML=Object.entries(gps).sort(([a],[b])=>a.localeCompare(b)).map(([dt,ts])=>{
+        const lbl=dt===amanha?'📅 Amanhã':new Date(dt+'T12:00:00').toLocaleDateString('pt-BR',{weekday:'short',day:'2-digit',month:'2-digit'});
+        return '<div style="font-size:11px;font-weight:700;color:var(--cinza);margin:8px 0 4px">'+lbl+'</div>'+
+          ts.map(t=>'<div class="task"><div style="flex:1"><div class="ttxt">'+t.txt+'</div><div style="font-size:11px;color:var(--cinza);margin-top:2px">'+(t.hora||'')+' · '+t.resp+'</div></div><span class="tpr '+(pc2[t.pri]||'pr-m')+'">'+t.pri+'</span><button onclick="excluirTarefa('+t.id+')" style="border:none;background:none;cursor:pointer;color:var(--cinza);font-size:13px">✕</button></div>').join('');
+      }).join('');
     }
   }
 }
