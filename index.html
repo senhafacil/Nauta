@@ -3823,10 +3823,11 @@ function abrirFichaCliente(id){
 function buscarCliente(q){
   const termo = (q||'').toLowerCase().trim();
   const clientes = (DB.clientes||[]);
-  const filtrados = termo ? clientes.filter(c=>
+  if(!termo){ renderClientes(); return; }
+  const filtrados = clientes.filter(c=>
     c.nome.toLowerCase().includes(termo) ||
     (c.fone||'').includes(termo)
-  ) : clientes;
+  );
   renderClientes(filtrados);
 }
 
@@ -3835,7 +3836,10 @@ function renderClientes(lista_param){
   if(!lista) return;
   const clientes = lista_param ? lista_param.sort((a,b)=>a.nome.localeCompare(b.nome)) : (DB.clientes||[]).sort((a,b)=>a.nome.localeCompare(b.nome));
   if(!clientes.length){
-    lista.innerHTML='<div style="text-align:center;color:var(--cinza);padding:24px;font-size:13px">Nenhuma cliente cadastrada.<br>Clique em + Nova para começar.</div>';
+    const msg = lista_param !== undefined
+      ? 'Nenhuma cliente encontrada para esta busca.'
+      : 'Nenhuma cliente cadastrada.<br>Clique em + Nova para começar.';
+    lista.innerHTML='<div style="text-align:center;color:var(--cinza);padding:24px;font-size:13px">'+msg+'</div>';
     return;
   }
   lista.innerHTML = clientes.map(c=>`
