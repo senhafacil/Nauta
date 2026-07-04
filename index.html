@@ -450,7 +450,7 @@ textarea.fi{resize:vertical;min-height:70px}
 
 <!-- ══════════ CLIENTES ══════════ -->
 <div class="page" id="pg-clientes">
-  <div class="sbox"><span>🔍</span><input placeholder="Buscar por nome, telefone..."></div>
+  <div class="sbox"><span>🔍</span><input id="cli-busca" placeholder="Buscar por nome, telefone..." oninput="buscarCliente(this.value)"></div>
   <div class="g2">
     <div class="card" style="padding:13px 16px">
       <div class="card-t">Clientes <button class="btn btn-p btn-xs" onclick="openM('m-cliente')">+ Nova</button></div>
@@ -3785,23 +3785,68 @@ function salvarCliente(){
 
 // v1783120506
 
-function renderClientes(){
+
+function abrirFichaCliente(id){
+  const c = (DB.clientes||[]).find(x=>x.id===id);
+  if(!c) return;
+  // Preencher ficha
+  const set = (elId, val) => { const el=document.getElementById(elId); if(el) el.textContent=val||'—'; };
+  const setHTML = (elId, val) => { const el=document.getElementById(elId); if(el) el.innerHTML=val||'—'; };
+  set('cd-nome', c.nome);
+  set('cd-tel',  c.fone);
+  set('cd-orig', c.origem);
+  set('cd-end',  c.end);
+  set('cd-obs',  c.obs);
+  // Aniversário formatado
+  if(c.nasc){
+    const parts = c.nasc.split('-');
+    set('cd-niver', parts[2]+'/'+parts[1]+'/'+parts[0]);
+  } else {
+    set('cd-niver', '—');
+  }
+  // Avatar
+  const av = document.getElementById('cd-av');
+  if(av) av.textContent = c.nome[0].toUpperCase();
+  // Badge tipo
+  const badge = document.getElementById('cd-badge');
+  if(badge){
+    const cor = c.tipo==='VIP'?'bp-v':c.tipo==='Atacado'?'bp-a':'bp-d';
+    badge.innerHTML = c.tipo!=='Cliente comum' ? `<span class="bp ${cor}">${c.tipo}</span>` : '';
+  }
+  // Guardar id para editar
+  window._clienteAbertoId = id;
+  // Scroll para ficha em mobile
+  const card = document.getElementById('cd-card');
+  if(card) card.scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+
+function buscarCliente(q){
+  const termo = (q||'').toLowerCase().trim();
+  const clientes = (DB.clientes||[]);
+  const filtrados = termo ? clientes.filter(c=>
+    c.nome.toLowerCase().includes(termo) ||
+    (c.fone||'').includes(termo)
+  ) : clientes;
+  renderClientes(filtrados);
+}
+
+function renderClientes(lista_param){
   const lista = document.getElementById('clientes-lista');
   if(!lista) return;
-  const clientes = (DB.clientes||[]).sort((a,b)=>a.nome.localeCompare(b.nome));
+  const clientes = lista_param ? lista_param.sort((a,b)=>a.nome.localeCompare(b.nome)) : (DB.clientes||[]).sort((a,b)=>a.nome.localeCompare(b.nome));
   if(!clientes.length){
     lista.innerHTML='<div style="text-align:center;color:var(--cinza);padding:24px;font-size:13px">Nenhuma cliente cadastrada.<br>Clique em + Nova para começar.</div>';
     return;
   }
   lista.innerHTML = clientes.map(c=>`
-    <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid var(--cream2)">
+    <div onclick="abrirFichaCliente(${c.id})" style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid var(--cream2);cursor:pointer;transition:background .15s" onmouseover="this.style.background='var(--cream)'" onmouseout="this.style.background=''">
       <div style="width:36px;height:36px;border-radius:50%;background:var(--terra);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0">${c.nome[0].toUpperCase()}</div>
       <div style="flex:1;min-width:0">
         <div style="font-size:13px;font-weight:600">${c.nome} ${c.tipo==='VIP'?'⭐':c.tipo==='Atacado'?'🏷️':''}</div>
         <div style="font-size:11px;color:var(--cinza)">${c.fone||'—'} ${c.nasc?'· 🎂 '+c.nasc.split('-').reverse().slice(0,2).join('/'):''}
         </div>
       </div>
-      <button onclick="excluirCliente(${c.id})" style="border:none;background:none;cursor:pointer;color:var(--cinza);font-size:14px">✕</button>
+      <button onclick="event.stopPropagation();excluirCliente(${c.id})" style="border:none;background:none;cursor:pointer;color:var(--cinza);font-size:14px">✕</button>
     </div>`).join('');
 }
 
