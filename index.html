@@ -454,7 +454,7 @@ textarea.fi{resize:vertical;min-height:70px}
   <div class="g2">
     <div class="card" style="padding:13px 16px">
       <div class="card-t">Clientes <button class="btn btn-p btn-xs" onclick="openM('m-cliente')">+ Nova</button></div>
-      <div style="text-align:center;color:var(--cinza);padding:24px;font-size:13px">Nenhuma cliente cadastrada.<br>Clique em + Nova para começar.</div>
+      <div id="clientes-lista"><div style="text-align:center;color:var(--cinza);padding:24px;font-size:13px">Nenhuma cliente cadastrada.<br>Clique em + Nova para começar.</div></div>
     </div>
     <div class="card" id="cd-card">
       <div class="card-t">Ficha <button class="btn btn-xs" onclick="openM('m-cliente')">Editar</button></div>
@@ -2022,6 +2022,7 @@ function go(id) {
   if(id==='tarefas') setTimeout(renderTarefas, 50);
   if(id==='gestao'){setTimeout(()=>{renderMetas();renderInfos();renderDirecao();},50);}
   if(id==='compras') setTimeout(renderCompras, 50);
+  if(id==='clientes') setTimeout(renderClientes, 50);
   if(id==='estoque') setTimeout(renderEstoque, 50);
   if(id==='financeiro') setTimeout(renderFinanceiro, 50);
   if(id==='precificacao'){ setTimeout(()=>{ renderInsumos('calc'); calcPreco(); }, 50); }
@@ -3765,11 +3766,40 @@ function salvarCliente(){
   DB.clientes.push({ id:DB.nextId.cliente++, nome, fone, nasc, origem, end, obs, tipo, pgto, criado:new Date().toISOString() });
   salvarDados();
   closeM('m-cliente');
+  renderClientes();
   toast('✅ Cliente cadastrada!');
   ['cli-nome','cli-fone','cli-end','cli-obs'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
 }
 
 // v1783120506
+
+function renderClientes(){
+  const lista = document.getElementById('clientes-lista');
+  if(!lista) return;
+  const clientes = (DB.clientes||[]).sort((a,b)=>a.nome.localeCompare(b.nome));
+  if(!clientes.length){
+    lista.innerHTML='<div style="text-align:center;color:var(--cinza);padding:24px;font-size:13px">Nenhuma cliente cadastrada.<br>Clique em + Nova para começar.</div>';
+    return;
+  }
+  lista.innerHTML = clientes.map(c=>`
+    <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid var(--cream2)">
+      <div style="width:36px;height:36px;border-radius:50%;background:var(--terra);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0">${c.nome[0].toUpperCase()}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;font-weight:600">${c.nome} ${c.tipo==='VIP'?'⭐':c.tipo==='Atacado'?'🏷️':''}</div>
+        <div style="font-size:11px;color:var(--cinza)">${c.fone||'—'} ${c.nasc?'· 🎂 '+c.nasc.split('-').reverse().slice(0,2).join('/'):''}
+        </div>
+      </div>
+      <button onclick="excluirCliente(${c.id})" style="border:none;background:none;cursor:pointer;color:var(--cinza);font-size:14px">✕</button>
+    </div>`).join('');
+}
+
+function excluirCliente(id){
+  if(!confirm('Excluir esta cliente?')) return;
+  DB.clientes=(DB.clientes||[]).filter(c=>c.id!==id);
+  salvarDados(); renderClientes();
+  toast('Cliente removida!');
+}
+
 // Deploy final - com error catching
 window.onerror = function(msg, src, line, col, err) {
   console.error('JS Error:', msg, 'line:', line, 'col:', col);
