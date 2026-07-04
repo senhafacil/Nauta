@@ -2031,7 +2031,6 @@ function go(id) {
 /* ══════════ MODAIS ══════════ */
 function openM(id){
   document.getElementById(id).classList.add('open');
-  // Pré-preencher data com hoje quando abre modal
   if(id==='m-tarefa'){
     const dt=document.getElementById('mt-data');
     if(dt) dt.value=getTodayISO();
@@ -2039,6 +2038,19 @@ function openM(id){
   if(id==='m-evento'){
     const de=document.getElementById('ev-data');
     if(de&&!de.value) de.value=getTodayISO();
+  }
+  if(id==='m-pedido'){
+    // Preencher data
+    const dp=document.getElementById('mp-data');
+    if(dp&&!dp.value) dp.value=getTodayISO();
+    // Popular select de clientes
+    const sel=document.getElementById('mp-cliente');
+    if(sel){
+      const clientes=(DB.clientes||[]).sort((a,b)=>a.nome.localeCompare(b.nome));
+      sel.innerHTML='<option value="">Selecione a cliente...</option>'+
+        clientes.map(c=>`<option value="${c.nome}">${c.nome}${c.fone?' · '+c.fone:''}</option>`).join('')+
+        '<option value="+ Nova cliente">+ Nova cliente</option>';
+    }
   }
 }
 function closeM(id){document.getElementById(id).classList.remove('open')}
