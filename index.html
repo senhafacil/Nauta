@@ -3872,7 +3872,7 @@ function renderPedidos(lista_param){
   const pedidos = lista_param !== undefined ? lista_param
     : (DB.pedidos||[]).sort((a,b)=>(b.criado||'').localeCompare(a.criado||''));
   if(!pedidos.length){
-    tbody.innerHTML='<tr><td colspan="7" style="text-align:center;color:var(--cinza);padding:20px">Nenhum pedido cadastrado</td></tr>';
+    tbody.innerHTML='<tr><td colspan="9" style="text-align:center;color:var(--cinza);padding:20px">Nenhum pedido cadastrado</td></tr>';
     return;
   }
   const statusCor = {
@@ -3886,8 +3886,10 @@ function renderPedidos(lista_param){
       <td>#${p.id}</td>
       <td style="font-weight:600">${p.cliente||'—'}</td>
       <td>${p.produto||'—'}</td>
+      <td>${p.sabor_tema||'—'}</td>
       <td>${entrega}</td>
       <td style="font-weight:700;color:var(--dourado)">${fmtR(parseFloat(p.valor_total||0))}</td>
+      <td>${fmtR(parseFloat(p.sinal||0))}</td>
       <td><span style="font-size:11px;font-weight:700;color:${cor};background:${cor}22;padding:2px 8px;border-radius:10px">${p.status||'Novo'}</span></td>
       <td>
         <button onclick="event.stopPropagation();setStatusPedido(${p.id})" style="border:none;background:var(--terra);color:#fff;padding:3px 8px;border-radius:6px;cursor:pointer;font-size:11px">Status</button>
