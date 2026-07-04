@@ -1174,6 +1174,7 @@ window.calcInsumos = [{nome:'',qtd:1,custo:0}];
 window.diagInsumos = [{nome:'',qtd:1,custo:0}];
 
 function fmt2(v){return 'R$ '+v.toFixed(2).replace('.',',');}
+function fmtR(v){return 'R$'+(v||0).toFixed(2).replace('.',',');}
 
 function renderInsumos(tipo){
   const arr = tipo==='calc' ? window.calcInsumos : window.diagInsumos;
