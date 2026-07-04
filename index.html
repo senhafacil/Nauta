@@ -2023,6 +2023,7 @@ function go(id) {
   if(id==='gestao'){setTimeout(()=>{renderMetas();renderInfos();renderDirecao();},50);}
   if(id==='compras') setTimeout(renderCompras, 50);
   if(id==='clientes') setTimeout(renderClientes, 50);
+  if(id==='pedidos') setTimeout(renderPedidos, 50);
   if(id==='estoque') setTimeout(renderEstoque, 50);
   if(id==='financeiro') setTimeout(renderFinanceiro, 50);
   if(id==='precificacao'){ setTimeout(()=>{ renderInsumos('calc'); calcPreco(); }, 50); }
@@ -3752,9 +3753,9 @@ function salvarPedido(){
   
   salvarDados();
   closeM('m-pedido');
-  toast('✅ Pedido registrado!');
-  // Atualizar dashboard
+  renderPedidos();
   renderDashboard && renderDashboard();
+  toast('✅ Pedido registrado!');
   // Limpar campos
   ['mp-prod','mp-obs','mp-valor','mp-sinal'].forEach(id=>{
     const el=document.getElementById(id);
@@ -3859,6 +3860,73 @@ function excluirCliente(id){
   DB.clientes=(DB.clientes||[]).filter(c=>c.id!==id);
   salvarDados(); renderClientes();
   toast('Cliente removida!');
+}
+
+
+function renderPedidos(lista_param){
+  const tbody = document.getElementById('ped-tbody');
+  if(!tbody) return;
+  const pedidos = lista_param !== undefined ? lista_param
+    : (DB.pedidos||[]).sort((a,b)=>(b.criado||'').localeCompare(a.criado||''));
+  if(!pedidos.length){
+    tbody.innerHTML='<tr><td colspan="7" style="text-align:center;color:var(--cinza);padding:20px">Nenhum pedido cadastrado</td></tr>';
+    return;
+  }
+  const statusCor = {
+    'Novo':'#e67e22','Em produção':'#2980b9','Pronto':'#8e44ad',
+    'Entregue':'#27ae60','Cancelado':'#c0392b'
+  };
+  tbody.innerHTML = pedidos.map(p=>{
+    const cor = statusCor[p.status]||'var(--cinza)';
+    const entrega = p.entrega ? p.entrega.split('-').reverse().join('/') : '—';
+    return `<tr onclick="abrirPedido(${p.id})" style="cursor:pointer">
+      <td>#${p.id}</td>
+      <td style="font-weight:600">${p.cliente||'—'}</td>
+      <td>${p.produto||'—'}</td>
+      <td>${entrega}</td>
+      <td style="font-weight:700;color:var(--dourado)">${fmtR(parseFloat(p.valor_total||0))}</td>
+      <td><span style="font-size:11px;font-weight:700;color:${cor};background:${cor}22;padding:2px 8px;border-radius:10px">${p.status||'Novo'}</span></td>
+      <td>
+        <button onclick="event.stopPropagation();setStatusPedido(${p.id})" style="border:none;background:var(--terra);color:#fff;padding:3px 8px;border-radius:6px;cursor:pointer;font-size:11px">Status</button>
+        <button onclick="event.stopPropagation();excluirPedido(${p.id})" style="border:none;background:none;cursor:pointer;color:var(--cinza);font-size:13px">✕</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function buscarPedido(q){
+  const termo = (q||'').toLowerCase().trim();
+  if(!termo){ renderPedidos(); return; }
+  const filtrados = (DB.pedidos||[]).filter(p=>
+    (p.cliente||'').toLowerCase().includes(termo) ||
+    (p.produto||'').toLowerCase().includes(termo) ||
+    String(p.id).includes(termo)
+  );
+  renderPedidos(filtrados);
+}
+
+function excluirPedido(id){
+  if(!confirm('Excluir este pedido?')) return;
+  DB.pedidos=(DB.pedidos||[]).filter(p=>p.id!==id);
+  salvarDados(); renderPedidos();
+  toast('Pedido excluído!');
+}
+
+function setStatusPedido(id){
+  const p = (DB.pedidos||[]).find(x=>x.id===id);
+  if(!p) return;
+  const status = ['Novo','Em produção','Pronto','Entregue','Cancelado'];
+  const atual = status.indexOf(p.status||'Novo');
+  const proximo = status[(atual+1)%status.length];
+  DB.pedidos = DB.pedidos.map(x=>x.id===id?{...x,status:proximo}:x);
+  salvarDados(); renderPedidos();
+  toast('Status: '+proximo);
+}
+
+function abrirPedido(id){
+  const p = (DB.pedidos||[]).find(x=>x.id===id);
+  if(!p) return;
+  toast('#'+p.id+' · '+p.cliente+' · '+fmtR(parseFloat(p.valor_total||0)));
 }
 
 // Deploy final - com error catching
