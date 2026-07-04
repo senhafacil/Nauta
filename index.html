@@ -3728,6 +3728,7 @@ function filtroEstoque(tipo){
 
 /* ══════════ PEDIDOS SAVE ══════════ */
 function salvarPedido(){
+  console.log('salvarPedido v1783134350 chamado');
   const cliente  = document.getElementById('mp-cliente')?.value || '';
   const resp     = document.getElementById('mp-resp')?.value || 'Proprietária';
   const data     = document.getElementById('mp-data')?.value || getTodayISO();
@@ -3864,6 +3865,7 @@ function excluirCliente(id){
 
 
 function renderPedidos(lista_param){
+  console.log('renderPedidos v1783134350');
   const tbody = document.getElementById('ped-tbody');
   if(!tbody) return;
   const pedidos = lista_param !== undefined ? lista_param
