@@ -431,7 +431,7 @@ textarea.fi{resize:vertical;min-height:70px}
 <!-- ══════════ PEDIDOS ══════════ -->
 <div class="page" id="pg-pedidos">
   <div style="display:flex;gap:9px;flex-wrap:wrap;align-items:center">
-    <div class="sbox" style="flex:1;min-width:180px;margin-bottom:0"><span>🔍</span><input id="ped-search-inp" placeholder="Buscar..."></div>
+    <div class="sbox" style="flex:1;min-width:180px;margin-bottom:0"><span>🔍</span><input id="ped-search-inp" placeholder="Buscar..." oninput="buscarPedido(this.value)"></div>
     <select class="fi" style="width:auto;padding:8px 12px"><option>Todos</option><option>Aguardando</option><option>Em produção</option><option>Pronto</option><option>Entregue</option></select>
     <select class="fi" style="width:auto;padding:8px 12px"><option>Hoje</option><option>Esta semana</option><option>Este mês</option></select>
   </div>
