@@ -647,10 +647,10 @@ textarea.fi{resize:vertical;min-height:70px}
       <!-- INDICADORES RÁPIDOS -->
       <div class="card">
         <div class="card-t">📈 Indicadores da Semana</div>
-        <div class="fr"><span>Pedidos concluídos</span><strong>0</strong></div>
-        <div class="fr"><span>Pedidos em produção</span><strong>0</strong></div>
-        <div class="fr"><span>Novos clientes</span><span class="bp bp-c">0</span></div>
-        <div class="fr"><span>Reclamações / devoluções</span><span class="bp bp-v">0</span></div>
+        <div class="fr"><span>Pedidos concluídos</span><strong id="ind-concluidos">0</strong></div>
+        <div class="fr"><span>Pedidos em produção</span><strong id="ind-producao">0</strong></div>
+        <div class="fr"><span>Novos clientes</span><span class="bp bp-c" id="ind-clientes">0</span></div>
+        <div class="fr"><span>Reclamações / devoluções</span><span class="bp bp-v" id="ind-reclamacoes">0</span></div>
         <div class="fr" style="border:none"><span>NPS (satisfação)</span><span class="bp bp-c">—</span></div>
       </div>
     </div>
@@ -2047,7 +2047,7 @@ function go(id) {
   if(id==='dashboard') setTimeout(renderDashboard, 50);
   if(id==='agenda'){ setTimeout(()=>{buildCalendario();renderAgenda();},50); }
   if(id==='tarefas') setTimeout(renderTarefas, 50);
-  if(id==='gestao'){setTimeout(()=>{renderMetas();renderInfos();renderDirecao();},50);}
+  if(id==='gestao'){setTimeout(()=>{renderMetas();renderInfos();renderDirecao();renderIndicadoresSemana();},50);}
   if(id==='compras') setTimeout(renderCompras, 50);
   if(id==='clientes') setTimeout(renderClientes, 50);
   if(id==='comanda'){ setTimeout(()=>{popularSelectComanda(); if(comandaAtualId) abrirComanda(comandaAtualId);}, 50); }
@@ -3641,7 +3641,24 @@ function setStatusEvento(id, status){
   buildCalendario();
   toast(status==='finalizado'?'✅ Evento finalizado!':status==='cancelado'?'❌ Evento cancelado':'↩ Evento reaberto');
 }
+function renderIndicadoresSemana(){
+  const hoje = new Date();
+  const seteDiasAtras = new Date(Date.now() - 7*86400000);
+  const iso = d => d.toISOString().split('T')[0];
+  const inicio = iso(seteDiasAtras);
 
+  const pedidosSemana = (DB.pedidos||[]).filter(p => (p.criado||'').split('T')[0] >= inicio);
+  const concluidos = pedidosSemana.filter(p => (p.status||'').toLowerCase()==='entregue').length;
+  const producao = pedidosSemana.filter(p => (p.status||'').toLowerCase()==='em produção').length;
+  const novosClientes = (DB.clientes||[]).filter(c => (c.criado||'').split('T')[0] >= inicio).length;
+  const reclamacoes = pedidosSemana.filter(p => (p.status||'').toLowerCase()==='cancelado').length;
+
+  const set = (elId, val) => { const el=document.getElementById(elId); if(el) el.textContent=val; };
+  set('ind-concluidos', concluidos);
+  set('ind-producao', producao);
+  set('ind-clientes', novosClientes);
+  set('ind-reclamacoes', reclamacoes);
+}
 function renderDirecao(){
   const el = document.getElementById('direcao-display');
   if(!el) return;
