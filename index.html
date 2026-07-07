@@ -647,8 +647,10 @@ textarea.fi{resize:vertical;min-height:70px}
       <!-- INDICADORES RÁPIDOS -->
       <div class="card">
         <div class="card-t">📈 Indicadores da Semana</div>
-        <div class="fr"><span>Pedidos concluídos</span><strong id="ind-concluidos">0</strong></div>
-        <div class="fr"><span>Pedidos em produção</span><strong id="ind-producao">0</strong></div>
+        <div class="fr"><span>Aguardando</span><strong id="ind-aguardando">0</strong></div>
+      <div class="fr"><span>Em produção</span><strong id="ind-producao">0</strong></div>
+      <div class="fr"><span>Pronto</span><strong id="ind-pronto">0</strong></div>
+      <div class="fr"><span>Entregue</span><strong id="ind-concluidos">0</strong></div>
         <div class="fr"><span>Novos clientes</span><span class="bp bp-c" id="ind-clientes">0</span></div>
         <div class="fr"><span>Reclamações / devoluções</span><span class="bp bp-v" id="ind-reclamacoes">0</span></div>
         <div class="fr" style="border:none"><span>NPS (satisfação)</span><span class="bp bp-c">—</span></div>
@@ -3648,14 +3650,18 @@ function renderIndicadoresSemana(){
   const inicio = iso(seteDiasAtras);
 
   const pedidosSemana = (DB.pedidos||[]).filter(p => (p.criado||'').split('T')[0] >= inicio);
-  const concluidos = pedidosSemana.filter(p => (p.status||'').toLowerCase()==='entregue').length;
+  const aguardando = pedidosSemana.filter(p => (p.status||'novo').toLowerCase()==='novo').length;
   const producao = pedidosSemana.filter(p => (p.status||'').toLowerCase()==='em produção').length;
+  const pronto = pedidosSemana.filter(p => (p.status||'').toLowerCase()==='pronto').length;
+  const concluidos = pedidosSemana.filter(p => (p.status||'').toLowerCase()==='entregue').length;
   const novosClientes = (DB.clientes||[]).filter(c => (c.criado||'').split('T')[0] >= inicio).length;
   const reclamacoes = pedidosSemana.filter(p => (p.status||'').toLowerCase()==='cancelado').length;
 
   const set = (elId, val) => { const el=document.getElementById(elId); if(el) el.textContent=val; };
-  set('ind-concluidos', concluidos);
+  set('ind-aguardando', aguardando);
   set('ind-producao', producao);
+  set('ind-pronto', pronto);
+  set('ind-concluidos', concluidos);
   set('ind-clientes', novosClientes);
   set('ind-reclamacoes', reclamacoes);
 }
