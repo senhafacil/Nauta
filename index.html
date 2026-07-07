@@ -1,6 +1,5 @@
 <!DOCTYPE html> 
-<html lang="pt-BR">
-  
+<html lang="pt-BR">  
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -332,7 +331,7 @@ textarea.fi{resize:vertical;min-height:70px}
     <div><div class="tb-title" id="tb-title">Dashboard</div><div class="tb-sub" id="tb-sub"></div></div>
     <div class="brow" id="tb-right">
       <span id="save-status" style="font-size:11px;color:var(--cinza);font-weight:500;padding:4px 10px;background:var(--cream2);border-radius:20px">☁ Sincronizado</span>
-      <button class="btn btn-sm" onclick="openM('m-cliente')">+ Cliente</button>
+      <button class="btn btn-sm" onclick="window._editandoClienteId=null;openM('m-cliente')">+ Cliente</button>
       <button class="btn btn-p btn-sm" onclick="openM('m-pedido')">+ Novo Pedido</button>
     </div>
   </div>
@@ -454,11 +453,11 @@ textarea.fi{resize:vertical;min-height:70px}
   <div class="sbox"><span>🔍</span><input id="cli-busca" placeholder="Buscar por nome, telefone..." oninput="buscarCliente(this.value)"></div>
   <div class="g2">
     <div class="card" style="padding:13px 16px">
-      <div class="card-t">Clientes <button class="btn btn-p btn-xs" onclick="openM('m-cliente')">+ Nova</button></div>
+      <div class="card-t">Clientes <button class="btn btn-p btn-xs" onclick="window._editandoClienteId=null;openM('m-cliente')">+ Nova</button></div>
       <div id="clientes-lista"><div style="text-align:center;color:var(--cinza);padding:24px;font-size:13px">Nenhuma cliente cadastrada.<br>Clique em + Nova para começar.</div></div>
     </div>
     <div class="card" id="cd-card">
-      <div class="card-t">Ficha <button class="btn btn-xs" onclick="openM('m-cliente')">Editar</button></div>
+      <div class="card-t">Ficha <button class="btn btn-xs" onclick="editarCliente(window._clienteAbertoId)">Editar</button>
       <div style="display:flex;gap:13px;align-items:center;margin-bottom:16px">
         <div id="cd-av" class="cl-av" style="width:50px;height:50px;font-size:17px">?</div>
         <div>
@@ -3791,7 +3790,13 @@ function salvarCliente(){
   if(!nome){ toast('Informe o nome da cliente!'); return; }
   if(!DB.clientes) DB.clientes=[];
   if(!DB.nextId.cliente) DB.nextId.cliente=1;
-  DB.clientes.push({ id:DB.nextId.cliente++, nome, fone, nasc, origem, end, obs, tipo, pgto, alergia, extra1, criado:new Date().toISOString() });
+const editId = window._editandoClienteId;
+  if(editId){
+    DB.clientes = DB.clientes.map(x=>x.id===editId?{...x, nome, fone, nasc, origem, end, obs, tipo, pgto, alergia, extra1}:x);
+    window._editandoClienteId = null;
+  } else {
+    DB.clientes.push({ id:DB.nextId.cliente++, nome, fone, nasc, origem, end, obs, tipo, pgto, alergia, extra1, criado:new Date().toISOString() });
+  }
   salvarDados();
   closeM('m-cliente');
   renderClientes();
@@ -3801,7 +3806,23 @@ function salvarCliente(){
 
 // v1783120506
 
-
+function editarCliente(id){
+  const c = (DB.clientes||[]).find(x=>x.id===id);
+  if(!c){ toast('Selecione uma cliente primeiro!'); return; }
+  window._editandoClienteId = id;
+  document.getElementById('cli-nome').value = c.nome||'';
+  document.getElementById('cli-fone').value = c.fone||'';
+  document.getElementById('cli-nasc').value = c.nasc||'';
+  document.getElementById('cli-origem').value = c.origem||'Selecione...';
+  document.getElementById('cli-end').value = c.end||'';
+  document.getElementById('cli-alergia').value = c.alergia||'';
+  document.getElementById('cli-obs').value = c.obs||'';
+  document.getElementById('cli-tipo').value = c.tipo||'Cliente comum';
+  document.getElementById('cli-pgto').value = c.pgto||'Sem preferência';
+  const extra1El = document.getElementById('cli-extra1');
+  if(extra1El) extra1El.value = c.extra1||'';
+  openM('m-cliente');
+}
 function abrirFichaCliente(id){
   const c = (DB.clientes||[]).find(x=>x.id===id);
   if(!c) return;
