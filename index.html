@@ -3781,7 +3781,7 @@ function salvarPedido(){
   const sinal    = parseFloat(document.getElementById('mp-sinal')?.value)||0;
   const pagto    = document.getElementById('mp-pagto')?.value || 'Pix';
   const obs      = document.getElementById('mp-obs')?.value.trim() || '';
-  const extras = ['mp-extra1','mp-extra2','mp-extra3','mp-extra4','mp-extra5']
+  const extras = ['mp-extra1','mp-extra2','mp-extra3','mp-extra4']
     .map(id => document.getElementById(id)?.value?.trim())
     .filter(v => v && v.trim() !== '');
   const sabor_tema = extras.join(' · ');
