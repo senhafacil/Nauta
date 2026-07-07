@@ -488,7 +488,15 @@ textarea.fi{resize:vertical;min-height:70px}
 
 <!-- ══════════ COMANDA ══════════ -->
 <div class="page" id="pg-comanda">
-  <div class="g2">
+    <div class="card" style="margin-bottom:0">
+      <div class="fg" style="margin-bottom:0">
+        <div class="fl">Selecionar pedido</div>
+        <select class="fi" id="cmd-pedido-select" onchange="abrirComanda(this.value)">
+          <option value="">Selecione um pedido...</option>
+        </select>
+      </div>
+    </div>
+    <div class="g2">
     <div class="card">
       <div class="card-t">Itens do Pedido</div>
       <div id="cmd-items">
@@ -526,7 +534,7 @@ textarea.fi{resize:vertical;min-height:70px}
       <div id="cmd-msg" style="display:none;margin-top:11px;padding:11px 13px;background:var(--verde-l);border-radius:var(--r);font-size:13px;color:var(--verde);font-weight:600"></div>
     </div>
     <div class="card">
-      <div class="card-t">Detalhes do Pedido <button class="btn btn-xs" onclick="openM('m-pedido')">Editar</button></div>
+      <div class="card-t">Detalhes do Pedido <button class="btn btn-xs" onclick="if(comandaAtualId) editarPedidoNaComanda(comandaAtualId)">Editar</button></div>
       <div class="fr"><span style="color:var(--cinza)">Cliente</span><strong>—</strong></div>
       <div class="fr"><span style="color:var(--cinza)">WhatsApp</span><span id="cmd-wpp">—</span></div>
       <div class="fr"><span style="color:var(--cinza)">Pedido em</span><span>—</span></div>
@@ -2042,6 +2050,7 @@ function go(id) {
   if(id==='gestao'){setTimeout(()=>{renderMetas();renderInfos();renderDirecao();},50);}
   if(id==='compras') setTimeout(renderCompras, 50);
   if(id==='clientes') setTimeout(renderClientes, 50);
+  if(id==='comanda'){ setTimeout(()=>{popularSelectComanda(); if(comandaAtualId) abrirComanda(comandaAtualId);}, 50); }
   if(id==='pedidos') setTimeout(renderPedidos, 50);
   if(id==='estoque') setTimeout(renderEstoque, 50);
   if(id==='financeiro') setTimeout(renderFinanceiro, 50);
@@ -3983,6 +3992,7 @@ function renderPedidos(lista_param){
       <td>${fmtR(parseFloat(p.sinal||0))}</td>
       <td><span style="font-size:11px;font-weight:700;color:${cor};background:${cor}22;padding:2px 8px;border-radius:10px">${p.status||'Novo'}</span></td>
       <td>
+      <button onclick="event.stopPropagation();abrirNaComanda(${p.id})" style="border:none;background:var(--verde);color:#fff;padding:3px 8px;border-radius:6px;cursor:pointer;font-size:11px">🧾 Comanda</button>
         <button onclick="event.stopPropagation();setStatusPedido(${p.id})" style="border:none;background:var(--terra);color:#fff;padding:3px 8px;border-radius:6px;cursor:pointer;font-size:11px">Status</button>
         <button onclick="event.stopPropagation();excluirPedido(${p.id})" style="border:none;background:none;cursor:pointer;color:var(--cinza);font-size:13px">✕</button>
       </td>
@@ -4018,7 +4028,53 @@ function setStatusPedido(id){
   salvarDados(); renderPedidos();
   toast('Status: '+proximo);
 }
+  let comandaAtualId = null;
 
+function popularSelectComanda(){
+  const sel = document.getElementById('cmd-pedido-select');
+  if(!sel) return;
+  const pedidos = (DB.pedidos||[]).slice().sort((a,b)=>(b.criado||'').localeCompare(a.criado||''));
+  sel.innerHTML = '<option value="">Selecione um pedido...</option>' +
+    pedidos.map(p=>`<option value="${p.id}">#${p.id} · ${p.cliente||'—'} · ${p.produto||'—'}</option>`).join('');
+}
+function editarPedidoNaComanda(id){
+  const p = (DB.pedidos||[]).find(x=>x.id===id);
+  if(!p) return;
+  openM('m-pedido');
+  document.getElementById('mp-cliente').value = p.cliente||'';
+  document.getElementById('mp-data').value = p.data||'';
+  document.getElementById('mp-entrega').value = p.entrega||'';
+  document.getElementById('mp-prod').value = p.produto||'';
+  document.getElementById('mp-valor').value = p.valor_total||'';
+  document.getElementById('mp-sinal').value = p.sinal||'';
+  document.getElementById('mp-obs').value = p.obs||'';
+}
+function abrirComanda(id){
+  const pedidoId = parseInt(id);
+  const p = (DB.pedidos||[]).find(x=>x.id===pedidoId);
+  comandaAtualId = pedidoId || null;
+  if(!p){
+    document.getElementById('cmd-items').innerHTML = '<div style="text-align:center;color:var(--cinza);padding:20px;font-size:13px">Selecione um pedido para ver os itens</div>';
+    return;
+  }
+  const valor = parseFloat(p.valor_total||0);
+  const sinal = parseFloat(p.sinal||0);
+  const saldo = valor - sinal;
+  document.getElementById('cmd-items').innerHTML = `<div class="ci"><div class="ci-qty">1</div><div class="ci-name">${p.produto||'—'}${p.sabor_tema?' — '+p.sabor_tema:''}</div><div class="ci-price">${fmtR(valor)}</div></div>`;
+  document.getElementById('cmd-total').textContent = fmtR(valor);
+  document.getElementById('cmd-wpp').textContent = (DB.clientes||[]).find(c=>c.nome===p.cliente)?.fone || '—';
+  document.getElementById('saldo-val').textContent = fmtR(saldo);
+  document.getElementById('cmd-obs').textContent = p.obs || 'Nenhuma observação.';
+  window._saldoComandaBase = saldo;
+}
+function abrirNaComanda(id){
+  go('comanda');
+  setTimeout(()=>{
+    const sel = document.getElementById('cmd-pedido-select');
+    if(sel) sel.value = id;
+    abrirComanda(id);
+  }, 80);
+}
 function abrirPedido(id){
   const p = (DB.pedidos||[]).find(x=>x.id===id);
   if(!p) return;
