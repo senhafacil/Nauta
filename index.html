@@ -1592,6 +1592,11 @@ window.renderInsumos = renderInsumos;
       <div class="fg"><div class="fl" id="mp-lbl-ent">Data de entrega</div><input class="fi" type="date" id="mp-entrega"></div>
     </div>
     <div class="fg"><div class="fl" id="mp-lbl-prod">Produto / Serviço</div><input class="fi" id="mp-prod" placeholder="Descreva o produto ou serviço"></div>
+    <div class="fg">
+      <div class="fl">🔎 Produto pronto ou insumo do estoque (opcional)</div>
+      <div id="mp-estoque-wrap"></div>
+      <button type="button" class="btn btn-xs" onclick="addItemPedidoEstoque()">+ Adicionar item do estoque</button>
+    </div>
     <!-- NICHO FIELDS INJETADOS AQUI -->
     <div id="mp-nicho-fields"></div>
     <div class="fr2">
@@ -1599,11 +1604,7 @@ window.renderInsumos = renderInsumos;
       <div class="fg"><div class="fl">Sinal recebido (R$)</div><input class="fi" type="number" id="mp-sinal" step="0.01" placeholder="0,00"></div>
     </div>
     <div class="fg"><div class="fl">Pagamento do sinal</div><select class="fi" id="mp-pagto"><option>Pix</option><option>Dinheiro</option><option>Débito</option><option>Crédito 1x</option></select></div>
-    <div class="fg">
-      <div class="fl">Insumos / Produtos utilizados do estoque</div>
-      <div id="mp-estoque-wrap"></div>
-      <button type="button" class="btn btn-xs" onclick="addItemPedidoEstoque()">+ Adicionar item do estoque</button>
-    </div>
+    
     <div class="fg"><div class="fl">Observações</div><textarea class="fi" id="mp-obs" placeholder="Detalhes importantes..."></textarea></div>
     <div class="brow" style="justify-content:flex-end;margin-top:8px">
       <button class="btn btn-sm" onclick="closeM('m-pedido')">Cancelar</button>
