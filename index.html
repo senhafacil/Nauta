@@ -1601,7 +1601,8 @@ window.renderInsumos = renderInsumos;
       <div class="fg"><div class="fl">Como conheceu</div><select class="fi" id="cli-origem"><option>Selecione...</option><option>Instagram</option><option>WhatsApp</option><option>Indicação</option><option>Google</option><option>TikTok</option><option>Evento/Feira</option><option>Outro</option></select></div>
     </div>
     <div class="fg"><div class="fl">Endereço</div><input class="fi" id="cli-end" placeholder="Rua, número, bairro, cidade/UF"></div>
-    <div class="fg"><div class="fl" id="mc-obs-lbl">Observações / Alergias</div><textarea class="fi" id="cli-obs" placeholder="Restrições, preferências..."></textarea></div>
+    <div class="fg"><div class="fl">Alergias</div><input class="fi" id="cli-alergia" placeholder="Ex: amendoim, lactose, glúten..."></div>
+    <div class="fg"><div class="fl">Observações</div><textarea class="fi" id="cli-obs" placeholder="Outras observações..."></textarea></div>
     <!-- nicho extra -->
     <div id="mc-nicho-fields"></div>
     <div class="fr2">
@@ -1684,7 +1685,7 @@ const nichos = {
         <div class="fg"><div class="fl">Tema / Decoração</div><input class="fi" id="mp-extra4" placeholder="Ex: Unicórnio, Frozen, Floral..."></div>
         <div class="fg"><div class="fl">Tipo de entrega</div><select class="fi" id="mp-extra5"><option>Entrega</option><option>Retirada no ateliê</option></select></div>
       </div>`,
-    cliente_fields:`<div class="fg"><div class="fl">Alergias alimentares</div><input class="fi" placeholder="Ex: amendoim, lactose, glúten..."></div>`,
+    cliente_fields:`<div class="fg"><div class="fl">Preferências alimentares</div><input class="fi" id="cli-extra1" placeholder="Ex: vegetariana, sem lactose..."></div>`,
     comanda_extra:`<div class="ci"><div class="ci-qty">—</div><div class="ci-name" style="color:var(--cinza);font-size:12px">🎂 Tema: Unicórnio · 30 porções · Chantilly</div></div>`,
     comanda_det:`<div class="fr"><span style="color:var(--cinza)">Sabor/Recheio</span><span>Choc. c/ morango</span></div><div class="fr"><span style="color:var(--cinza)">Tema</span><span>Unicórnio · Rosa/Dourado</span></div>`,
     dashboard_alert:'🎂 <strong>Confeitaria:</strong> — e 2 bolos para decorar. Estoque de caixas kraft baixo — repor antes de sexta!',
@@ -3782,12 +3783,14 @@ function salvarCliente(){
   const origem = document.getElementById('cli-origem')?.value||'';
   const end    = document.getElementById('cli-end')?.value.trim()||'';
   const obs    = document.getElementById('cli-obs')?.value.trim()||'';
+  const alergia = document.getElementById('cli-alergia')?.value.trim()||'';
+  const extra1  = document.getElementById('cli-extra1')?.value.trim()||'';
   const tipo   = document.getElementById('cli-tipo')?.value||'Cliente comum';
   const pgto   = document.getElementById('cli-pgto')?.value||'Sem preferência';
   if(!nome){ toast('Informe o nome da cliente!'); return; }
   if(!DB.clientes) DB.clientes=[];
   if(!DB.nextId.cliente) DB.nextId.cliente=1;
-  DB.clientes.push({ id:DB.nextId.cliente++, nome, fone, nasc, origem, end, obs, tipo, pgto, criado:new Date().toISOString() });
+  DB.clientes.push({ id:DB.nextId.cliente++, nome, fone, nasc, origem, end, obs, tipo, pgto, alergia, extra1, criado:new Date().toISOString() });
   salvarDados();
   closeM('m-cliente');
   renderClientes();
