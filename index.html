@@ -474,7 +474,8 @@ textarea.fi{resize:vertical;min-height:70px}
       <div class="fg"><div class="fl">Forma de pagamento preferida</div><div id="cd-pgto" style="font-size:13px;color:var(--cinza)">—</div></div>
       <div class="fg"><div class="fl">Classificação</div><div id="cd-tipo" style="font-size:13px;color:var(--cinza)">—</div></div>
       <div class="fg"><div class="fl">Observações</div><div id="cd-obs" style="font-size:13px;color:var(--cinza)">—</div></div>
-      <div class="fg"><div class="fl" id="cd-obs-lbl">Alergias / Preferências alimentares</div><div id="cd-alergia" style="font-size:13px;color:var(--cinza)">—</div></div>
+      <div class="fg"><div class="fl" id="cd-obs-lbl">Alergias</div><div id="cd-alergia" style="font-size:13px;color:var(--cinza)">—</div></div>
+      <div class="fg"><div class="fl">Preferências alimentares</div><div id="cd-extra1" style="font-size:13px;color:var(--cinza)">—</div></div>
       <!-- NICHO: campos extras na ficha -->
       <div id="cd-nicho-extra"></div>
       <div class="brow" style="margin-top:12px">
@@ -3814,7 +3815,8 @@ function abrirFichaCliente(id){
   set('cd-obs',  c.obs);
   set('cd-pgto', c.pgto);
   set('cd-tipo', c.tipo);
-  set('cd-alergia', c.extra1);
+  set('cd-alergia', c.alergia);
+  set('cd-extra1', c.extra1);
   // Aniversário formatado
   if(c.nasc){
     const parts = c.nasc.split('-');
