@@ -1,5 +1,6 @@
 <!DOCTYPE html> 
 <html lang="pt-BR">
+  
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -474,7 +475,7 @@ textarea.fi{resize:vertical;min-height:70px}
       <!-- NICHO: campos extras na ficha -->
       <div id="cd-nicho-extra"></div>
       <div class="brow" style="margin-top:12px">
-        <button class="btn btn-sm" onclick="go('pedidos')">Ver pedidos</button>
+        <button class="btn btn-sm" onclick="verPedidosDaCliente()">Ver pedidos</button>
         <button class="btn btn-p btn-sm" onclick="openM('m-cliente')">Editar</button>
       </div>
     </div>
@@ -3827,7 +3828,18 @@ function abrirFichaCliente(id){
   const card = document.getElementById('cd-card');
   if(card) card.scrollIntoView({behavior:'smooth', block:'nearest'});
 }
-
+function verPedidosDaCliente(){
+  const id = window._clienteAbertoId;
+  const c = (DB.clientes||[]).find(x=>x.id===id);
+  go('pedidos');
+  if(c){
+    setTimeout(()=>{
+      const inp = document.getElementById('ped-search-inp');
+      if(inp) inp.value = c.nome;
+      buscarPedido(c.nome);
+    }, 80);
+  }
+}
 function buscarCliente(q){
   const termo = (q||'').toLowerCase().trim();
   const clientes = (DB.clientes||[]);
