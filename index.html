@@ -1584,7 +1584,7 @@ window.renderInsumos = renderInsumos;
   <div class="modal">
     <div class="modal-hdr"><div class="modal-title">Novo Pedido</div><button class="modal-x" onclick="closeM('m-pedido')">×</button></div>
     <div class="fr2">
-      <div class="fg"><div class="fl" id="mp-lbl-cli">Cliente</div><select class="fi" id="mp-cliente"><option>Selecione...</option><option>+ Nova cliente</option></select></div>
+      <div class="fg"><div class="fl" id="mp-lbl-cli">Cliente</div><select class="fi" id="mp-cliente" onchange="onChangeMpCliente(this)"><option>Selecione...</option><option>+ Nova cliente</option></select></div>
       <div class="fg"><div class="fl">Responsável</div><select class="fi" id="mp-resp"><option>Proprietária</option></select></div>
     </div>
     <div class="fr2">
@@ -3802,7 +3802,15 @@ function renderItensPedidoEstoque(){
       <button type="button" onclick="window.itensPedidoEstoque.splice(${i},1);renderItensPedidoEstoque()" style="background:none;border:none;cursor:pointer;color:var(--rubi);font-size:16px">✕</button>
     </div>`).join('');
 }
-function salvarPedido(){
+function onChangeMpCliente(sel){
+  if(sel.value === '+ Nova cliente'){
+    window._voltarParaPedidoAposCliente = true;
+    sel.value = '';
+    closeM('m-pedido');
+    window._editandoClienteId = null;
+    openM('m-cliente');
+  }
+}function salvarPedido(){
   console.log('salvarPedido v1783134350 chamado');
   const cliente  = document.getElementById('mp-cliente')?.value || '';
   const resp     = document.getElementById('mp-resp')?.value || 'Proprietária';
@@ -3875,6 +3883,14 @@ const editId = window._editandoClienteId;
   closeM('m-cliente');
   renderClientes();
   toast('✅ Cliente cadastrada!');
+  if(window._voltarParaPedidoAposCliente){
+    window._voltarParaPedidoAposCliente = false;
+    openM('m-pedido');
+    setTimeout(()=>{
+      const sel=document.getElementById('mp-cliente');
+      if(sel) sel.value = nome;
+    }, 80);
+  }
   ['cli-nome','cli-fone','cli-end','cli-obs'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
 }
 
