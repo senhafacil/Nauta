@@ -3884,6 +3884,7 @@ function atualizarProdutoProntoSelecionado(){
   const qtd = parseFloat(qtdEl?.value)||1;
   const valorEl = document.getElementById('mp-valor');
   if(valorEl) valorEl.value = ((item.preco||0)*qtd).toFixed(2);
+  }
 function salvarPedido(){
   console.log('salvarPedido v1783526000 chamado');
   const tipoVenda = window._mpTipoVenda || 'encomenda';
