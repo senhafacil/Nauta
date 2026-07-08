@@ -2155,10 +2155,40 @@ function aplicarDesc(){
   toast(`✅ Desconto de R$${v.toFixed(2)} aplicado!`);
 }
 function fecharComanda(){
+  if(!comandaAtualId){toast('⚠️ Selecione um pedido primeiro!');return;}
   if(!pgtoSel){toast('⚠️ Selecione a forma de pagamento!');return;}
+  const p = (DB.pedidos||[]).find(x=>x.id===comandaAtualId);
+  if(!p){toast('⚠️ Pedido não encontrado!');return;}
+
+  DB.pedidos = DB.pedidos.map(x=>x.id===comandaAtualId?{...x,status:'Entregue',pgto:pgtoSel}:x);
+
+  if(p.estoqueProdutoId && !p.baixaFeita){
+    DB.estoque = (DB.estoque||[]).map(e=>e.id===p.estoqueProdutoId?{...e, qtd:(e.qtd||0)-(p.estoqueProdutoQtd||1)}:e);
+    DB.pedidos = DB.pedidos.map(x=>x.id===comandaAtualId?{...x,baixaFeita:true}:x);
+  }
+
+  if(!DB.financeiro) DB.financeiro={entradas:[],saidas:[]};
+  if(!DB.financeiro.entradas) DB.financeiro.entradas=[];
+  if(!DB.nextId) DB.nextId={};
+  if(!DB.nextId.financeiro) DB.nextId.financeiro=1;
+  DB.financeiro.entradas.push({
+    id:DB.nextId.financeiro++,
+    desc:'Pedido #'+p.id+' — '+(p.produto||''),
+    valor:saldoBase,
+    data:getTodayISO(),
+    forma:pgtoSel,
+    tipo:'receita',
+    criado:new Date().toISOString()
+  });
+
+  salvarDados();
+  renderPedidos();
+  renderEstoque && renderEstoque();
+  renderDashboard && renderDashboard();
+
   const msg=document.getElementById('cmd-msg');
   msg.style.display='block';
-  msg.textContent=`✓ Comanda #0052 fechada! ${pgtoSel} · R$${saldoBase.toFixed(2)} recebido. Pedido marcado como entregue.`;
+  msg.textContent=`✓ Comanda do pedido #${p.id} fechada! ${pgtoSel} · R$${saldoBase.toFixed(2)} recebido. Pedido marcado como entregue.`;
   toast('🎉 Comanda fechada com sucesso!');
 }
 function imprimirComanda(){toast('🖨 Preparando impressão...');}
@@ -4167,6 +4197,13 @@ function abrirComanda(id){
   document.getElementById('saldo-val').textContent = fmtR(saldo);
   document.getElementById('cmd-obs').textContent = p.obs || 'Nenhuma observação.';
   window._saldoComandaBase = saldo;
+  saldoBase = saldo;
+  pgtoSel = null;
+  document.querySelectorAll('.pgto-btn').forEach(b=>b.classList.remove('sel'));
+  const ti=document.getElementById('taxa-info'); if(ti) ti.style.display='none';
+  const dr=document.getElementById('desc-res'); if(dr) dr.style.display='none';
+  const di=document.getElementById('desc-inp'); if(di) di.value='';
+  const msg=document.getElementById('cmd-msg'); if(msg) msg.style.display='none';
 }
 function abrirNaComanda(id){
   go('comanda');
