@@ -1583,6 +1583,10 @@ window.renderInsumos = renderInsumos;
 <div class="modal-bg" id="m-pedido">
   <div class="modal">
     <div class="modal-hdr"><div class="modal-title">Novo Pedido</div><button class="modal-x" onclick="closeM('m-pedido')">×</button></div>
+    <div class="brow" style="margin-bottom:10px">
+      <button type="button" class="btn btn-p btn-sm" id="mp-tab-encomenda" onclick="setTipoVendaPedido('encomenda')">🎂 Encomenda</button>
+      <button type="button" class="btn btn-sm" id="mp-tab-pronto" onclick="setTipoVendaPedido('pronto')">📦 Produto pronto</button>
+    </div>
     <div class="fr2">
       <div class="fg"><div class="fl" id="mp-lbl-cli">Cliente</div><select class="fi" id="mp-cliente" onchange="onChangeMpCliente(this)"><option>Selecione...</option><option>+ Nova cliente</option></select></div>
       <div class="fg"><div class="fl">Responsável</div><select class="fi" id="mp-resp"><option>Proprietária</option></select></div>
@@ -1591,14 +1595,25 @@ window.renderInsumos = renderInsumos;
       <div class="fg"><div class="fl">Data do pedido</div><input class="fi" type="date" id="mp-data"></div>
       <div class="fg"><div class="fl" id="mp-lbl-ent">Data de entrega</div><input class="fi" type="date" id="mp-entrega"></div>
     </div>
-    <div class="fg"><div class="fl" id="mp-lbl-prod">Produto / Serviço</div><input class="fi" id="mp-prod" placeholder="Descreva o produto ou serviço"></div>
-    <div class="fg">
-      <div class="fl">🔎 Produto pronto ou insumo do estoque (opcional)</div>
-      <div id="mp-estoque-wrap"></div>
-      <button type="button" class="btn btn-xs" onclick="addItemPedidoEstoque()">+ Adicionar item do estoque</button>
+    <div id="mp-bloco-encomenda">
+      <div class="fg"><div class="fl" id="mp-lbl-prod">Produto / Serviço</div><input class="fi" id="mp-prod" placeholder="Descreva o produto ou serviço"></div>
+      <div class="fg">
+        <div class="fl">🔎 Insumos usados na produção (opcional)</div>
+        <div id="mp-estoque-wrap"></div>
+        <button type="button" class="btn btn-xs" onclick="addItemPedidoEstoque()">+ Adicionar item do estoque</button>
+      </div>
+      <!-- NICHO FIELDS INJETADOS AQUI -->
+      <div id="mp-nicho-fields"></div>
     </div>
-    <!-- NICHO FIELDS INJETADOS AQUI -->
-    <div id="mp-nicho-fields"></div>
+    <div id="mp-bloco-pronto" style="display:none">
+      <div class="fg">
+        <div class="fl">📦 Produto pronto (do estoque)</div>
+        <select class="fi" id="mp-produto-pronto" onchange="atualizarProdutoProntoSelecionado()">
+          <option value="">Selecione o produto...</option>
+        </select>
+      </div>
+      <div class="fg"><div class="fl">Quantidade</div><input class="fi" type="number" id="mp-pronto-qtd" value="1" min="1" step="1" oninput="atualizarProdutoProntoSelecionado()"></div>
+    </div>
     <div class="fr2">
       <div class="fg"><div class="fl">Valor total (R$)</div><input class="fi" type="number" id="mp-valor" step="0.01" placeholder="0,00"></div>
       <div class="fg"><div class="fl">Sinal recebido (R$)</div><input class="fi" type="number" id="mp-sinal" step="0.01" placeholder="0,00"></div>
@@ -2085,6 +2100,7 @@ function openM(id){
         clientes.map(c=>`<option value="${c.nome}">${c.nome}${c.fone?' · '+c.fone:''}</option>`).join('')+
         '<option value="+ Nova cliente">+ Nova cliente</option>';
     }
+    setTipoVendaPedido('encomenda');
   }
 }
 function closeM(id){document.getElementById(id).classList.remove('open')}
@@ -3811,14 +3827,40 @@ function onChangeMpCliente(sel){
     window._editandoClienteId = null;
     openM('m-cliente');
   }
-}function salvarPedido(){
-  console.log('salvarPedido v1783134350 chamado');
+}function setTipoVendaPedido(tipo){
+  window._mpTipoVenda = tipo;
+  const be = document.getElementById('mp-bloco-encomenda');
+  const bp = document.getElementById('mp-bloco-pronto');
+  const te = document.getElementById('mp-tab-encomenda');
+  const tp = document.getElementById('mp-tab-pronto');
+  if(be) be.style.display = tipo==='pronto' ? 'none' : '';
+  if(bp) bp.style.display = tipo==='pronto' ? '' : 'none';
+  if(te) te.className = tipo==='pronto' ? 'btn btn-sm' : 'btn btn-p btn-sm';
+  if(tp) tp.className = tipo==='pronto' ? 'btn btn-p btn-sm' : 'btn btn-sm';
+  if(tipo==='pronto'){
+    const sel = document.getElementById('mp-produto-pronto');
+    if(sel){
+      const produtos = (DB.estoque||[]).filter(e=>e.categoria==='Produto');
+      sel.innerHTML = '<option value="">Selecione o produto...</option>' +
+        produtos.map(e=>`<option value="${e.id}">${e.nome} (${e.qtd} ${e.unid} em estoque)</option>`).join('');
+    }
+  }
+}
+function atualizarProdutoProntoSelecionado(){
+  const sel = document.getElementById('mp-produto-pronto');
+  const qtdEl = document.getElementById('mp-pronto-qtd');
+  const item = (DB.estoque||[]).find(e=>e.id==sel?.value);
+  if(!item) return;
+  const qtd = parseFloat(qtdEl?.value)||1;
+  const valorEl = document.getElementById('mp-valor');
+  if(valorEl) valorEl.value = ((item.preco||0)*qtd).toFixed(2);
+function salvarPedido(){
+  console.log('salvarPedido v1783526000 chamado');
+  const tipoVenda = window._mpTipoVenda || 'encomenda';
   const cliente  = document.getElementById('mp-cliente')?.value || '';
   const resp     = document.getElementById('mp-resp')?.value || 'Proprietária';
   const data     = document.getElementById('mp-data')?.value || getTodayISO();
   const entrega  = document.getElementById('mp-entrega')?.value || '';
-  const produto  = document.getElementById('mp-prod')?.value.trim() || '';
-  const valor    = parseFloat(document.getElementById('mp-valor')?.value)||0;
   const sinal    = parseFloat(document.getElementById('mp-sinal')?.value)||0;
   const pagto    = document.getElementById('mp-pagto')?.value || 'Pix';
   const obs      = document.getElementById('mp-obs')?.value.trim() || '';
@@ -3826,22 +3868,41 @@ function onChangeMpCliente(sel){
     .map(id => document.getElementById(id)?.value?.trim())
     .filter(v => v && v.trim() !== '');
   const sabor_tema = extras.join(' · ');
-  
-  if(!produto){ toast('Informe o produto/serviço!'); return; }
-  const itensEstoqueUsados = (window.itensPedidoEstoque||[]).filter(it=>it.estoqueId && it.qtd>0);
+
+  let produto = '', valor = parseFloat(document.getElementById('mp-valor')?.value)||0;
+  let estoqueProdutoId = null, estoqueProdutoQtd = 0;
+  let itensEstoqueUsados = [];
+
+  if(tipoVenda === 'pronto'){
+    const selPronto = document.getElementById('mp-produto-pronto');
+    const qtdPronto = parseFloat(document.getElementById('mp-pronto-qtd')?.value)||1;
+    const itemPronto = (DB.estoque||[]).find(e=>e.id==selPronto?.value);
+    if(!itemPronto){ toast('Selecione o produto pronto!'); return; }
+    produto = itemPronto.nome;
+    estoqueProdutoId = itemPronto.id;
+    estoqueProdutoQtd = qtdPronto;
+  } else {
+    produto = document.getElementById('mp-prod')?.value.trim() || '';
+    if(!produto){ toast('Informe o produto/serviço!'); return; }
+    itensEstoqueUsados = (window.itensPedidoEstoque||[]).filter(it=>it.estoqueId && it.qtd>0);
+  }
+
   if(!DB.pedidos) DB.pedidos = [];
   if(!DB.nextId) DB.nextId = {};
   if(!DB.nextId.pedido) DB.nextId.pedido = 1;
-  
+
   DB.pedidos.push({
     id: DB.nextId.pedido++,
     cliente, resp, data, entrega, produto,
     sabor_tema,
     valor_total: valor, sinal, pagto, obs,
     status: 'Novo',
+    tipoVenda,
+    estoqueProdutoId, estoqueProdutoQtd,
+    baixaFeita: false,
     criado: new Date().toISOString()
   });
-  
+
   itensEstoqueUsados.forEach(it=>{
     DB.estoque = (DB.estoque||[]).map(e=>e.id==it.estoqueId ? {...e, qtd: (e.qtd||0) - it.qtd} : e);
   });
