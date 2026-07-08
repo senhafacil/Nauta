@@ -810,7 +810,21 @@ textarea.fi{resize:vertical;min-height:70px}
       </div>
     </div>
   </div>
-
+<!-- HISTÓRICO DE MOVIMENTAÇÕES -->
+  <div class="card" style="margin-top:16px;padding:0">
+    <div class="card-t" style="padding:14px 16px 0">📋 Histórico de Movimentações</div>
+    <div style="padding:0 16px 6px;font-size:11px;color:var(--cinza)">Tudo que já saiu ou entrou no estoque, com data e origem</div>
+    <div style="display:grid;grid-template-columns:110px 2fr 90px 80px 1fr;gap:8px;padding:10px 16px;font-size:10px;font-weight:700;color:var(--cinza);text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--cream3);margin-top:8px">
+      <span>Data</span>
+      <span>Produto / Insumo</span>
+      <span style="text-align:center">Tipo</span>
+      <span style="text-align:center">Qtd</span>
+      <span>Origem</span>
+    </div>
+    <div id="est-historico">
+      <div style="text-align:center;color:var(--cinza);padding:24px;font-size:13px">Nenhuma movimentação registrada ainda.</div>
+    </div>
+  </div>
 </div><!-- /pg-estoque -->
 
 <div class="page" id="pg-funcionarios">
@@ -2163,8 +2177,10 @@ function fecharComanda(){
   DB.pedidos = DB.pedidos.map(x=>x.id===comandaAtualId?{...x,status:'Entregue',pgto:pgtoSel}:x);
 
   if(p.estoqueProdutoId && !p.baixaFeita){
+    const itemEst = (DB.estoque||[]).find(e=>e.id===p.estoqueProdutoId);
     DB.estoque = (DB.estoque||[]).map(e=>e.id===p.estoqueProdutoId?{...e, qtd:(e.qtd||0)-(p.estoqueProdutoQtd||1)}:e);
     DB.pedidos = DB.pedidos.map(x=>x.id===comandaAtualId?{...x,baixaFeita:true}:x);
+    registrarMovimentoEstoque(p.estoqueProdutoId, itemEst?itemEst.nome:(p.produto||'—'), 'Saída', p.estoqueProdutoQtd||1, `Pedido #${p.id} — ${p.cliente||'Venda'} (produto pronto vendido, pago em ${pgtoSel})`);
   }
 
   if(!DB.financeiro) DB.financeiro={entradas:[],saidas:[]};
@@ -3013,11 +3029,40 @@ async function excluirMentoradaNauta(login,nome){
 /* ══════════ ESTOQUE ══════════ */
 let estoqueFiltro = 'todos';
 
-function renderEstoque(){
+function registrarMovimentoEstoque(estoqueId, nomeProduto, tipo, qtd, origem){
+  if(!DB.estoqueMovimentos) DB.estoqueMovimentos = [];
+  if(!DB.nextId) DB.nextId = {};
+  if(!DB.nextId.movimento) DB.nextId.movimento = 1;
+  DB.estoqueMovimentos.push({
+    id: DB.nextId.movimento++,
+    estoqueId, nomeProduto, tipo, qtd, origem,
+    data: getTodayISO(),
+    criado: new Date().toISOString()
+  });
+}
+function renderHistoricoEstoque(){
+  const wrap = document.getElementById('est-historico');
+  if(!wrap) return;
+  const movs = (DB.estoqueMovimentos||[]).slice().sort((a,b)=> (b.criado||'').localeCompare(a.criado||''));
+  if(!movs.length){
+    wrap.innerHTML = '<div style="text-align:center;color:var(--cinza);padding:24px;font-size:13px">Nenhuma movimentação registrada ainda.</div>';
+    return;
+  }
+  wrap.innerHTML = movs.map(m=>{
+    const dataFmt = (m.data||'').split('-').reverse().join('/');
+    return `<div style="display:grid;grid-template-columns:110px 2fr 90px 80px 1fr;gap:8px;padding:10px 16px;font-size:12px;border-bottom:1px solid var(--cream3);align-items:center">
+      <span>${dataFmt}</span>
+      <span style="font-weight:600">${m.nomeProduto||'—'}</span>
+      <span style="text-align:center"><span class="bp" style="background:#FDECEA;color:#C0392B;padding:2px 8px;border-radius:6px;font-size:11px">${m.tipo}</span></span>
+      <span style="text-align:center">${m.qtd}</span>
+      <span style="color:var(--cinza)">${m.origem||'—'}</span>
+    </div>`;
+  }).join('');
+}function renderEstoque(){
   if(!DB.estoque) DB.estoque=[];
   const lista = document.getElementById('est-lista');
   if(!lista) return;
-
+renderHistoricoEstoque();
   let items = DB.estoque;
   if(estoqueFiltro==='baixo') items = items.filter(i=>i.qtd>0 && i.qtd<i.min);
   if(estoqueFiltro==='zero')  items = items.filter(i=>i.qtd<=0);
@@ -3934,8 +3979,11 @@ function salvarPedido(){
     criado: new Date().toISOString()
   });
 
+  const idPedidoNovo = DB.pedidos[DB.pedidos.length-1].id;
   itensEstoqueUsados.forEach(it=>{
+    const itemEst = (DB.estoque||[]).find(e=>e.id==it.estoqueId);
     DB.estoque = (DB.estoque||[]).map(e=>e.id==it.estoqueId ? {...e, qtd: (e.qtd||0) - it.qtd} : e);
+    registrarMovimentoEstoque(it.estoqueId, itemEst?itemEst.nome:'—', 'Saída', it.qtd, `Pedido #${idPedidoNovo} — ${cliente||'Encomenda'} (insumo usado na produção)`);
   });
   window.itensPedidoEstoque = [];
   salvarDados();
