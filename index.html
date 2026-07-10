@@ -2064,7 +2064,20 @@ const pgMeta = {
   configuracoes:{title:'Configurações',     sub:'Nicho, taxas e personalização',       btns:''}
 };
 
-function go(id) {
+function aplicarPermissoes(){
+  const nav = {dashboard:'dashboard',agenda:'agenda',pedidos:'pedidos',clientes:'clientes',comanda:'comanda',financeiro:'financeiro',relatorios:'relatorios',gestao:'gestao',precificacao:'precificacao',tarefas:'tarefas',compras:'compras',estoque:'estoque',funcionarios:'funcionarios',configuracoes:'configuracoes'};
+  document.querySelectorAll('.ni').forEach(el=>{
+    const m = el.getAttribute('onclick')?.match(/go\('(\w+)'\)/);
+    if(!m) return;
+    const chave = nav[m[1]];
+    if(!chave) return;
+    if(window.PERMISSOES && !window.PERMISSOES[chave]){
+      el.style.display = 'none';
+    } else {
+      el.style.display = '';
+    }
+  });
+}function go(id) {
   document.querySelectorAll('.page').forEach(p=>{p.style.display='none';p.classList.remove('active')});
   document.querySelectorAll('.ni').forEach(n=>n.classList.remove('active'));
   const pg = document.getElementById('pg-'+id);
@@ -2650,7 +2663,7 @@ async function iniciarSistema(){
 
   // Tenta carregar dados existentes da nuvem
   await carregarDados();
-
+aplicarPermissoes();
   // Se configuração veio da nuvem, usa ela; senão mantém a que acabou de preencher
   if(DB.config.negocio_id) NEGOCIO_ID = DB.config.negocio_id;
 
@@ -2963,14 +2976,15 @@ async function fazerLoginNauta(){
   if(!login||!senha){err.style.display='block';err.textContent='Preencha usuário e senha.';return;}
   btn.textContent='Entrando...'; btn.disabled=true;
   try{
-    const r = await fetch(`${SUPA_URL}/rest/v1/nauta_usuarios?login=eq.${encodeURIComponent(login)}&senha=eq.${encodeURIComponent(senha)}&select=login,nome`,{headers:SUPA_HDR});
+    const r = await fetch(`${SUPA_URL}/rest/v1/nauta_usuarios?login=eq.${encodeURIComponent(login)}&senha=eq.${encodeURIComponent(senha)}&select=login,nome,negocio_id,permissoes`,{headers:SUPA_HDR});
     const rows = await r.json();
     if(!rows||!rows.length){
       err.style.display='block'; err.textContent='Usuário ou senha incorretos.';
       btn.textContent='Entrar →'; btn.disabled=false; return;
     }
-    NEGOCIO_ID = rows[0].login;
+    NEGOCIO_ID = rows[0].negocio_id || rows[0].login;
     USUARIO_ADMIN = rows[0].login === 'vanessa2026';
+    window.PERMISSOES = rows[0].permissoes ? JSON.parse(rows[0].permissoes) : null;
     const nomeLogin = rows[0].nome || rows[0].login;
     document.getElementById('login-screen')?.remove();
 
@@ -2984,6 +2998,7 @@ async function fazerLoginNauta(){
       buildAdminScreen();
     } else {
       await carregarDados();
+      aplicarPermissoes();
       document.querySelectorAll('.page').forEach(p=>{p.style.display='none';p.classList.remove('active')});
       document.getElementById('pg-dashboard').style.display='flex';
       document.getElementById('pg-dashboard').classList.add('active');
