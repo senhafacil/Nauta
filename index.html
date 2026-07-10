@@ -1,5 +1,5 @@
 <!DOCTYPE html> 
-<html lang="pt-BR">  
+<html lang="pt-BR"> 
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -2095,6 +2095,11 @@ function openM(id){
   if(id==='m-tarefa'){
     const dt=document.getElementById('mt-data');
     if(dt) dt.value=getTodayISO();
+    const selResp=document.getElementById('mt-resp');
+    if(selResp){
+      const funcs=(DB.funcionarios||[]);
+      selResp.innerHTML = '<option>Proprietária</option>' + funcs.map(f=>`<option>${f.nome}</option>`).join('');
+    }
   }
   if(id==='m-evento'){
     const de=document.getElementById('ev-data');
