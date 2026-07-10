@@ -4054,8 +4054,7 @@ function atualizarProdutoProntoSelecionado(){
   if(valorEl) valorEl.value = ((item.preco||0)*qtd).toFixed(2);
   }
 function salvarPedido(){
-  console.log('salvarPedido v1783526000 chamado');
-  const tipoVenda = window._mpTipoVenda || 'encomenda';
+  console.log('salvarPedido carrinho v1');
   const cliente  = document.getElementById('mp-cliente')?.value || '';
   const resp     = document.getElementById('mp-resp')?.value || 'Proprietária';
   const data     = document.getElementById('mp-data')?.value || getTodayISO();
@@ -4068,59 +4067,49 @@ function salvarPedido(){
     .filter(v => v && v.trim() !== '');
   const sabor_tema = extras.join(' · ');
 
-  let produto = '', valor = parseFloat(document.getElementById('mp-valor')?.value)||0;
-  let estoqueProdutoId = null, estoqueProdutoQtd = 0;
-  let itensEstoqueUsados = [];
+  const carrinho = (window.itensPedidoCarrinho||[]).filter(it=>it.produto && it.produto.trim()!=='');
+  if(!carrinho.length){ toast('⚠️ Adicione pelo menos um item ao pedido!'); return; }
 
-  if(tipoVenda === 'pronto'){
-    const selPronto = document.getElementById('mp-produto-pronto');
-    const qtdPronto = parseFloat(document.getElementById('mp-pronto-qtd')?.value)||1;
-    const itemPronto = (DB.estoque||[]).find(e=>e.id==selPronto?.value);
-    if(!itemPronto){ toast('Selecione o produto pronto!'); return; }
-    produto = itemPronto.nome;
-    estoqueProdutoId = itemPronto.id;
-    estoqueProdutoQtd = qtdPronto;
-  } else {
-    produto = document.getElementById('mp-prod')?.value.trim() || '';
-    if(!produto){ toast('Informe o produto/serviço!'); return; }
-    itensEstoqueUsados = (window.itensPedidoEstoque||[]).filter(it=>it.estoqueId && it.qtd>0);
-  }
+  const valor = parseFloat(document.getElementById('mp-valor')?.value) || carrinho.reduce((s,it)=>s+(it.qtd||0)*(it.valorUnit||0),0);
+  const produtoResumo = carrinho.map(it=>`${it.produto}${it.qtd>1?' x'+it.qtd:''}`).join(', ');
+
+  const itensEstoqueUsados = (window.itensPedidoEstoque||[]).filter(it=>it.estoqueId && it.qtd>0);
 
   if(!DB.pedidos) DB.pedidos = [];
   if(!DB.nextId) DB.nextId = {};
   if(!DB.nextId.pedido) DB.nextId.pedido = 1;
 
+  const idPedidoNovo = DB.nextId.pedido++;
   DB.pedidos.push({
-    id: DB.nextId.pedido++,
-    cliente, resp, data, entrega, produto,
+    id: idPedidoNovo,
+    cliente, resp, data, entrega,
+    produto: produtoResumo,
+    itens: carrinho,
     sabor_tema,
     valor_total: valor, sinal, pagto, obs,
     status: 'Novo',
-    tipoVenda,
-    estoqueProdutoId, estoqueProdutoQtd,
     baixaFeita: false,
     criado: new Date().toISOString()
   });
 
-  const idPedidoNovo = DB.pedidos[DB.pedidos.length-1].id;
   itensEstoqueUsados.forEach(it=>{
     const itemEst = (DB.estoque||[]).find(e=>e.id==it.estoqueId);
     DB.estoque = (DB.estoque||[]).map(e=>e.id==it.estoqueId ? {...e, qtd: (e.qtd||0) - it.qtd} : e);
     registrarMovimentoEstoque(it.estoqueId, itemEst?itemEst.nome:'—', 'Saída', it.qtd, `Pedido #${idPedidoNovo} — ${cliente||'Encomenda'} (insumo usado na produção)`);
   });
+
   window.itensPedidoEstoque = [];
+  window.itensPedidoCarrinho = [];
   salvarDados();
   closeM('m-pedido');
   renderPedidos();
   renderDashboard && renderDashboard();
   toast('✅ Pedido registrado!');
-  // Limpar campos
-  ['mp-prod','mp-obs','mp-valor','mp-sinal'].forEach(id=>{
+  ['mp-obs','mp-sinal'].forEach(id=>{
     const el=document.getElementById(id);
     if(el) el.value='';
   });
 }
-
 
 function salvarCliente(){
   const nome   = document.getElementById('cli-nome')?.value.trim();
