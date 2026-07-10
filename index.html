@@ -2253,11 +2253,15 @@ function fecharComanda(){
 
   DB.pedidos = DB.pedidos.map(x=>x.id===comandaAtualId?{...x,status:'Entregue',pgto:pgtoSel}:x);
 
-  if(p.estoqueProdutoId && !p.baixaFeita){
-    const itemEst = (DB.estoque||[]).find(e=>e.id===p.estoqueProdutoId);
-    DB.estoque = (DB.estoque||[]).map(e=>e.id===p.estoqueProdutoId?{...e, qtd:(e.qtd||0)-(p.estoqueProdutoQtd||1)}:e);
+  if(p.itens && p.itens.length && !p.baixaFeita){
+    p.itens.forEach(it=>{
+      if(it.estoqueProdutoId){
+        const itemEst = (DB.estoque||[]).find(e=>e.id===it.estoqueProdutoId);
+        DB.estoque = (DB.estoque||[]).map(e=>e.id===it.estoqueProdutoId?{...e, qtd:(e.qtd||0)-(it.qtd||1)}:e);
+        registrarMovimentoEstoque(it.estoqueProdutoId, itemEst?itemEst.nome:(it.produto||'—'), 'Saída', it.qtd||1, `Pedido #${p.id} — ${p.cliente||'Venda'} (produto pronto vendido, pago em ${pgtoSel})`);
+      }
+    });
     DB.pedidos = DB.pedidos.map(x=>x.id===comandaAtualId?{...x,baixaFeita:true}:x);
-    registrarMovimentoEstoque(p.estoqueProdutoId, itemEst?itemEst.nome:(p.produto||'—'), 'Saída', p.estoqueProdutoQtd||1, `Pedido #${p.id} — ${p.cliente||'Venda'} (produto pronto vendido, pago em ${pgtoSel})`);
   }
 
   if(!DB.financeiro) DB.financeiro={entradas:[],saidas:[]};
