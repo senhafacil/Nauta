@@ -794,7 +794,10 @@ textarea.fi{resize:vertical;min-height:70px}
         <div class="fl">Custo por unidade (R$) <span style="font-weight:400;color:var(--cinza)">— opcional</span></div>
         <input class="fi" id="est-preco" type="number" step="0.01" placeholder="0,00" value="0">
       </div>
-
+<div class="fg">
+        <div class="fl">💰 Preço de venda (R$) <span style="font-weight:400;color:var(--cinza)">— usado nos pedidos de produto pronto</span></div>
+        <input class="fi" id="est-preco-venda" type="number" step="0.01" placeholder="0,00" value="0">
+      </div>
       <div class="fg">
         <div class="fl">Fornecedor ou observação <span style="font-weight:400;color:var(--cinza)">— opcional</span></div>
         <input class="fi" id="est-obs" placeholder="Ex: Atacadão, validade 3 meses...">
@@ -3692,12 +3695,12 @@ function salvarItemEstoque(){
   const min   = parseFloat(document.getElementById('est-min')?.value)||1;
   const unid  = document.getElementById('est-unid')?.value||'un.';
   const preco = parseFloat(document.getElementById('est-preco')?.value)||0;
+  const precoVenda = parseFloat(document.getElementById('est-preco-venda')?.value)||0;
   const obs   = document.getElementById('est-obs')?.value.trim()||'';
   if(!nome){ toast('Informe o nome do item!'); return; }
   if(!DB.estoque) DB.estoque=[];
   if(!DB.nextId.estoque) DB.nextId.estoque=1;
-  DB.estoque.push({id:DB.nextId.estoque++, nome, categoria, qtd, min, unid, preco, obs});
-  salvarDados();
+DB.estoque.push({id:DB.nextId.estoque++, nome, categoria, qtd, min, unid, preco, precoVenda, obs});  salvarDados();
   closeM('m-estoque');
   renderEstoque();
   toast('✅ Item adicionado ao estoque!');
@@ -4019,8 +4022,7 @@ function atualizarItemCarrinhoEstoque(i, estoqueId){
   if(!window.itensPedidoCarrinho[i]) return;
   window.itensPedidoCarrinho[i].estoqueProdutoId = item?item.id:null;
   window.itensPedidoCarrinho[i].produto = item?item.nome:'';
-  window.itensPedidoCarrinho[i].valorUnit = item?(item.preco||0):0;
-  renderItensPedidoCarrinho();
+window.itensPedidoCarrinho[i].valorUnit = item?(item.precoVenda||item.preco||0):0;  renderItensPedidoCarrinho();
 }function onChangeMpCliente(sel){
   if(sel.value === '+ Nova cliente'){
     window._voltarParaPedidoAposCliente = true;
