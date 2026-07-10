@@ -2253,7 +2253,7 @@ function fecharComanda(){
   if(!pgtoSel){toast('⚠️ Selecione a forma de pagamento!');return;}
   const p = (DB.pedidos||[]).find(x=>x.id===comandaAtualId);
   if(!p){toast('⚠️ Pedido não encontrado!');return;}
-
+if(p.status === 'Entregue'){toast('⚠️ Essa comanda já foi fechada!');return;}
   DB.pedidos = DB.pedidos.map(x=>x.id===comandaAtualId?{...x,status:'Entregue',pgto:pgtoSel}:x);
 
   if(p.itens && p.itens.length && !p.baixaFeita){
