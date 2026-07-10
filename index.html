@@ -1598,10 +1598,7 @@ window.renderInsumos = renderInsumos;
   <div class="modal">
     <div class="modal-hdr"><div class="modal-title">Novo Pedido</div><button class="modal-x" onclick="closeM('m-pedido')">×</button></div>
     <div class="brow" style="margin-bottom:10px">
-      <button type="button" class="btn btn-p btn-sm" id="mp-tab-encomenda" onclick="setTipoVendaPedido('encomenda')">🎂 Encomenda</button>
-      <button type="button" class="btn btn-sm" id="mp-tab-pronto" onclick="setTipoVendaPedido('pronto')">📦 Produto pronto</button>
-    </div>
-    <div class="fr2">
+      <div class="fr2">
       <div class="fg"><div class="fl" id="mp-lbl-cli">Cliente</div><select class="fi" id="mp-cliente" onchange="onChangeMpCliente(this)"><option>Selecione...</option><option>+ Nova cliente</option></select></div>
       <div class="fg"><div class="fl">Responsável</div><select class="fi" id="mp-resp"><option>Proprietária</option></select></div>
     </div>
@@ -1609,25 +1606,21 @@ window.renderInsumos = renderInsumos;
       <div class="fg"><div class="fl">Data do pedido</div><input class="fi" type="date" id="mp-data"></div>
       <div class="fg"><div class="fl" id="mp-lbl-ent">Data de entrega</div><input class="fi" type="date" id="mp-entrega"></div>
     </div>
-    <div id="mp-bloco-encomenda">
-      <div class="fg"><div class="fl" id="mp-lbl-prod">Produto / Serviço</div><input class="fi" id="mp-prod" placeholder="Descreva o produto ou serviço"></div>
-      <div class="fg">
-        <div class="fl">🔎 Insumos usados na produção (opcional)</div>
-        <div id="mp-estoque-wrap"></div>
-        <button type="button" class="btn btn-xs" onclick="addItemPedidoEstoque()">+ Adicionar item do estoque</button>
+    <div class="fg">
+      <div class="fl">🛒 Itens do Pedido</div>
+      <div id="mp-itens-wrap"></div>
+      <div class="brow" style="gap:8px;margin-top:6px">
+        <button type="button" class="btn btn-xs" onclick="addItemCarrinhoManual()">+ Produto personalizado</button>
+        <button type="button" class="btn btn-xs" onclick="addItemCarrinhoEstoque()">+ Produto do estoque</button>
       </div>
-      <!-- NICHO FIELDS INJETADOS AQUI -->
-      <div id="mp-nicho-fields"></div>
     </div>
-    <div id="mp-bloco-pronto" style="display:none">
-      <div class="fg">
-        <div class="fl">📦 Produto pronto (do estoque)</div>
-        <select class="fi" id="mp-produto-pronto" onchange="atualizarProdutoProntoSelecionado()">
-          <option value="">Selecione o produto...</option>
-        </select>
-      </div>
-      <div class="fg"><div class="fl">Quantidade</div><input class="fi" type="number" id="mp-pronto-qtd" value="1" min="1" step="1" oninput="atualizarProdutoProntoSelecionado()"></div>
+    <div class="fg">
+      <div class="fl">🔎 Insumos usados na produção (opcional)</div>
+      <div id="mp-estoque-wrap"></div>
+      <button type="button" class="btn btn-xs" onclick="addItemPedidoEstoque()">+ Adicionar item do estoque</button>
     </div>
+    <!-- NICHO FIELDS INJETADOS AQUI -->
+    <div id="mp-nicho-fields"></div>
     <div class="fr2">
       <div class="fg"><div class="fl">Valor total (R$)</div><input class="fi" type="number" id="mp-valor" step="0.01" placeholder="0,00"></div>
       <div class="fg"><div class="fl">Sinal recebido (R$)</div><input class="fi" type="number" id="mp-sinal" step="0.01" placeholder="0,00"></div>
@@ -2120,7 +2113,9 @@ function openM(id){
   }
   if(id==='m-pedido'){
     window.itensPedidoEstoque = [];
+    window.itensPedidoCarrinho = [];
     renderItensPedidoEstoque();
+    renderItensPedidoCarrinho();
     // Preencher data
     const dp=document.getElementById('mp-data');
     if(dp&&!dp.value) dp.value=getTodayISO();
@@ -2132,7 +2127,7 @@ function openM(id){
         clientes.map(c=>`<option value="${c.nome}">${c.nome}${c.fone?' · '+c.fone:''}</option>`).join('')+
         '<option value="+ Nova cliente">+ Nova cliente</option>';
     }
-    setTipoVendaPedido('encomenda');
+  
   }
 }
 function closeM(id){document.getElementById(id).classList.remove('open')}
@@ -3978,7 +3973,51 @@ function renderItensPedidoEstoque(){
       <button type="button" onclick="window.itensPedidoEstoque.splice(${i},1);renderItensPedidoEstoque()" style="background:none;border:none;cursor:pointer;color:var(--rubi);font-size:16px">✕</button>
     </div>`).join('');
 }
-function onChangeMpCliente(sel){
+function renderItensPedidoCarrinho(){
+  const wrap = document.getElementById('mp-itens-wrap');
+  if(!wrap) return;
+  const itens = window.itensPedidoCarrinho||[];
+  if(!itens.length){
+    wrap.innerHTML = '<div style="text-align:center;color:var(--cinza);padding:14px;font-size:12px">Nenhum item adicionado ainda.</div>';
+  } else {
+    wrap.innerHTML = itens.map((it,i)=>{
+      const nomeField = it.tipo==='estoque'
+        ? `<select class="fi" style="font-size:12px" onchange="atualizarItemCarrinhoEstoque(${i},this.value)">
+             <option value="">Selecione...</option>
+             ${(DB.estoque||[]).filter(e=>e.categoria==='Produto').map(e=>`<option value="${e.id}" ${it.estoqueProdutoId==e.id?'selected':''}>${e.nome}</option>`).join('')}
+           </select>`
+        : `<input class="fi" style="font-size:12px" value="${it.produto||''}" placeholder="Nome do produto" oninput="window.itensPedidoCarrinho[${i}].produto=this.value">`;
+      return `<div class="brow" style="gap:6px;align-items:center;margin-bottom:6px">
+        <div style="flex:1">${nomeField}</div>
+        <input class="fi" type="number" min="1" step="1" value="${it.qtd}" style="width:60px;font-size:12px" oninput="window.itensPedidoCarrinho[${i}].qtd=parseFloat(this.value)||1;renderItensPedidoCarrinho()">
+        <input class="fi" type="number" step="0.01" value="${it.valorUnit}" style="width:80px;font-size:12px" oninput="window.itensPedidoCarrinho[${i}].valorUnit=parseFloat(this.value)||0;renderItensPedidoCarrinho()">
+        <span style="font-size:12px;width:70px;text-align:right">${fmtR((it.qtd||0)*(it.valorUnit||0))}</span>
+        <button type="button" class="btn btn-xs" onclick="window.itensPedidoCarrinho.splice(${i},1);renderItensPedidoCarrinho()" style="color:var(--rubi)">✕</button>
+      </div>`;
+    }).join('');
+  }
+  const total = itens.reduce((s,it)=>s+(it.qtd||0)*(it.valorUnit||0),0);
+  const valorEl = document.getElementById('mp-valor');
+  if(valorEl) valorEl.value = total.toFixed(2);
+}
+function addItemCarrinhoManual(){
+  if(!window.itensPedidoCarrinho) window.itensPedidoCarrinho=[];
+  window.itensPedidoCarrinho.push({tipo:'manual', produto:'', qtd:1, valorUnit:0, estoqueProdutoId:null});
+  renderItensPedidoCarrinho();
+}
+function addItemCarrinhoEstoque(){
+  if(!window.itensPedidoCarrinho) window.itensPedidoCarrinho=[];
+  window.itensPedidoCarrinho.push({tipo:'estoque', produto:'', qtd:1, valorUnit:0, estoqueProdutoId:null});
+  renderItensPedidoCarrinho();
+}
+function atualizarItemCarrinhoEstoque(i, estoqueId){
+  const item = (DB.estoque||[]).find(e=>e.id==estoqueId);
+  if(!window.itensPedidoCarrinho[i]) return;
+  window.itensPedidoCarrinho[i].estoqueProdutoId = item?item.id:null;
+  window.itensPedidoCarrinho[i].produto = item?item.nome:'';
+  window.itensPedidoCarrinho[i].valorUnit = item?(item.preco||0):0;
+  renderItensPedidoCarrinho();
+}function onChangeMpCliente(sel){
   if(sel.value === '+ Nova cliente'){
     window._voltarParaPedidoAposCliente = true;
     sel.value = '';
