@@ -3115,13 +3115,32 @@ async function carregarListaNauta(){
     </div>`).join('');
 }
 
-async function editarNichoMentorada(login,nome){
-  const opcoes = NICHO_OPCOES.map(n=>`${n.key} — ${n.ico} ${n.nome}`).join('\n');
-  const novoKey = prompt(`Digite a chave do novo nicho para ${nome}:\n\n${opcoes}`);
-  if(!novoKey) return;
-  const chave = novoKey.trim().toLowerCase();
+function editarNichoMentorada(login, nome){
+  document.getElementById('nicho-edit-screen')?.remove();
+  const div = document.createElement('div');
+  div.id = 'nicho-edit-screen';
+  div.style.cssText = "position:fixed;inset:0;z-index:10000;background:rgba(44,36,22,.6);display:flex;align-items:center;justify-content:center;font-family:'DM Sans',sans-serif;padding:20px";
+  div.innerHTML = `
+    <div style="background:#fff;border-radius:16px;padding:24px;max-width:420px;width:100%;box-shadow:0 8px 30px rgba(0,0,0,.25)">
+      <div style="font-size:16px;font-weight:700;color:#2C1A0E;margin-bottom:4px">Alterar nicho de ${nome}</div>
+      <div style="font-size:12px;color:#999;margin-bottom:16px">Escolha o novo ramo de negócio</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        ${NICHO_OPCOES.map(n=>`
+          <button onclick="salvarNichoMentorada('${login}','${nome.replace(/'/g,"\\'")}','${n.key}')"
+            style="padding:12px 8px;border:1.5px solid #E5E0D8;border-radius:10px;background:#fff;cursor:pointer;text-align:center;font-family:'DM Sans',sans-serif">
+            <div style="font-size:22px;margin-bottom:4px">${n.ico}</div>
+            <div style="font-size:11px;font-weight:600;color:#2C1A0E">${n.nome}</div>
+          </button>`).join('')}
+      </div>
+      <button onclick="document.getElementById('nicho-edit-screen').remove()" style="margin-top:16px;width:100%;padding:10px;border-radius:10px;border:1px solid #E5E0D8;background:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif">Cancelar</button>
+    </div>
+  `;
+  document.body.appendChild(div);
+}
+
+async function salvarNichoMentorada(login, nome, chave){
   const valido = NICHO_OPCOES.find(n=>n.key===chave);
-  if(!valido){ alert('Nicho inválido. Digite exatamente uma das chaves da lista (ex: estetica).'); return; }
+  if(!valido) return;
   const r = await fetch(`${SUPA_URL}/rest/v1/nauta_dados?negocio_id=eq.${encodeURIComponent(login)}&select=dados`,{headers:SUPA_HDR});
   const rows = await r.json();
   if(!rows || !rows.length){ alert('Não foi possível carregar os dados dessa mentorada.'); return; }
@@ -3132,6 +3151,7 @@ async function editarNichoMentorada(login,nome){
     method:'PATCH', headers:{...SUPA_HDR,'Prefer':'return=minimal'},
     body: JSON.stringify({dados})
   });
+  document.getElementById('nicho-edit-screen')?.remove();
   alert('✅ Nicho de '+nome+' atualizado para '+valido.ico+' '+valido.nome+'! A mudança aparece na próxima vez que ela entrar no sistema.');
 }async function excluirMentoradaNauta(login,nome){
   if(!confirm('Excluir acesso de '+nome+'? Os dados dela também serão apagados.')) return;
