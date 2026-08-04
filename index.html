@@ -3109,12 +3109,31 @@ async function carregarListaNauta(){
         <div style="font-size:13px;font-weight:600;color:#2C1A0E">${m.nome}</div>
         <div style="font-size:11px;color:#999">Login: <strong>${m.login}</strong></div>
       </div>
-      <button onclick="excluirMentoradaNauta('${m.login}','${m.nome}')"
+      <button onclick="editarNichoMentorada('${m.login}','${m.nome}')"
+        style="padding:5px 10px;border-radius:8px;border:none;background:#EAF2E5;color:#3D7A3D;font-size:11px;font-weight:600;cursor:pointer;margin-right:6px">Nicho</button><button onclick="excluirMentoradaNauta('${m.login}','${m.nome}')"
         style="padding:5px 10px;border-radius:8px;border:none;background:#FDECEA;color:#C0392B;font-size:11px;font-weight:600;cursor:pointer">Excluir</button>
     </div>`).join('');
 }
 
-async function excluirMentoradaNauta(login,nome){
+async function editarNichoMentorada(login,nome){
+  const opcoes = NICHO_OPCOES.map(n=>`${n.key} — ${n.ico} ${n.nome}`).join('\n');
+  const novoKey = prompt(`Digite a chave do novo nicho para ${nome}:\n\n${opcoes}`);
+  if(!novoKey) return;
+  const chave = novoKey.trim().toLowerCase();
+  const valido = NICHO_OPCOES.find(n=>n.key===chave);
+  if(!valido){ alert('Nicho inválido. Digite exatamente uma das chaves da lista (ex: estetica).'); return; }
+  const r = await fetch(`${SUPA_URL}/rest/v1/nauta_dados?negocio_id=eq.${encodeURIComponent(login)}&select=dados`,{headers:SUPA_HDR});
+  const rows = await r.json();
+  if(!rows || !rows.length){ alert('Não foi possível carregar os dados dessa mentorada.'); return; }
+  const dados = rows[0].dados || {};
+  if(!dados.config) dados.config = {};
+  dados.config.nicho = chave;
+  await fetch(`${SUPA_URL}/rest/v1/nauta_dados?negocio_id=eq.${encodeURIComponent(login)}`,{
+    method:'PATCH', headers:{...SUPA_HDR,'Prefer':'return=minimal'},
+    body: JSON.stringify({dados})
+  });
+  alert('✅ Nicho de '+nome+' atualizado para '+valido.ico+' '+valido.nome+'! A mudança aparece na próxima vez que ela entrar no sistema.');
+}async function excluirMentoradaNauta(login,nome){
   if(!confirm('Excluir acesso de '+nome+'? Os dados dela também serão apagados.')) return;
   await fetch(`${SUPA_URL}/rest/v1/nauta_dados?negocio_id=eq.${login}`,{method:'DELETE',headers:SUPA_HDR});
   await fetch(`${SUPA_URL}/rest/v1/nauta_usuarios?login=eq.${login}`,{method:'DELETE',headers:SUPA_HDR});
