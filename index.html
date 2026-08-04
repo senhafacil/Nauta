@@ -2660,20 +2660,23 @@ async function iniciarSistema(){
   if(!setupNichoSel){err.style.display='block';err.textContent='⚠ Selecione o ramo do negócio.';return;}
   err.style.display='none';
 
-  // Gera negocio_id único a partir do nome (slug)
-  NEGOCIO_ID = nome.toLowerCase()
-    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
-    .replace(/[^a-z0-9]/g,'-').replace(/-+/g,'-').replace(/^-|-$/g,'')
-    + '-' + Date.now().toString().slice(-6);
+  // Só gera um negocio_id novo se for cadastro realmente novo.
+  // Se já existe uma conta logada (reconfiguração), mantém o mesmo negocio_id
+  // pra não perder os dados (pedidos, clientes, estoque) e não criar uma conta fantasma.
+  if(!NEGOCIO_ID){
+    NEGOCIO_ID = nome.toLowerCase()
+      .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+      .replace(/[^a-z0-9]/g,'-').replace(/-+/g,'-').replace(/^-|-$/g,'')
+      + '-' + Date.now().toString().slice(-6);
+  }
 
-  // Atualiza config no DB
-  DB.config = { nome_negocio:nome, nome_proprietaria:prop, whatsapp:tel||'', meta_mensal:parseFloat(meta)||0, nicho:setupNichoSel, negocio_id:NEGOCIO_ID };
-
-  // Tenta carregar dados existentes da nuvem
+  // Tenta carregar dados existentes da nuvem (mantém pedidos, clientes, estoque etc.)
   await carregarDados();
-aplicarPermissoes();
-  // Se configuração veio da nuvem, usa ela; senão mantém a que acabou de preencher
-  if(DB.config.negocio_id) NEGOCIO_ID = DB.config.negocio_id;
+  aplicarPermissoes();
+
+  // Aplica por cima os dados que a pessoa acabou de preencher agora
+  // (nome, proprietária, meta e — o mais importante — o nicho escolhido)
+  DB.config = { ...(DB.config||{}), nome_negocio:nome, nome_proprietaria:prop, whatsapp:tel||'', meta_mensal:parseFloat(meta)||0, nicho:setupNichoSel, negocio_id:NEGOCIO_ID };
 
   // Remove setup screen
   const screen = document.getElementById('setup-screen');
