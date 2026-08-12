@@ -288,33 +288,19 @@ textarea.fi{resize:vertical;min-height:70px}
 <nav class="sidebar">
   <div class="brand">
     <div class="brand-logo"><div class="brand-dot"></div>Nauta</div>
-    <div class="brand-sub">Gestão Inteligente</div>
-    <div class="brand-nicho" id="sb-nicho">🎂 Confeitaria</div>
+    <div class="brand-sub">🎓 Modo Treinamento</div>
+    <div class="brand-nicho" id="sb-nicho">🌐 Geral</div>
   </div>
 
   <div class="nav-sec">
     <div class="nav-lbl">Principal</div>
     <div class="ni active" onclick="go('dashboard')"><span class="ni-ico">⊞</span>Dashboard</div>
     <div class="ni" onclick="go('agenda')"><span class="ni-ico">📅</span>Agenda</div>
-    <div class="ni" onclick="go('pedidos')"><span class="ni-ico">📋</span><span id="sb-pedidos">Pedidos</span></div>
+    <div class="ni" id="nav-pedidos" onclick="go('pedidos')"><span class="ni-ico">📋</span><span id="sb-pedidos">Pedidos</span></div>
     <div class="ni" onclick="go('clientes')"><span class="ni-ico">👤</span><span id="sb-clientes">Clientes</span></div>
-    <div class="ni" onclick="go('comanda')"><span class="ni-ico">🧾</span>Comanda</div>
-    <div class="ni" id="nav-servicos" style="display:none" onclick="go('servicos')"><span class="ni-ico">💇</span>Serviços</div>
-  </div>
-  <div class="nav-sec">
-    <div class="nav-lbl">Financeiro</div>
-    <div class="ni" onclick="go('financeiro')"><span class="ni-ico">💰</span>Financeiro</div>
-    <div class="ni" onclick="go('relatorios')"><span class="ni-ico">📊</span>Relatórios</div>
-  </div>
-  <div class="nav-sec">
-    <div class="nav-lbl">Gestão</div>
-    <div class="ni" onclick="go('gestao')"><span class="ni-ico">🎯</span>Central de Gestão</div>
-    <div class="ni" onclick="go('precificacao')"><span class="ni-ico">💲</span>Precificação</div>
-    <div class="ni" onclick="go('tarefas')"><span class="ni-ico">✅</span>Tarefas da Equipe</div>
-    <div class="ni" onclick="go('compras')"><span class="ni-ico">🛒</span>Lista de Compras</div>
-    <div class="ni" onclick="go('estoque')"><span class="ni-ico">📦</span>Estoque</div>
-    <div class="ni" onclick="go('funcionarios')"><span class="ni-ico">👥</span>Funcionários</div>
-    <div class="ni" onclick="go('configuracoes')" id="nav-configuracoes"><span class="ni-ico">⚙️</span>Configurações</div>
+    <div class="ni" id="nav-estoque" onclick="go('estoque')"><span class="ni-ico">📦</span>Estoque</div>
+    <div class="ni" id="nav-servicos-treino" style="display:none" onclick="go('servicos')"><span class="ni-ico">💇</span>Serviço</div>
+    <div class="ni" id="nav-relatorios-treino" style="display:none" onclick="go('relatorios')"><span class="ni-ico">📊</span>Relatórios</div>
   </div>
   <div class="su">
     <div class="su-av" id="su-av">?</div>
@@ -423,10 +409,14 @@ textarea.fi{resize:vertical;min-height:70px}
     <div class="card-t">Próximos eventos</div>
     <div class="tw"><table class="tbl">
       <thead><tr><th>Data</th><th>Hora</th><th>Evento</th><th>Tipo</th><th>Responsável</th><th></th></tr></thead>
-      <tbody>
+      <tbody id="agenda-proximos">
         <tr><td colspan="6" style="text-align:center;color:var(--cinza);padding:16px;font-size:13px">Nenhum evento cadastrado</td></tr>
       </tbody>
     </table></div>
+  </div>
+  <div class="card">
+    <div class="card-t">Minhas tarefas <button class="btn btn-p btn-xs" onclick="openM('m-tarefa')">+ Tarefa</button></div>
+    <div id="agenda-task-list"><div style="text-align:center;color:var(--cinza);padding:20px;font-size:13px">Nenhuma tarefa cadastrada.<br>Clique em + Tarefa pra criar a sua.</div></div>
   </div>
 </div>
 
@@ -438,7 +428,6 @@ textarea.fi{resize:vertical;min-height:70px}
     <select class="fi" style="width:auto;padding:8px 12px"><option>Hoje</option><option>Esta semana</option><option>Este mês</option></select>
   </div>
   <!-- NICHO-SPECIFIC CAMPOS DE PEDIDO -->
-  <div class="ibox t" id="ped-nicho-info">🎂 <strong>Confeitaria:</strong> Campos ativos: sabor, recheio, cobertura, tema, nº de porções, entrega/retirada.</div>
   <div class="card" style="padding:0;overflow:hidden">
     <div class="tw"><table class="tbl" id="ped-table">
       <thead><tr><th>#</th><th id="pth-cli">Cliente</th><th id="pth-prod">Produto</th><th id="pth-extra">Sabor/Tema</th><th id="pth-ent">Entrega</th><th>Total</th><th>Sinal</th><th>Status</th><th></th></tr></thead>
@@ -1688,6 +1677,13 @@ window.renderInsumos = renderInsumos;
     </div>
     <div class="fg">
       <div class="fl">🛒 Itens do Pedido</div>
+      <div id="mp-itens-head" style="display:none;gap:6px;align-items:center;margin-bottom:4px;font-size:10px;font-weight:700;color:var(--cinza);text-transform:uppercase;letter-spacing:.03em">
+        <div style="flex:1">Produto</div>
+        <div style="width:60px;text-align:center">Qtd.</div>
+        <div style="width:80px;text-align:center">Valor un. (R$)</div>
+        <div style="width:70px;text-align:right">Subtotal</div>
+        <div style="width:18px"></div>
+      </div>
       <div id="mp-itens-wrap"></div>
       <div class="brow" style="gap:8px;margin-top:6px">
         <button type="button" class="btn btn-xs" onclick="addItemCarrinhoManual()">+ Produto personalizado</button>
@@ -1742,7 +1738,7 @@ window.renderInsumos = renderInsumos;
   </div>
 </div>
 
-<div class="modal-bg" id="m-evento"><div class="modal" style="width:440px"><div class="modal-hdr"><div class="modal-title">Novo Evento</div><button class="modal-x" onclick="closeM('m-evento')">×</button></div><div class="fg"><div class="fl">Título</div><input class="fi" id="ev-titulo" placeholder="Ex: Entrega pedido — Nome da cliente"></div><div class="fr2"><div class="fg"><div class="fl">Data</div><input class="fi" type="date" id="ev-data"></div><div class="fg"><div class="fl">Horário</div><input class="fi" type="time" id="ev-hora"></div></div><div class="fr2"><div class="fg"><div class="fl">Tipo</div><select class="fi" id="ev-tipo"><option>Entrega</option><option>Retirada</option><option>Reunião</option><option>Compra</option><option>Aniversário</option><option>Gestão</option></select></div><div class="fg"><div class="fl">Responsável</div><select class="fi" id="ev-resp"><option>Proprietária</option></select></div></div><div class="fg"><div class="fl">Detalhes</div><textarea class="fi" id="ev-detalhe" rows="2" placeholder="Informações adicionais..."></textarea></div><div class="brow" style="justify-content:flex-end;margin-top:8px"><button class="btn btn-sm" onclick="closeM('m-evento')">Cancelar</button><button class="btn btn-p btn-sm" onclick="salvarEvento()">Salvar</button></div></div></div>
+<div class="modal-bg" id="m-evento"><div class="modal" style="width:440px"><div class="modal-hdr"><div class="modal-title">Novo Evento</div><button class="modal-x" onclick="closeM('m-evento')">×</button></div><div class="fg"><div class="fl">Título</div><input class="fi" id="ev-titulo" placeholder="Ex: Entrega pedido — Nome da cliente"></div><div class="fr2"><div class="fg"><div class="fl">Data</div><input class="fi" type="date" id="ev-data"></div><div class="fg"><div class="fl">Horário</div><input class="fi" type="time" id="ev-hora"></div></div><div class="fr2"><div class="fg"><div class="fl">Tipo</div><select class="fi" id="ev-tipo"><option>Entrega</option><option>Retirada</option><option>Pós-venda</option><option>Reunião</option><option>Compra</option><option>Aniversário</option><option>Gestão</option></select></div><div class="fg"><div class="fl">Responsável</div><select class="fi" id="ev-resp"><option>Proprietária</option></select></div></div><div class="fg"><div class="fl">Detalhes</div><textarea class="fi" id="ev-detalhe" rows="2" placeholder="Informações adicionais..."></textarea></div><div class="brow" style="justify-content:flex-end;margin-top:8px"><button class="btn btn-sm" onclick="closeM('m-evento')">Cancelar</button><button class="btn btn-p btn-sm" onclick="salvarEvento()">Salvar</button></div></div></div>
 
 <div class="modal-bg" id="m-tarefa"><div class="modal" style="width:440px"><div class="modal-hdr"><div class="modal-title">Nova Tarefa</div><button class="modal-x" onclick="closeM('m-tarefa')">×</button></div><div class="fg"><div class="fl">Descrição da tarefa</div><textarea class="fi" id="mt-txt" rows="2" placeholder="O que precisa ser feito?"></textarea></div><div class="fr2"><div class="fg"><div class="fl">Data</div><input class="fi" type="date" id="mt-data"></div><div class="fg"><div class="fl">Horário</div><input class="fi" type="time" id="mt-hora"></div></div><div class="fr2"><div class="fg"><div class="fl">Para quem</div><select class="fi" id="mt-resp"><option>Proprietária</option></select></div><div class="fg"><div class="fl">Prioridade</div><select class="fi" id="mt-pri"><option>Alta</option><option>Média</option><option>Baixa</option></select></div></div><div class="brow" style="justify-content:flex-end;margin-top:8px"><button class="btn btn-sm" onclick="closeM('m-tarefa')">Cancelar</button><button class="btn btn-p btn-sm" onclick="addTarefa()">Adicionar</button></div></div></div>
 
@@ -1808,7 +1804,7 @@ const nichos = {
       </div>
       <div class="fr2">
         <div class="fg"><div class="fl">Tema / Decoração</div><input class="fi" id="mp-extra4" placeholder="Ex: Unicórnio, Frozen, Floral..."></div>
-        <div class="fg"><div class="fl">Tipo de entrega</div><select class="fi" id="mp-extra5"><option>Entrega</option><option>Retirada no ateliê</option></select></div>
+        <div class="fg"><div class="fl">Tipo de entrega</div><select class="fi" id="mp-extra5"><option>Entrega</option><option>Retirada na loja</option></select></div>
       </div>`,
     cliente_fields:`<div class="fg"><div class="fl">Preferências alimentares</div><input class="fi" id="cli-extra1" placeholder="Ex: vegetariana, sem lactose..."></div>`,
     comanda_extra:`<div class="ci"><div class="ci-qty">—</div><div class="ci-name" style="color:var(--cinza);font-size:12px">🎂 Tema: Unicórnio · 30 porções · Chantilly</div></div>`,
@@ -1969,13 +1965,20 @@ function applyNicho(key) {
   if (!n) return;
   nichoAtual = key;
 
-  // menu "Serviços" só aparece pro nicho de Estética/Beleza
-  const navServ = document.getElementById('nav-servicos');
-  if (navServ) navServ.style.display = (key === 'estetica') ? '' : 'none';
+  // Menu: pro nicho Estética/Beleza, troca Pedidos+Estoque por Serviço+Relatórios
+  const ehEstetica = (key === 'estetica');
+  const navPedidos = document.getElementById('nav-pedidos');
+  const navEstoque = document.getElementById('nav-estoque');
+  const navServicos = document.getElementById('nav-servicos-treino');
+  const navRelatorios = document.getElementById('nav-relatorios-treino');
+  if(navPedidos) navPedidos.style.display = ehEstetica ? 'none' : '';
+  if(navEstoque) navEstoque.style.display = ehEstetica ? 'none' : '';
+  if(navServicos) navServicos.style.display = ehEstetica ? '' : 'none';
+  if(navRelatorios) navRelatorios.style.display = ehEstetica ? '' : 'none';
 
   // sidebar + brand
   document.getElementById('sb-nicho').textContent = n.ico + ' ' + n.nome;
-  document.getElementById('sb-pedidos').textContent = n.pedido_label + 's';
+  if(document.getElementById('sb-pedidos')) document.getElementById('sb-pedidos').textContent = n.pedido_label + 's';
   document.getElementById('sb-clientes').textContent = n.cliente_label + 's';
 
   // dashboard
@@ -1991,7 +1994,7 @@ function applyNicho(key) {
   document.getElementById('pth-prod').textContent = 'Produto / Serviço';
   document.getElementById('pth-extra').textContent = n.table_extra_header;
   document.getElementById('pth-ent').textContent = n.entrega_label;
-  document.getElementById('ped-nicho-info').innerHTML = n.ico + ' <strong>' + n.nome + ':</strong> Campos de pedido adaptados: ' + (n.table_extra_header || 'campos gerais') + '.';
+  if(document.getElementById('ped-nicho-info')) document.getElementById('ped-nicho-info').innerHTML = n.ico + ' <strong>' + n.nome + ':</strong> Campos de pedido adaptados: ' + (n.table_extra_header || 'campos gerais') + '.';
 
   // modal pedido
   if(document.getElementById('mp-lbl-cli')) document.getElementById('mp-lbl-cli').textContent = n.cliente_label;
@@ -2409,6 +2412,28 @@ function atualizarProg(){
   document.getElementById('prog-done').textContent=done;
   document.getElementById('prog-tot').textContent=tot;
 }
+// ── Lista de tarefas própria dentro da Agenda (treinamento: Tarefas não tem menu separado) ──
+function renderAgendaTarefas(){
+  const el = document.getElementById('agenda-task-list');
+  if(!el) return;
+  const tarefas = (DB.tarefas||[]).slice().sort((a,b)=>(a.data||'').localeCompare(b.data||''));
+  if(!tarefas.length){
+    el.innerHTML = '<div style="text-align:center;color:var(--cinza);padding:20px;font-size:13px">Nenhuma tarefa cadastrada.<br>Clique em + Tarefa pra criar a sua.</div>';
+    return;
+  }
+  const pc = {Alta:'pr-a',Média:'pr-m',Baixa:'pr-b'};
+  el.innerHTML = tarefas.map(t=>`
+    <div class="task ${t.feita?'done':''}">
+      <div class="tchk ${t.feita?'done':''}" onclick="toggleTarefa(${t.id})" style="cursor:pointer"></div>
+      <div style="flex:1">
+        <div class="ttxt" style="${t.feita?'text-decoration:line-through;color:var(--cinza)':''}">${t.txt}</div>
+        <div style="font-size:11px;color:var(--cinza);margin-top:2px">${t.data||''} ${t.hora||''} · ${t.resp||''}</div>
+      </div>
+      <span class="tpr ${pc[t.pri]||'pr-m'}">${t.pri}</span>
+      <button onclick="excluirTarefa(${t.id})" style="border:none;background:none;cursor:pointer;color:var(--cinza);font-size:14px;padding:4px">✕</button>
+    </div>`).join('');
+}
+
 function addTarefa(){
   const txt  = document.getElementById('mt-txt')?.value.trim();
   const data = document.getElementById('mt-data')?.value || new Date().toISOString().split('T')[0];
@@ -2428,6 +2453,7 @@ function addTarefa(){
   salvarDados();
   closeM('m-tarefa');
   renderTarefas();
+  renderAgendaTarefas();
   toast('✅ Tarefa adicionada!');
   document.getElementById('mt-txt').value='';
   const dtField = document.getElementById('mt-data');
@@ -2528,6 +2554,7 @@ function salvarTaxas(){
 /* Mostrada antes de enviar para a mentorada */
 
 const NICHO_OPCOES = [
+  {key:'geral',       ico:'🌐', nome:'Geral'},
   {key:'confeitaria', ico:'🎂', nome:'Confeitaria'},
   {key:'padaria',     ico:'🍞', nome:'Padaria'},
   {key:'estamparia',  ico:'👕', nome:'Estamparia'},
@@ -2821,7 +2848,7 @@ let USUARIO_ADMIN = false;
 
 // ── Estrutura inicial do banco ──
 const DB = {
-  config:    { nome_negocio:'', nome_proprietaria:'', whatsapp:'', meta_mensal:0, nicho:'', negocio_id:'' },
+  config:    { nome_negocio:'', nome_proprietaria:'', whatsapp:'', meta_mensal:0, nicho:'geral', negocio_id:'' },
   clientes:  [],
   pedidos:   [],
   financeiro:{ entradas:[], saidas:[] },
@@ -2835,8 +2862,31 @@ const DB = {
   nextId:    { cliente:1, pedido:1, financeiro:1, tarefa:1, compra:1, meta:1, estoque:1 },
 };
 
+// ── Reseta o DB para o estado padrão (evita vazar dados de um login anterior) ──
+function resetarDB(){
+  DB.config = { nome_negocio:'', nome_proprietaria:'', whatsapp:'', meta_mensal:0, nicho:'geral', negocio_id:'' };
+  DB.clientes = [];
+  DB.pedidos = [];
+  DB.financeiro = { entradas:[], saidas:[] };
+  DB.tarefas = [];
+  DB.compras = [];
+  DB.metas = [];
+  DB.informacoes = [];
+  DB.funcionarios = [];
+  DB.estoque = [];
+  DB.servicos = [];
+  DB.taxas = { pix:0, debito:1.49, credito1:2.99, credito2:3.49, credito3:3.99, credito6:4.99, credito12:6.99, dinheiro:0 };
+  DB.nextId = { cliente:1, pedido:1, financeiro:1, tarefa:1, compra:1, meta:1, estoque:1 };
+  DB.direcao = {};
+  DB.eventos = [];
+  DB.categoriasDesp = [];
+}
+
 // ── Supabase: buscar dados ──
+// MODO TREINAMENTO: nuvem desativada de propósito — tudo fica só no
+// localStorage deste navegador/tablet, sem risco de misturar com dados reais.
 async function supaGet(){
+  return null;
   if(!NEGOCIO_ID || SUPA_URL.includes('SEU_PROJETO')) return null;
   try{
     const r = await fetch(`${SUPA_URL}/rest/v1/${NAUTA_TABELA}?negocio_id=eq.${NEGOCIO_ID}&select=dados`,{headers:SUPA_HDR});
@@ -2847,7 +2897,9 @@ async function supaGet(){
 }
 
 // ── Supabase: salvar dados ──
+// MODO TREINAMENTO: nuvem desativada — ver nota em supaGet().
 async function supaSet(dados){
+  return false;
   if(!NEGOCIO_ID || SUPA_URL.includes('SEU_PROJETO')) return false;
   try{
     const payload = { dados, atualizado_em: new Date().toISOString() };
@@ -2906,26 +2958,6 @@ function salvarDados(){
 }
 
 // ── Carregar (nuvem com fallback local) ──
-// ── Reseta o DB para o estado padrão (evita vazar dados de um login anterior) ──
-function resetarDB(){
-  DB.config = { nome_negocio:'', nome_proprietaria:'', whatsapp:'', meta_mensal:0, nicho:'', negocio_id:'' };
-  DB.clientes = [];
-  DB.pedidos = [];
-  DB.financeiro = { entradas:[], saidas:[] };
-  DB.tarefas = [];
-  DB.compras = [];
-  DB.metas = [];
-  DB.informacoes = [];
-  DB.funcionarios = [];
-  DB.estoque = [];
-  DB.servicos = [];
-  DB.taxas = { pix:0, debito:1.49, credito1:2.99, credito2:3.49, credito3:3.99, credito6:4.99, credito12:6.99, dinheiro:0 };
-  DB.nextId = { cliente:1, pedido:1, financeiro:1, tarefa:1, compra:1, meta:1, estoque:1, servico:1, funcionario:1, evento:1 };
-  DB.direcao = {};
-  DB.eventos = [];
-  DB.categoriasDesp = [];
-}
-
 async function carregarDados(){
   setSaveStatus('⏳ Carregando...');
   // Sempre reseta ANTES de buscar — garante que um login novo (ou diferente)
@@ -3060,6 +3092,7 @@ function buildAdminScreen(){
         <div style="margin-bottom:14px">
           <label style="font-size:11px;font-weight:700;color:#999;display:block;margin-bottom:4px">Nicho do negócio</label>
           <select id="adm-nicho" style="width:100%;padding:9px 12px;border:1.5px solid #E5E0D8;border-radius:8px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none">
+            <option value="geral" selected>🌐 Geral / Todos os nichos</option>
             <option value="confeitaria">🎂 Confeitaria</option>
             <option value="padaria">🍞 Padaria</option>
             <option value="estamparia">👕 Estamparia</option>
@@ -3121,7 +3154,7 @@ async function fazerLoginNauta(){
       document.querySelectorAll('.page').forEach(p=>{p.style.display='none';p.classList.remove('active')});
       document.getElementById('pg-dashboard').style.display='flex';
       document.getElementById('pg-dashboard').classList.add('active');
-      const nichoKey = DB.config?.nicho || 'confeitaria';
+      const nichoKey = DB.config?.nicho || 'geral';
       applyNicho(nichoKey);
       renderInsumos('calc');
       renderInsumos('diag');
@@ -3172,7 +3205,7 @@ async function cadastrarMentoradaNauta(){
   const nome  = document.getElementById('adm-nome')?.value.trim();
   const login = document.getElementById('adm-login')?.value.trim().toLowerCase().replace(/\s/g,'');
   const senha = document.getElementById('adm-senha')?.value.trim();
-  const nicho = document.getElementById('adm-nicho')?.value || 'confeitaria';
+  const nicho = document.getElementById('adm-nicho')?.value || 'geral';
   const msg   = document.getElementById('adm-msg');
   if(!nome||!login||!senha){msg.style.display='block';msg.style.color='#C0392B';msg.textContent='Preencha todos os campos.';return;}
   const r = await fetch(`${SUPA_URL}/rest/v1/nauta_usuarios`,{
@@ -3218,9 +3251,47 @@ async function carregarListaNauta(){
         <div style="font-size:11px;color:#999">Login: <strong>${m.login}</strong></div>
       </div>
       <button onclick="editarNichoMentorada('${m.login}','${m.nome}')"
-        style="padding:5px 10px;border-radius:8px;border:none;background:#EAF2E5;color:#3D7A3D;font-size:11px;font-weight:600;cursor:pointer;margin-right:6px">Nicho</button><button onclick="excluirMentoradaNauta('${m.login}','${m.nome}')"
+        style="padding:5px 10px;border-radius:8px;border:none;background:#EAF2E5;color:#3D7A3D;font-size:11px;font-weight:600;cursor:pointer;margin-right:6px">Nicho</button><button onclick="redefinirSenhaMentorada('${m.login}','${m.nome}')"
+        style="padding:5px 10px;border-radius:8px;border:none;background:#FDF3E3;color:#B8720E;font-size:11px;font-weight:600;cursor:pointer;margin-right:6px">Senha</button><button onclick="excluirMentoradaNauta('${m.login}','${m.nome}')"
         style="padding:5px 10px;border-radius:8px;border:none;background:#FDECEA;color:#C0392B;font-size:11px;font-weight:600;cursor:pointer">Excluir</button>
     </div>`).join('');
+}
+
+function redefinirSenhaMentorada(login, nome){
+  document.getElementById('senha-edit-screen')?.remove();
+  const div = document.createElement('div');
+  div.id = 'senha-edit-screen';
+  div.style.cssText = "position:fixed;inset:0;z-index:10000;background:rgba(44,36,22,.6);display:flex;align-items:center;justify-content:center;font-family:'DM Sans',sans-serif;padding:20px";
+  div.innerHTML = `
+    <div style="background:#fff;border-radius:16px;padding:24px;max-width:380px;width:100%;box-shadow:0 8px 30px rgba(0,0,0,.25)">
+      <div style="font-size:16px;font-weight:700;color:#2C1A0E;margin-bottom:4px">Redefinir senha de ${nome}</div>
+      <div style="font-size:12px;color:#999;margin-bottom:16px">Login: <strong>${login}</strong> — defina uma nova senha, ela substitui a antiga na hora</div>
+      <input id="senha-edit-nova" style="width:100%;padding:10px 12px;border:1.5px solid #E5E0D8;border-radius:8px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;box-sizing:border-box;margin-bottom:14px" placeholder="Nova senha">
+      <div id="senha-edit-msg" style="display:none;font-size:12px;margin-bottom:10px"></div>
+      <div style="display:flex;gap:8px">
+        <button onclick="document.getElementById('senha-edit-screen').remove()" style="flex:1;padding:10px;border-radius:10px;border:1px solid #E5E0D8;background:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif">Cancelar</button>
+        <button onclick="salvarNovaSenhaMentorada('${login}')" style="flex:1;padding:10px;border-radius:10px;border:none;background:#C17B4E;color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif">Salvar</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(div);
+  setTimeout(()=>document.getElementById('senha-edit-nova')?.focus(), 50);
+}
+
+async function salvarNovaSenhaMentorada(login){
+  const nova = document.getElementById('senha-edit-nova')?.value.trim();
+  const msg  = document.getElementById('senha-edit-msg');
+  if(!nova){ msg.style.display='block'; msg.style.color='#C0392B'; msg.textContent='Digite a nova senha.'; return; }
+  const r = await fetch(`${SUPA_URL}/rest/v1/nauta_usuarios?login=eq.${encodeURIComponent(login)}`,{
+    method:'PATCH', headers:{...SUPA_HDR,'Prefer':'return=minimal'},
+    body: JSON.stringify({ senha: nova })
+  });
+  if(r.ok){
+    alert('✅ Senha atualizada! Nova senha: '+nova);
+    document.getElementById('senha-edit-screen')?.remove();
+  } else {
+    msg.style.display='block'; msg.style.color='#C0392B'; msg.textContent='Erro ao atualizar. Tente novamente.';
+  }
 }
 
 function editarNichoMentorada(login, nome){
@@ -3721,12 +3792,14 @@ function toggleTarefa(id){
   DB.tarefas = (DB.tarefas||[]).map(t=>t.id===id?{...t,feita:!t.feita}:t);
   salvarDados();
   renderTarefas();
+  renderAgendaTarefas();
 };
 
 function excluirTarefa(id){
   DB.tarefas = (DB.tarefas||[]).filter(t=>t.id!==id);
   salvarDados();
   renderTarefas();
+  renderAgendaTarefas();
 };
 
 
@@ -4011,6 +4084,7 @@ function abrirEditarDirecao(){
 }
 
 function renderAgenda(){
+  renderAgendaTarefas();
   const hoje = getTodayISO();
   const eventos = (DB.eventos||[]).sort((a,b)=>a.data.localeCompare(b.data));
   
@@ -4272,8 +4346,10 @@ function renderItensPedidoEstoque(){
 }
 function renderItensPedidoCarrinho(){
   const wrap = document.getElementById('mp-itens-wrap');
+  const head = document.getElementById('mp-itens-head');
   if(!wrap) return;
   const itens = window.itensPedidoCarrinho||[];
+  if(head) head.style.display = itens.length ? 'flex' : 'none';
   if(!itens.length){
     wrap.innerHTML = '<div style="text-align:center;color:var(--cinza);padding:14px;font-size:12px">Nenhum item adicionado ainda.</div>';
   } else {
@@ -4286,9 +4362,9 @@ function renderItensPedidoCarrinho(){
         : `<input class="fi" style="font-size:12px" value="${it.produto||''}" placeholder="Nome do produto" oninput="window.itensPedidoCarrinho[${i}].produto=this.value">`;
       return `<div class="brow" style="gap:6px;align-items:center;margin-bottom:6px">
         <div style="flex:1">${nomeField}</div>
-        <input class="fi" type="number" min="1" step="1" value="${it.qtd}" style="width:60px;font-size:12px" oninput="window.itensPedidoCarrinho[${i}].qtd=parseFloat(this.value)||1;renderItensPedidoCarrinho()">
-        <input class="fi" type="number" step="0.01" value="${it.valorUnit}" style="width:80px;font-size:12px" oninput="window.itensPedidoCarrinho[${i}].valorUnit=parseFloat(this.value)||0;renderItensPedidoCarrinho()">
-        <span style="font-size:12px;width:70px;text-align:right">${fmtR((it.qtd||0)*(it.valorUnit||0))}</span>
+        <input class="fi" type="number" min="1" step="1" value="${it.qtd}" title="Quantidade" placeholder="Qtd." style="width:60px;font-size:12px" oninput="window.itensPedidoCarrinho[${i}].qtd=parseFloat(this.value)||1;renderItensPedidoCarrinho()">
+        <input class="fi" type="number" step="0.01" value="${it.valorUnit}" title="Valor unitário (R$)" placeholder="Valor un." style="width:80px;font-size:12px" oninput="window.itensPedidoCarrinho[${i}].valorUnit=parseFloat(this.value)||0;renderItensPedidoCarrinho()">
+        <span style="font-size:12px;width:70px;text-align:right" title="Subtotal (qtd. × valor unitário)">${fmtR((it.qtd||0)*(it.valorUnit||0))}</span>
         <button type="button" class="btn btn-xs" onclick="window.itensPedidoCarrinho.splice(${i},1);renderItensPedidoCarrinho()" style="color:var(--rubi)">✕</button>
       </div>`;
     }).join('');
@@ -4394,13 +4470,33 @@ function salvarPedido(){
     registrarMovimentoEstoque(it.estoqueId, itemEst?itemEst.nome:'—', 'Saída', it.qtd, `Pedido #${idPedidoNovo} — ${cliente||'Encomenda'} (insumo usado na produção)`);
   });
 
+  // Cria automaticamente o evento de entrega na Agenda, se uma data de entrega foi informada
+  if(entrega){
+    if(!DB.eventos) DB.eventos = [];
+    if(!DB.nextId) DB.nextId = {};
+    if(!DB.nextId.evento) DB.nextId.evento = 1;
+    DB.eventos.push({
+      id: DB.nextId.evento++,
+      titulo: `Entrega — ${cliente || 'Pedido #'+idPedidoNovo}`,
+      data: entrega,
+      hora: '',
+      tipo: 'Entrega',
+      resp,
+      detalhe: `Gerado automaticamente a partir do Pedido #${idPedidoNovo}${produtoResumo?' — '+produtoResumo:''}`,
+      pedidoId: idPedidoNovo,
+      criado: new Date().toISOString()
+    });
+  }
+
   window.itensPedidoEstoque = [];
   window.itensPedidoCarrinho = [];
   salvarDados();
   closeM('m-pedido');
   renderPedidos();
+  buildCalendario && buildCalendario();
+  renderAgenda && renderAgenda();
   renderDashboard && renderDashboard();
-  toast('✅ Pedido registrado!');
+  toast(entrega ? '✅ Pedido registrado e entrega marcada na Agenda!' : '✅ Pedido registrado!');
   ['mp-obs','mp-sinal'].forEach(id=>{
     const el=document.getElementById(id);
     if(el) el.value='';
