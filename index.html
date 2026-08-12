@@ -3182,6 +3182,9 @@ async function fazerLoginNauta(){
       if(USUARIO_ADMIN){
         const b = document.getElementById('cfg-admin-block');
         if(b) b.style.display='block';
+      }
+      // Seletor de nicho liberado pra qualquer conta poder configurar o próprio negócio
+      {
         const n = document.getElementById('cfg-nicho-block');
         if(n) n.style.display='block';
       }
