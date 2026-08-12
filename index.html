@@ -1016,7 +1016,7 @@ textarea.fi{resize:vertical;min-height:70px}
       <div class="fg"><div class="fl">Terminologia: "Cliente"</div><select class="fi"><option>Cliente</option><option>Paciente</option><option>Aluno</option><option>Consumidor</option></select></div>
       <div class="fg"><div class="fl">Notificação de aniversário</div><select class="fi"><option>1 dia antes</option><option>No dia</option><option>3 dias antes</option><option>Desativado</option></select></div>
       <div class="fg"><div class="fl">Alerta de estoque baixo</div><select class="fi"><option>Ativado</option><option>Desativado</option></select></div>
-      <button class="btn btn-p btn-sm" style="margin-top:4px" onclick="toast('Configurações salvas!')">💾 Salvar</button>
+      <button class="btn btn-p btn-sm" style="margin-top:4px" onclick="salvarDados();toast('Configurações salvas!')">💾 Salvar</button>
     </div>
   </div>
   </div><!-- /cfg-admin-block -->
@@ -2523,6 +2523,10 @@ function selNicho(btn,key,ico,nome){
   document.querySelectorAll('.nb').forEach(b=>b.classList.remove('sel'));
   btn.classList.add('sel');
   applyNicho(key);
+  // Persiste de verdade a escolha do nicho — antes só mudava a tela, sem salvar
+  if(!DB.config) DB.config = {};
+  DB.config.nicho = key;
+  salvarDados();
   toast(ico+' Nicho alterado para: '+nome+'. Sistema adaptado!');
 }
 
