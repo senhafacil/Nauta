@@ -1938,10 +1938,10 @@ const nichos = {
 };
 
 // fallback genérico para nichos sem detalhes
-['atelie','floricultura','artesanato','loja'].forEach(k => {
+['atelie','floricultura','artesanato','loja','geral'].forEach(k => {
   nichos[k] = {
-    ico: {atelie:'🧵',floricultura:'💐',artesanato:'🎨',loja:'🛍️'}[k],
-    nome: {atelie:'Ateliê/Costura',floricultura:'Floricultura',artesanato:'Artesanato',loja:'Loja Virtual'}[k],
+    ico: {atelie:'🧵',floricultura:'💐',artesanato:'🎨',loja:'🛍️',geral:'🌐'}[k],
+    nome: {atelie:'Ateliê/Costura',floricultura:'Floricultura',artesanato:'Artesanato',loja:'Loja Virtual',geral:'Geral'}[k],
     pedido_label:'Pedido', cliente_label:'Cliente', entrega_label:'Data de entrega',
     prod_placeholder:'Descreva o produto ou serviço...',
     obs_placeholder:'Observações do pedido...',
@@ -1950,9 +1950,9 @@ const nichos = {
     table_extra_header:'Detalhes',
     top_vend:'<div style="text-align:center;color:var(--cinza);padding:16px;font-size:13px">Nenhum produto/serviço vendido ainda.<br>Os dados aparecem conforme você cadastra pedidos.</div>',
     compras_extra:'',
-    preview:`✅ Sistema configurado para <strong>${{atelie:'Ateliê/Costura',floricultura:'Floricultura',artesanato:'Artesanato',loja:'Loja Virtual'}[k]}</strong><br>✅ Campos gerais de pedido, cliente e comanda ativos<br>✅ Você pode personalizar os campos nas configurações`,
+    preview:`✅ Sistema configurado para <strong>${{atelie:'Ateliê/Costura',floricultura:'Floricultura',artesanato:'Artesanato',loja:'Loja Virtual',geral:'Geral'}[k]}</strong><br>✅ Campos gerais de pedido, cliente e comanda ativos<br>✅ Você pode personalizar os campos nas configurações`,
     agenda_ev1:'Entrega · cliente',agenda_ev2:'Reunião de planejamento',agenda_prox1:'Entrega especial',agenda_prox2:'Compra de insumos',
-    dash_alert_txt:`${({atelie:'🧵',floricultura:'💐',artesanato:'🎨',loja:'🛍️'}[k])} <strong>${{atelie:'Ateliê',floricultura:'Floricultura',artesanato:'Artesanato',loja:'Loja Virtual'}[k]}:</strong> Sistema adaptado para seu nicho. Configure os campos nas configurações!`
+    dash_alert_txt:`${({atelie:'🧵',floricultura:'💐',artesanato:'🎨',loja:'🛍️',geral:'🌐'}[k])} <strong>${{atelie:'Ateliê',floricultura:'Floricultura',artesanato:'Artesanato',loja:'Loja Virtual',geral:'Geral'}[k]}:</strong> Sistema adaptado para seu nicho. Configure os campos nas configurações!`
   };
 });
 
@@ -2519,15 +2519,21 @@ function editarPerms(id,nome){
 }
 
 /* ══════════ NICHO SELECTOR ══════════ */
-function selNicho(btn,key,ico,nome){
+async function selNicho(btn,key,ico,nome){
   document.querySelectorAll('.nb').forEach(b=>b.classList.remove('sel'));
   btn.classList.add('sel');
   applyNicho(key);
-  // Persiste de verdade a escolha do nicho — antes só mudava a tela, sem salvar
+  // Persiste de verdade a escolha do nicho — antes só mudava a tela, sem salvar.
+  // Salva de forma IMEDIATA (sem esperar o debounce de 800ms), pra não correr
+  // o risco de sair/recarregar a página antes do salvamento na nuvem terminar.
   if(!DB.config) DB.config = {};
   DB.config.nicho = key;
-  salvarDados();
-  toast(ico+' Nicho alterado para: '+nome+'. Sistema adaptado!');
+  const dadosAtualizados = coletarDados();
+  salvarLocal(dadosAtualizados);
+  toast(ico+' Nicho alterado para: '+nome+'. Salvando...');
+  const ok = await supaSet(dadosAtualizados);
+  setSaveStatus(ok ? '☁ Sincronizado' : '⚠ Só local');
+  toast(ico+' Nicho salvo: '+nome+(ok?' ☁':' (só local)'));
 }
 
 /* ══════════ TAXAS ══════════ */
