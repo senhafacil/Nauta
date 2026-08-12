@@ -289,6 +289,8 @@ textarea.fi{resize:vertical;min-height:70px}
   <div class="brand">
     <div class="brand-logo"><div class="brand-dot"></div>Nauta</div>
     <div class="brand-sub">🎓 Modo Treinamento</div>
+    <div style="font-size:9px;color:#999;margin-top:2px" id="build-version">build v2026-08-12-c</div>
+    <div style="font-size:9px;color:#f0a;margin-top:2px;word-break:break-all" id="debug-nicho">neg_id: — · nicho recebido: —</div>
     <div class="brand-nicho" id="sb-nicho">🌐 Geral</div>
   </div>
 
@@ -1962,6 +1964,10 @@ const taxas = {Pix:0, Débito:1.49, 'Crédito 1x':2.99, 'Crédito 2x':3.49, Dinh
 /* ══════════ APPLY NICHO ══════════ */
 function applyNicho(key) {
   const n = nichos[key];
+  // Debug visível: mostra o negocio_id atual e a chave de nicho recebida,
+  // mesmo se a chave for inválida — ajuda a diagnosticar sem precisar abrir o console.
+  const dbg = document.getElementById('debug-nicho');
+  if(dbg) dbg.textContent = 'neg_id: '+(typeof NEGOCIO_ID!=='undefined'?NEGOCIO_ID:'?')+' · nicho recebido: '+key+(n?'':' (INVÁLIDO)');
   if (!n) return;
   nichoAtual = key;
 
