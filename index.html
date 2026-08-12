@@ -1,3 +1,4 @@
+
 <!DOCTYPE html> 
 <html lang="pt-BR"> 
 <head>
@@ -298,6 +299,7 @@ textarea.fi{resize:vertical;min-height:70px}
     <div class="ni" onclick="go('pedidos')"><span class="ni-ico">📋</span><span id="sb-pedidos">Pedidos</span></div>
     <div class="ni" onclick="go('clientes')"><span class="ni-ico">👤</span><span id="sb-clientes">Clientes</span></div>
     <div class="ni" onclick="go('comanda')"><span class="ni-ico">🧾</span>Comanda</div>
+    <div class="ni" id="nav-servicos" style="display:none" onclick="go('servicos')"><span class="ni-ico">💇</span>Serviços</div>
   </div>
   <div class="nav-sec">
     <div class="nav-lbl">Financeiro</div>
@@ -487,6 +489,70 @@ textarea.fi{resize:vertical;min-height:70px}
 </div>
 
 <!-- ══════════ COMANDA ══════════ -->
+<div class="page" id="pg-servicos">
+  <div class="g4" style="margin-bottom:16px">
+    <div class="mc mc-t"><div class="mc-lbl">Serviços cadastrados</div><div class="mc-val" id="serv-total">0</div></div>
+    <div class="mc mc-v"><div class="mc-lbl">Preço médio</div><div class="mc-val" id="serv-preco-medio">R$ 0</div></div>
+  </div>
+
+  <div class="card" style="padding:0">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px">
+      <div class="card-t" style="padding:0">💇 Catálogo de serviços</div>
+      <button class="btn btn-p btn-sm" onclick="openM('m-servico')">+ Serviço</button>
+    </div>
+    <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr 80px;gap:8px;padding:10px 16px;font-size:10px;font-weight:700;color:var(--cinza);text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--cream3)">
+      <span>Serviço</span>
+      <span style="text-align:center">Duração</span>
+      <span style="text-align:center">Preço</span>
+      <span style="text-align:center">Profissional</span>
+      <span></span>
+    </div>
+    <div id="serv-lista">
+      <div style="text-align:center;color:var(--cinza);padding:32px;font-size:13px">
+        <div style="font-size:32px;margin-bottom:10px">💇</div>
+        Nenhum serviço cadastrado ainda.<br>Clique em <strong>+ Serviço</strong> para começar.
+      </div>
+    </div>
+  </div>
+
+  <div id="m-servico" class="modal-bg" onclick="if(event.target===this)closeM('m-servico')">
+    <div class="modal-box">
+      <div class="modal-hdr"><div class="modal-title">💇 Novo serviço</div><button class="modal-x" onclick="closeM('m-servico')">×</button></div>
+
+      <div class="fg">
+        <div class="fl">Nome do serviço *</div>
+        <input class="fi" id="serv-nome" placeholder="Ex: Corte feminino, Escova, Manicure, Design de sobrancelha...">
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+        <div class="fg" style="margin-bottom:0">
+          <div class="fl">Duração estimada</div>
+          <select class="fi" id="serv-duracao">
+            <option>15 min</option><option>30 min</option><option selected>1 hora</option>
+            <option>1h30</option><option>2 horas</option><option>3 horas</option>
+          </select>
+        </div>
+        <div class="fg" style="margin-bottom:0">
+          <div class="fl">Preço (R$)</div>
+          <input class="fi" id="serv-preco" type="number" step="0.01" placeholder="0,00">
+        </div>
+      </div>
+
+      <div class="fg">
+        <div class="fl">Profissional responsável <span style="font-weight:400;color:var(--cinza)">— opcional</span></div>
+        <select class="fi" id="serv-profissional">
+          <option value="">— Qualquer profissional —</option>
+        </select>
+      </div>
+
+      <div class="brow" style="justify-content:flex-end;margin-top:14px">
+        <button class="btn" onclick="closeM('m-servico')">Cancelar</button>
+        <button class="btn btn-p" onclick="salvarServico()">+ Adicionar serviço</button>
+      </div>
+    </div>
+  </div>
+</div><!-- /pg-servicos -->
+
 <div class="page" id="pg-comanda">
     <div class="card" style="margin-bottom:0">
       <div class="fg" style="margin-bottom:0">
@@ -596,6 +662,17 @@ textarea.fi{resize:vertical;min-height:70px}
         <div style="text-align:center;color:var(--cinza);padding:20px;font-size:13px">Nenhum dado ainda</div>
 
       </div>
+    </div>
+  </div>
+  <div class="g2">
+    <div class="card">
+      <div class="card-t">💇 Serviço mais vendido</div>
+      <div class="bc" id="rel-servico-top"><div style="text-align:center;color:var(--cinza);padding:20px;font-size:13px">Nenhum dado ainda</div></div>
+    </div>
+    <div class="card">
+      <div class="card-t">📅 Dias desde a última visita</div>
+      <div style="font-size:11px;color:var(--cinza);padding:0 2px 8px">Por cliente, do mais tempo ausente para o mais recente</div>
+      <div class="bc" id="rel-ultima-visita"><div style="text-align:center;color:var(--cinza);padding:20px;font-size:13px">Nenhum dado ainda</div></div>
     </div>
   </div>
   <div class="card">
@@ -1892,6 +1969,10 @@ function applyNicho(key) {
   if (!n) return;
   nichoAtual = key;
 
+  // menu "Serviços" só aparece pro nicho de Estética/Beleza
+  const navServ = document.getElementById('nav-servicos');
+  if (navServ) navServ.style.display = (key === 'estetica') ? '' : 'none';
+
   // sidebar + brand
   document.getElementById('sb-nicho').textContent = n.ico + ' ' + n.nome;
   document.getElementById('sb-pedidos').textContent = n.pedido_label + 's';
@@ -2049,6 +2130,7 @@ const pgMeta = {
   pedidos:     {title:'Pedidos',            sub:'14 abertos · 3 para hoje',           btns:'<button class="btn btn-p btn-sm" onclick="openM(\'m-pedido\')">+ Novo Pedido</button>'},
   clientes:    {title:'Clientes',           sub:'87 cadastradas',                     btns:'<button class="btn btn-p btn-sm" onclick="openM(\'m-cliente\')">+ Nova</button>'},
   comanda:     {title:'Comanda',    sub:'Selecione um pedido',                       btns:'<button class="btn btn-sm" onclick="imprimirComanda()">🖨 Imprimir</button><button class="btn btn-v btn-sm" onclick="fecharComanda()">✓ Fechar Comanda</button>'},
+  servicos:    {title:'Serviços',        sub:'Catálogo de serviços oferecidos',      btns:'<button class="btn btn-p btn-sm" onclick="openM(\'m-servico\')">+ Serviço</button>'},
   financeiro:  {title:'Financeiro',         sub:'Controle de caixa — '+getMesAno(),     btns:'<button class="btn btn-xs" onclick="openM(\'m-despesa\')">+ Despesa</button><button class="btn btn-p btn-sm" onclick="openM(\'m-receita\')">+ Receita</button>'},
   relatorios:  {title:'Relatórios',         sub:'Análise de desempenho',              btns:'<button class="btn btn-sm">📄 Exportar PDF</button>'},
   gestao:      {title:'Central de Gestão', sub:'Metas, direcionamento e indicadores', btns:'<button class="btn btn-p btn-sm" onclick="openM(\'m-meta\')">+ Meta</button><button class="btn btn-sm" onclick="openM(\'m-info\')">+ Info</button>'},
@@ -2061,7 +2143,7 @@ const pgMeta = {
 };
 
 function aplicarPermissoes(){
-  const nav = {dashboard:'dashboard',agenda:'agenda',pedidos:'pedidos',clientes:'clientes',comanda:'comanda',financeiro:'financeiro',relatorios:'relatorios',gestao:'gestao',precificacao:'precificacao',tarefas:'tarefas',compras:'compras',estoque:'estoque',funcionarios:'funcionarios',configuracoes:'configuracoes'};
+  const nav = {dashboard:'dashboard',agenda:'agenda',pedidos:'pedidos',clientes:'clientes',comanda:'comanda',servicos:'servicos',financeiro:'financeiro',relatorios:'relatorios',gestao:'gestao',precificacao:'precificacao',tarefas:'tarefas',compras:'compras',estoque:'estoque',funcionarios:'funcionarios',configuracoes:'configuracoes'};
   document.querySelectorAll('.ni').forEach(el=>{
     const m = el.getAttribute('onclick')?.match(/go\('(\w+)'\)/);
     if(!m) return;
@@ -2092,6 +2174,8 @@ function aplicarPermissoes(){
   if(id==='compras') setTimeout(renderCompras, 50);
   if(id==='clientes') setTimeout(renderClientes, 50);
   if(id==='comanda'){ setTimeout(()=>{popularSelectComanda(); if(comandaAtualId) abrirComanda(comandaAtualId);}, 50); }
+  if(id==='servicos') setTimeout(renderServicos, 50);
+  if(id==='relatorios') setTimeout(renderRelatoriosExtra, 50);
   if(id==='pedidos') setTimeout(renderPedidos, 50);
   if(id==='estoque') setTimeout(renderEstoque, 50);
   if(id==='financeiro') setTimeout(renderFinanceiro, 50);
@@ -2802,7 +2886,7 @@ function coletarDados(){
     financeiro:DB.financeiro, tarefas:DB.tarefas, compras:DB.compras,
     metas:DB.metas, informacoes:DB.informacoes, funcionarios:DB.funcionarios,
     taxas:DB.taxas, nextId:DB.nextId,
-    direcao:DB.direcao||{}, estoque:DB.estoque||[],
+    direcao:DB.direcao||{}, estoque:DB.estoque||[], servicos:DB.servicos||[],
     eventos:DB.eventos||[], categoriasDesp:DB.categoriasDesp||[],
   };
 }
@@ -2822,8 +2906,31 @@ function salvarDados(){
 }
 
 // ── Carregar (nuvem com fallback local) ──
+// ── Reseta o DB para o estado padrão (evita vazar dados de um login anterior) ──
+function resetarDB(){
+  DB.config = { nome_negocio:'', nome_proprietaria:'', whatsapp:'', meta_mensal:0, nicho:'', negocio_id:'' };
+  DB.clientes = [];
+  DB.pedidos = [];
+  DB.financeiro = { entradas:[], saidas:[] };
+  DB.tarefas = [];
+  DB.compras = [];
+  DB.metas = [];
+  DB.informacoes = [];
+  DB.funcionarios = [];
+  DB.estoque = [];
+  DB.servicos = [];
+  DB.taxas = { pix:0, debito:1.49, credito1:2.99, credito2:3.49, credito3:3.99, credito6:4.99, credito12:6.99, dinheiro:0 };
+  DB.nextId = { cliente:1, pedido:1, financeiro:1, tarefa:1, compra:1, meta:1, estoque:1, servico:1, funcionario:1, evento:1 };
+  DB.direcao = {};
+  DB.eventos = [];
+  DB.categoriasDesp = [];
+}
+
 async function carregarDados(){
   setSaveStatus('⏳ Carregando...');
+  // Sempre reseta ANTES de buscar — garante que um login novo (ou diferente)
+  // nunca herde dados que sobraram na memória de uma sessão anterior.
+  resetarDB();
   let dados = await supaGet();
   if(dados){ setSaveStatus('☁ Sincronizado'); }
   else{ dados = carregarLocal(); if(dados) setSaveStatus('⚠ Dados locais'); }
@@ -2835,6 +2942,7 @@ async function carregarDados(){
     if(!DB.compras) DB.compras=[];
     if(!DB.metas) DB.metas=[];
     if(!DB.estoque) DB.estoque=[];
+    if(!DB.servicos) DB.servicos=[];
     if(!DB.nextId.estoque) DB.nextId.estoque=1;
     if(!DB.informacoes) DB.informacoes=[];
     // Restaurar categorias customizadas no select de despesa
@@ -3753,6 +3861,140 @@ DB.estoque.push({id:DB.nextId.estoque++, nome, categoria, qtd, min, unid, preco,
   renderEstoque();
   toast('✅ Item adicionado ao estoque!');
 };
+
+/* ══════════ SERVIÇOS (nicho Estética/Beleza) ══════════ */
+function popularSelectProfissionalServico(){
+  const sel = document.getElementById('serv-profissional');
+  if(!sel) return;
+  const atual = sel.value;
+  const funcs = DB.funcionarios||[];
+  sel.innerHTML = '<option value="">— Qualquer profissional —</option>' +
+    funcs.map(f=>`<option value="${f.nome}">${f.nome}</option>`).join('');
+  sel.value = atual;
+}
+
+function salvarServico(){
+  const nome = document.getElementById('serv-nome')?.value.trim();
+  const duracao = document.getElementById('serv-duracao')?.value||'1 hora';
+  const preco = parseFloat(document.getElementById('serv-preco')?.value)||0;
+  const profissional = document.getElementById('serv-profissional')?.value||'';
+  if(!nome){ toast('Informe o nome do serviço!'); return; }
+  if(!DB.servicos) DB.servicos=[];
+  if(!DB.nextId) DB.nextId={};
+  if(!DB.nextId.servico) DB.nextId.servico=1;
+  DB.servicos.push({id:DB.nextId.servico++, nome, duracao, preco, profissional});
+  salvarDados();
+  closeM('m-servico');
+  renderServicos();
+  toast('✅ Serviço cadastrado!');
+  ['serv-nome','serv-preco'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+}
+
+function excluirServico(id){
+  if(!confirm('Remover este serviço?')) return;
+  DB.servicos = (DB.servicos||[]).filter(s=>s.id!==id);
+  salvarDados();
+  renderServicos();
+}
+
+function renderServicos(){
+  popularSelectProfissionalServico();
+  const lista = DB.servicos||[];
+  const totalEl = document.getElementById('serv-total');
+  const mediaEl = document.getElementById('serv-preco-medio');
+  if(totalEl) totalEl.textContent = lista.length;
+  if(mediaEl){
+    const media = lista.length ? lista.reduce((s,x)=>s+(x.preco||0),0)/lista.length : 0;
+    mediaEl.textContent = 'R$ ' + media.toFixed(2).replace('.',',');
+  }
+  const wrap = document.getElementById('serv-lista');
+  if(!wrap) return;
+  if(!lista.length){
+    wrap.innerHTML = '<div style="text-align:center;color:var(--cinza);padding:32px;font-size:13px"><div style="font-size:32px;margin-bottom:10px">💇</div>Nenhum serviço cadastrado ainda.<br>Clique em <strong>+ Serviço</strong> para começar.</div>';
+    return;
+  }
+  wrap.innerHTML = lista.map(s=>`
+    <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr 80px;gap:8px;padding:12px 16px;align-items:center;border-bottom:1px solid var(--cream3);font-size:13px">
+      <span style="font-weight:600">${s.nome}</span>
+      <span style="text-align:center;color:var(--cinza)">${s.duracao}</span>
+      <span style="text-align:center;font-weight:600;color:var(--terra-d)">R$ ${(s.preco||0).toFixed(2).replace('.',',')}</span>
+      <span style="text-align:center;color:var(--cinza)">${s.profissional||'—'}</span>
+      <span style="text-align:center"><button class="btn btn-xs" onclick="excluirServico(${s.id})" style="color:var(--rubi)">✕</button></span>
+    </div>`).join('');
+}
+
+/* ══════════ RELATÓRIO: SERVIÇO MAIS VENDIDO ══════════ */
+function renderRelatorioServicoTop(){
+  const wrap = document.getElementById('rel-servico-top');
+  if(!wrap) return;
+  const contagem = {};
+  (DB.pedidos||[]).forEach(p=>{
+    (p.itens||[]).forEach(it=>{
+      const nome = (it.produto||'').trim();
+      if(!nome) return;
+      if(!contagem[nome]) contagem[nome] = {qtd:0, valor:0};
+      contagem[nome].qtd += (it.qtd||1);
+      contagem[nome].valor += (it.qtd||1)*(it.valorUnit||0);
+    });
+  });
+  const ranking = Object.entries(contagem).sort((a,b)=>b[1].qtd-a[1].qtd).slice(0,8);
+  if(!ranking.length){
+    wrap.innerHTML = '<div style="text-align:center;color:var(--cinza);padding:20px;font-size:13px">Nenhum dado ainda</div>';
+    return;
+  }
+  const max = ranking[0][1].qtd;
+  wrap.innerHTML = ranking.map(([nome,info])=>`
+    <div style="margin-bottom:10px">
+      <div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:4px">
+        <span style="font-weight:600">${nome}</span>
+        <span style="color:var(--cinza)">${info.qtd}× · R$ ${info.valor.toFixed(2).replace('.',',')}</span>
+      </div>
+      <div style="height:6px;background:var(--cream3);border-radius:3px;overflow:hidden">
+        <div style="height:100%;width:${(info.qtd/max*100).toFixed(0)}%;background:var(--terra)"></div>
+      </div>
+    </div>`).join('');
+}
+
+/* ══════════ RELATÓRIO: DIAS DESDE A ÚLTIMA VISITA ══════════ */
+function renderRelatorioUltimaVisita(){
+  const wrap = document.getElementById('rel-ultima-visita');
+  if(!wrap) return;
+  const ultimaPorCliente = {};
+  (DB.pedidos||[]).forEach(p=>{
+    const nome = (p.cliente||'').trim();
+    if(!nome || !p.data) return;
+    if(!ultimaPorCliente[nome] || p.data > ultimaPorCliente[nome]) ultimaPorCliente[nome] = p.data;
+  });
+  const hoje = new Date(getTodayISO());
+  const linhas = Object.entries(ultimaPorCliente).map(([nome,data])=>{
+    const dUlt = new Date(data);
+    const dias = Math.round((hoje - dUlt) / (1000*60*60*24));
+    return {nome, data, dias};
+  }).sort((a,b)=>b.dias-a.dias);
+
+  if(!linhas.length){
+    wrap.innerHTML = '<div style="text-align:center;color:var(--cinza);padding:20px;font-size:13px">Nenhum dado ainda</div>';
+    return;
+  }
+  wrap.innerHTML = `
+    <div style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:8px;padding:6px 2px;font-size:10px;font-weight:700;color:var(--cinza);text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--cream3)">
+      <span>Cliente</span><span style="text-align:center">Última visita</span><span style="text-align:center">Dias sem vir</span>
+    </div>` +
+    linhas.map(l=>{
+      const cor = l.dias>=30 ? 'var(--rubi)' : (l.dias>=14 ? 'var(--dourado)' : 'var(--verde)');
+      const dataFmt = new Date(l.data+'T00:00:00').toLocaleDateString('pt-BR');
+      return `<div style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:8px;padding:9px 2px;border-bottom:1px solid var(--cream3);font-size:12.5px;align-items:center">
+        <span style="font-weight:600">${l.nome}</span>
+        <span style="text-align:center;color:var(--cinza)">${dataFmt}</span>
+        <span style="text-align:center;font-weight:700;color:${cor}">${l.dias} dia${l.dias===1?'':'s'}</span>
+      </div>`;
+    }).join('');
+}
+
+function renderRelatoriosExtra(){
+  renderRelatorioServicoTop();
+  renderRelatorioUltimaVisita();
+}
 
 /* ══════════ DIRECAO SAVE ══════════ */
 
