@@ -1723,7 +1723,7 @@ window.renderInsumos = renderInsumos;
       <button type="button" class="btn btn-p btn-sm" id="mov-tab-entrada" onclick="setTipoMovEstoque('entrada')">➕ Entrada (comprei)</button>
       <button type="button" class="btn btn-sm" id="mov-tab-saida" onclick="setTipoMovEstoque('saida')">➖ Saída (usei/perdi)</button>
     </div>
-    <div class="fg"><div class="fl">Insumo</div><select class="fi" id="mov-insumo-item"><option value="">Selecione...</option></select></div>
+    <div class="fg"><div class="fl">Insumo</div><select class="fi" id="mov-insumo-item" onchange="toggleNovoInsumo(this)"><option value="">Selecione...</option></select></div>
         <div class="fg" id="mov-insumo-novo-wrap" style="display:none">
       <div class="fl">Nome do novo insumo</div>
       <input class="fi" id="mov-insumo-novo-nome" placeholder="Ex: Farinha de trigo">
