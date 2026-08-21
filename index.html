@@ -3312,6 +3312,8 @@ function filtroTipoEstoque(t, btn){
   btn.classList.add('on');
   const btnBaixa = document.getElementById('est-btn-baixa');
   if(btnBaixa) btnBaixa.style.display = t==='insumo' ? '' : 'none';
+    const btnProduto = document.getElementById('est-btn-produto');
+  if(btnProduto) btnProduto.style.display = t==='produto' ? '' : 'none';
   renderEstoque();
 }
 
