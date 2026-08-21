@@ -3298,7 +3298,46 @@ async function salvarNichoMentorada(login, nome, chave){
 
 /* ══════════ ESTOQUE ══════════ */
 let estoqueFiltro = 'todos';
+let estoqueTipoFiltro = 'insumo';
+window._movTipoEstoque = 'entrada';
 
+function filtroTipoEstoque(t, btn){
+  estoqueTipoFiltro = t;
+  document.querySelectorAll('#est-tipo-insumo, #est-tipo-produto').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  const btnBaixa = document.getElementById('est-btn-baixa');
+  if(btnBaixa) btnBaixa.style.display = t==='insumo' ? '' : 'none';
+  renderEstoque();
+}
+
+function setTipoMovEstoque(tipo){
+  window._movTipoEstoque = tipo;
+  const te=document.getElementById('mov-tab-entrada');
+  const ts=document.getElementById('mov-tab-saida');
+  if(te) te.className = tipo==='entrada' ? 'btn btn-p btn-sm' : 'btn btn-sm';
+  if(ts) ts.className = tipo==='saida' ? 'btn btn-p btn-sm' : 'btn btn-sm';
+  const lbl = document.getElementById('mov-lbl-qtd');
+  if(lbl) lbl.textContent = tipo==='entrada' ? 'Quantidade a adicionar' : 'Quantidade a retirar';
+}
+
+function salvarMovimentoEstoqueManual(){
+  const id = parseInt(document.getElementById('mov-insumo-item')?.value);
+  const qtd = parseFloat(document.getElementById('mov-insumo-qtd')?.value)||0;
+  const motivo = document.getElementById('mov-insumo-motivo')?.value.trim();
+  const tipo = window._movTipoEstoque || 'entrada';
+  if(!id){ toast('⚠️ Selecione o insumo!'); return; }
+  if(qtd<=0){ toast('⚠️ Informe uma quantidade válida!'); return; }
+  const item = (DB.estoque||[]).find(e=>e.id===id);
+  if(!item){ toast('⚠️ Insumo não encontrado!'); return; }
+  const delta = tipo==='entrada' ? qtd : -qtd;
+  DB.estoque = (DB.estoque||[]).map(e=>e.id===id?{...e, qtd:(e.qtd||0)+delta}:e);
+  registrarMovimentoEstoque(id, item.nome, tipo==='entrada'?'Entrada':'Saída', qtd, motivo || (tipo==='entrada'?'Compra registrada manualmente':'Baixa manual'));
+  salvarDados();
+  closeM('m-baixa-insumo');
+  renderEstoque();
+  toast(tipo==='entrada' ? '✅ Entrada registrada!' : '✅ Baixa registrada!');
+  ['mov-insumo-qtd','mov-insumo-motivo'].forEach(fid=>{const el=document.getElementById(fid);if(el)el.value='';});
+}
 function registrarMovimentoEstoque(estoqueId, nomeProduto, tipo, qtd, origem){
   if(!DB.estoqueMovimentos) DB.estoqueMovimentos = [];
   if(!DB.nextId) DB.nextId = {};
