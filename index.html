@@ -1720,7 +1720,22 @@ window.renderInsumos = renderInsumos;
   </div>
 </div>
 
-<div class="modal-bg" id="m-cliente">
+<div class="modal-bg" id="m-baixa-insumo">
+  <div class="modal">
+    <div class="modal-hdr"><div class="modal-title">Movimentar estoque de insumo</div><button class="modal-x" onclick="closeM('m-baixa-insumo')">×</button></div>
+    <div class="brow" style="margin-bottom:10px">
+      <button type="button" class="btn btn-p btn-sm" id="mov-tab-entrada" onclick="setTipoMovEstoque('entrada')">➕ Entrada (comprei)</button>
+      <button type="button" class="btn btn-sm" id="mov-tab-saida" onclick="setTipoMovEstoque('saida')">➖ Saída (usei/perdi)</button>
+    </div>
+    <div class="fg"><div class="fl">Insumo</div><select class="fi" id="mov-insumo-item"><option value="">Selecione...</option></select></div>
+    <div class="fg"><div class="fl" id="mov-lbl-qtd">Quantidade a adicionar</div><input class="fi" type="number" step="0.1" id="mov-insumo-qtd" placeholder="0"></div>
+    <div class="fg"><div class="fl">Motivo <span style="font-weight:400;color:var(--cinza)">— opcional</span></div><input class="fi" id="mov-insumo-motivo" placeholder="Ex: Compra no atacadão, produção do dia, validade vencida..."></div>
+    <div class="brow" style="justify-content:flex-end;margin-top:8px">
+      <button class="btn btn-sm" onclick="closeM('m-baixa-insumo')">Cancelar</button>
+      <button class="btn btn-p btn-sm" onclick="salvarMovimentoEstoqueManual()">Salvar</button>
+    </div>
+  </div>
+</div><div class="modal-bg" id="m-cliente">
   <div class="modal">
     <div class="modal-hdr"><div class="modal-title">Nova Cliente</div><button class="modal-x" onclick="closeM('m-cliente')">×</button></div>
     <div class="fr2">
