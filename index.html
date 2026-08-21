@@ -3374,6 +3374,7 @@ function renderHistoricoEstoque(){
   if(!lista) return;
 renderHistoricoEstoque();
   let items = DB.estoque;
+    items = items.filter(i => (i.categoria||'Insumo') === (estoqueTipoFiltro==='insumo' ? 'Insumo' : 'Produto'));
   if(estoqueFiltro==='baixo') items = items.filter(i=>i.qtd>0 && i.qtd<i.min);
   if(estoqueFiltro==='zero')  items = items.filter(i=>i.qtd<=0);
   if(estoqueFiltro==='ok')    items = items.filter(i=>i.qtd>=i.min);
