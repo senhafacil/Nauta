@@ -3341,11 +3341,12 @@ function salvarMovimentoEstoqueManual(){
   if(selVal === 'novo'){
     if(tipo!=='entrada'){ toast('⚠️ Um insumo novo só pode começar com uma entrada!'); return; }
     const nomeNovo = document.getElementById('mov-insumo-novo-nome')?.value.trim();
+        const unidNovo = document.getElementById('mov-insumo-novo-unid')?.value || 'un.';
     if(!nomeNovo){ toast('⚠️ Informe o nome do insumo novo!'); return; }
     if(!DB.estoque) DB.estoque=[];
     if(!DB.nextId) DB.nextId={};
     if(!DB.nextId.estoque) DB.nextId.estoque=1;
-    item = {id:DB.nextId.estoque++, nome:nomeNovo, categoria:'Insumo', qtd:0, min:1, unid:'un.', preco:0, precoVenda:0, obs:''};
+        item = {id:DB.nextId.estoque++, nome:nomeNovo, categoria:'Insumo', qtd:0, min:1, unid:unidNovo, preco:0, precoVenda:0, obs:''};
     DB.estoque.push(item);
   } else {
     item = (DB.estoque||[]).find(e=>e.id===parseInt(selVal));
