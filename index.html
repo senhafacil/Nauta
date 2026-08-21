@@ -2220,7 +2220,7 @@ function openM(id){
     if(sel){
       const insumos = (DB.estoque||[]).filter(e=>e.categoria==='Insumo').sort((a,b)=>a.nome.localeCompare(b.nome));
       sel.innerHTML = '<option value="">Selecione...</option>' +
-        insumos.map(e=>`<option value="${e.id}">${e.nome} (${e.qtd} ${e.unid} em estoque)</option>`).join('');
+        insumos.map(e=>`<option value="${e.id}">${e.nome} (${e.qtd} ${e.unid} em estoque)</option>`).join('') + '<option value="novo">+ Novo insumo...</option>';
     }
   }if(id==='m-pedido'){
     window.itensPedidoEstoque = [];
