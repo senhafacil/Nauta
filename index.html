@@ -1724,6 +1724,10 @@ window.renderInsumos = renderInsumos;
       <button type="button" class="btn btn-sm" id="mov-tab-saida" onclick="setTipoMovEstoque('saida')">➖ Saída (usei/perdi)</button>
     </div>
     <div class="fg"><div class="fl">Insumo</div><select class="fi" id="mov-insumo-item"><option value="">Selecione...</option></select></div>
+        <div class="fg" id="mov-insumo-novo-wrap" style="display:none">
+      <div class="fl">Nome do novo insumo</div>
+      <input class="fi" id="mov-insumo-novo-nome" placeholder="Ex: Farinha de trigo">
+    </div>
     <div class="fg"><div class="fl" id="mov-lbl-qtd">Quantidade a adicionar</div><input class="fi" type="number" step="0.1" id="mov-insumo-qtd" placeholder="0"></div>
     <div class="fg"><div class="fl">Motivo <span style="font-weight:400;color:var(--cinza)">— opcional</span></div><input class="fi" id="mov-insumo-motivo" placeholder="Ex: Compra no atacadão, produção do dia, validade vencida..."></div>
     <div class="brow" style="justify-content:flex-end;margin-top:8px">
