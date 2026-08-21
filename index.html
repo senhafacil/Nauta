@@ -3320,23 +3320,41 @@ function setTipoMovEstoque(tipo){
   if(lbl) lbl.textContent = tipo==='entrada' ? 'Quantidade a adicionar' : 'Quantidade a retirar';
 }
 
+function toggleNovoInsumo(sel){
+  const wrap = document.getElementById('mov-insumo-novo-wrap');
+  if(wrap) wrap.style.display = sel.value==='novo' ? '' : 'none';
+}
 function salvarMovimentoEstoqueManual(){
-  const id = parseInt(document.getElementById('mov-insumo-item')?.value);
+  const selVal = document.getElementById('mov-insumo-item')?.value;
   const qtd = parseFloat(document.getElementById('mov-insumo-qtd')?.value)||0;
   const motivo = document.getElementById('mov-insumo-motivo')?.value.trim();
   const tipo = window._movTipoEstoque || 'entrada';
-  if(!id){ toast('⚠️ Selecione o insumo!'); return; }
+  if(!selVal){ toast('⚠️ Selecione o insumo!'); return; }
   if(qtd<=0){ toast('⚠️ Informe uma quantidade válida!'); return; }
-  const item = (DB.estoque||[]).find(e=>e.id===id);
-  if(!item){ toast('⚠️ Insumo não encontrado!'); return; }
+
+  let item;
+  if(selVal === 'novo'){
+    if(tipo!=='entrada'){ toast('⚠️ Um insumo novo só pode começar com uma entrada!'); return; }
+    const nomeNovo = document.getElementById('mov-insumo-novo-nome')?.value.trim();
+    if(!nomeNovo){ toast('⚠️ Informe o nome do insumo novo!'); return; }
+    if(!DB.estoque) DB.estoque=[];
+    if(!DB.nextId) DB.nextId={};
+    if(!DB.nextId.estoque) DB.nextId.estoque=1;
+    item = {id:DB.nextId.estoque++, nome:nomeNovo, categoria:'Insumo', qtd:0, min:1, unid:'un.', preco:0, precoVenda:0, obs:''};
+    DB.estoque.push(item);
+  } else {
+    item = (DB.estoque||[]).find(e=>e.id===parseInt(selVal));
+    if(!item){ toast('⚠️ Insumo não encontrado!'); return; }
+  }
+
   const delta = tipo==='entrada' ? qtd : -qtd;
-  DB.estoque = (DB.estoque||[]).map(e=>e.id===id?{...e, qtd:(e.qtd||0)+delta}:e);
-  registrarMovimentoEstoque(id, item.nome, tipo==='entrada'?'Entrada':'Saída', qtd, motivo || (tipo==='entrada'?'Compra registrada manualmente':'Baixa manual'));
+  DB.estoque = (DB.estoque||[]).map(e=>e.id===item.id?{...e, qtd:(e.qtd||0)+delta}:e);
+  registrarMovimentoEstoque(item.id, item.nome, tipo==='entrada'?'Entrada':'Saída', qtd, motivo || (tipo==='entrada'?'Compra registrada manualmente':'Baixa manual'));
   salvarDados();
   closeM('m-baixa-insumo');
   renderEstoque();
   toast(tipo==='entrada' ? '✅ Entrada registrada!' : '✅ Baixa registrada!');
-  ['mov-insumo-qtd','mov-insumo-motivo'].forEach(fid=>{const el=document.getElementById(fid);if(el)el.value='';});
+  ['mov-insumo-qtd','mov-insumo-motivo','mov-insumo-novo-nome'].forEach(fid=>{const el=document.getElementById(fid);if(el)el.value='';});
 }
 
 function registrarMovimentoEstoque(estoqueId, nomeProduto, tipo, qtd, origem){
