@@ -778,7 +778,7 @@ textarea.fi{resize:vertical;min-height:70px}
         <div class="fr"><span>Comprados ✓</span><span class="bp bp-v" id="comp-done">0</span></div>
         <div class="fr" style="border:none"><span>Pendentes</span><span class="bp bp-r" id="comp-pend">0</span></div>
         <div class="prog" style="margin-top:10px"><div class="prog-f" id="comp-prog" style="width:0%"></div></div>
-        <div style="font-size:11px;color:var(--cinza);margin-top:5px">0% das compras concluídas</div>
+        <div style="font-size:11px;color:var(--cinza);margin-top:5px"><span id="comp-pct-txt">0%</span> das compras concluídas</div>
       </div>
       <div class="card">
         <div class="card-t">Fornecedores <button class="btn btn-xs" onclick="openM('m-forn')">+ Cadastrar</button></div>
@@ -786,9 +786,9 @@ textarea.fi{resize:vertical;min-height:70px}
       </div>
       <div class="card">
         <div class="card-t">Estimativa de gasto</div>
-        <div style="font-size:24px;font-weight:700;color:var(--terra);margin-bottom:5px">R$0,00</div>
+        <div style="font-size:24px;font-weight:700;color:var(--terra);margin-bottom:5px" id="comp-estimativa">R$0,00</div>
         <div style="font-size:12px;color:var(--cinza)">Estimativa para os itens pendentes</div>
-        <div class="ibox v" style="margin-top:10px">💡 Adicione itens à lista e cadastre fornecedores para ver dicas de economia.</div>
+        <div class="ibox v" style="margin-top:10px">💡 Adicione o preço estimado de cada item para acompanhar aqui quanto falta gastar.</div>
       </div>
     </div>
   </div>
@@ -1808,7 +1808,7 @@ window.renderInsumos = renderInsumos;
 
 <div class="modal-bg" id="m-tarefa"><div class="modal" style="width:440px"><div class="modal-hdr"><div class="modal-title">Nova Tarefa</div><button class="modal-x" onclick="closeM('m-tarefa')">×</button></div><div class="fg"><div class="fl">Descrição da tarefa</div><textarea class="fi" id="mt-txt" rows="2" placeholder="O que precisa ser feito?"></textarea></div><div class="fr2"><div class="fg"><div class="fl">Data</div><input class="fi" type="date" id="mt-data"></div><div class="fg"><div class="fl">Horário</div><input class="fi" type="time" id="mt-hora"></div></div><div class="fr2"><div class="fg"><div class="fl">Para quem</div><select class="fi" id="mt-resp"><option>Proprietária</option></select></div><div class="fg"><div class="fl">Prioridade</div><select class="fi" id="mt-pri"><option>Alta</option><option>Média</option><option>Baixa</option></select></div></div><div class="brow" style="justify-content:flex-end;margin-top:8px"><button class="btn btn-sm" onclick="closeM('m-tarefa')">Cancelar</button><button class="btn btn-p btn-sm" onclick="addTarefa()">Adicionar</button></div></div></div>
 
-<div class="modal-bg" id="m-compra"><div class="modal" style="width:420px"><div class="modal-hdr"><div class="modal-title">Adicionar Item</div><button class="modal-x" onclick="closeM('m-compra')">×</button></div><div class="fg"><div class="fl">Item</div><input class="fi" id="mc-nome" placeholder="Ex: Farinha de trigo"></div><div class="fr2"><div class="fg"><div class="fl">Quantidade</div><input class="fi" id="mc-qty" placeholder="Ex: 2 sacos"></div><div class="fg"><div class="fl">Prioridade</div><select class="fi" id="mc-pri"><option>Urgente</option><option>Normal</option><option>Baixa</option></select></div></div><div class="fg"><div class="fl">Fornecedor (opcional)</div><input class="fi" id="mc-forn" placeholder="Nome do fornecedor"></div><div class="brow" style="justify-content:flex-end;margin-top:8px"><button class="btn btn-sm" onclick="closeM('m-compra')">Cancelar</button><button class="btn btn-p btn-sm" onclick="addCompra()">Adicionar</button></div></div></div>
+<div class="modal-bg" id="m-compra"><div class="modal" style="width:420px"><div class="modal-hdr"><div class="modal-title">Adicionar Item</div><button class="modal-x" onclick="closeM('m-compra')">×</button></div><div class="fg"><div class="fl">Item</div><input class="fi" id="mc-nome" placeholder="Ex: Farinha de trigo"></div><div class="fr2"><div class="fg"><div class="fl">Quantidade</div><input class="fi" id="mc-qty" placeholder="Ex: 2 sacos"></div><div class="fg"><div class="fl">Prioridade</div><select class="fi" id="mc-pri"><option>Urgente</option><option>Normal</option><option>Baixa</option></select></div></div><div class="fr2"><div class="fg"><div class="fl" style="display:flex;align-items:center;gap:5px">Preço estimado (R$) <span title="Quanto você espera gastar nesse item ao todo. Esse valor entra na Estimativa de gasto, ao lado." style="cursor:help;background:var(--cinza);color:#fff;border-radius:50%;width:16px;height:16px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0">?</span></div><input class="fi" type="number" id="mc-preco" step="0.01" placeholder="Ex: 50,00"></div><div class="fg"><div class="fl">Fornecedor (opcional)</div><input class="fi" id="mc-forn" placeholder="Nome do fornecedor"></div></div><div class="brow" style="justify-content:flex-end;margin-top:8px"><button class="btn btn-sm" onclick="closeM('m-compra')">Cancelar</button><button class="btn btn-p btn-sm" onclick="addCompra()">Adicionar</button></div></div></div>
 
 <div class="modal-bg" id="m-meta"><div class="modal" style="width:460px"><div class="modal-hdr"><div class="modal-title">Nova Meta</div><button class="modal-x" onclick="closeM('m-meta')">×</button></div><div class="fg"><div class="fl">Título</div><input class="fi" id="mm-titulo" placeholder="Ex: Meta de faturamento de maio"></div><div class="fr2"><div class="fg"><div class="fl">Categoria</div><select class="fi" id="mm-cat"><option>💰 Financeiro</option><option>👥 Clientes</option><option>📦 Produtos</option><option>📢 Marketing</option><option>🏭 Produção</option></select></div><div class="fg"><div class="fl">Mês</div><input class="fi" type="month" id="mm-mes"></div></div><div class="fr2"><div class="fg"><div class="fl">Meta (valor ou qtd)</div><input class="fi" id="mm-valor" placeholder="Ex: R$15.000 ou 10 clientes"></div><div class="fg"><div class="fl">Alcançado até agora</div><input class="fi" placeholder="Ex: R$5.000"></div></div><div class="fg"><div class="fl">Estratégia</div><textarea class="fi" placeholder="Como vai alcançar essa meta?"></textarea></div><div class="brow" style="justify-content:flex-end;margin-top:8px"><button class="btn btn-sm" onclick="closeM('m-meta')">Cancelar</button><button class="btn btn-p btn-sm" onclick="salvarMeta()">Salvar</button></div></div></div>
 
@@ -2601,30 +2601,37 @@ function toggleCompra(cb){
   atualizarCompras();
 }
 function atualizarCompras(){
-  const all=document.querySelectorAll('#compra-list .comp-chk').length;
-  const done=document.querySelectorAll('#compra-list .comp-chk:checked').length;
+  const compras = DB.compras||[];
+  const all=compras.length;
+  const done=compras.filter(c=>c.feito).length;
   const pend=all-done;
   if(document.getElementById('comp-tot'))document.getElementById('comp-tot').textContent=all;
   if(document.getElementById('comp-done'))document.getElementById('comp-done').textContent=done;
   if(document.getElementById('comp-pend'))document.getElementById('comp-pend').textContent=pend;
   const pct=all>0?Math.round((done/all)*100):0;
   if(document.getElementById('comp-prog'))document.getElementById('comp-prog').style.width=pct+'%';
+  if(document.getElementById('comp-pct-txt'))document.getElementById('comp-pct-txt').textContent=pct+'%';
+  const estimativa = compras.filter(c=>!c.feito).reduce((s,c)=>s+(c.preco||0),0);
+  if(document.getElementById('comp-estimativa'))document.getElementById('comp-estimativa').textContent=fmt2(estimativa);
 }
 function addCompra(){
   const nome = document.getElementById('mc-nome')?.value.trim();
   const qty  = document.getElementById('mc-qty')?.value.trim()||'';
   const pri  = document.getElementById('mc-pri')?.value||'Normal';
+  const preco = parseFloat(document.getElementById('mc-preco')?.value)||0;
   const forn = document.getElementById('mc-forn')?.value.trim()||'';
   if(!nome){toast('Informe o item!');return;}
   if(!DB.compras) DB.compras=[];
   if(!DB.nextId.compra) DB.nextId.compra=1;
-  DB.compras.push({id:DB.nextId.compra++, nome, qty, pri, forn, feito:false, criado:new Date().toISOString()});
+  DB.compras.push({id:DB.nextId.compra++, nome, qty, pri, preco, forn, feito:false, criado:new Date().toISOString()});
   salvarDados();
   closeM('m-compra');
   renderCompras();
   toast('✅ Item adicionado à lista!');
   document.getElementById('mc-nome').value='';
   document.getElementById('mc-qty').value='';
+  document.getElementById('mc-preco').value='';
+  document.getElementById('mc-forn').value='';
 }
 
 /* ══════════ FUNCIONÁRIOS / PERMISSÕES ══════════ */
@@ -4047,6 +4054,7 @@ function renderCompras(){
       <input type="checkbox" class="comp-chk" ${c.feito?'checked':''} onchange="toggleCompraDB(${c.id},this.checked)">
       <div class="comp-name" style="${c.feito?'text-decoration:line-through;color:var(--cinza)':''}">${c.nome}</div>
       <div class="comp-qty">${c.qty||'—'}</div>
+      ${c.preco>0?`<div class="comp-qty" style="min-width:70px;text-align:right">${fmt2(c.preco)}</div>`:''}
       <span class="comp-pri ${pc[c.pri]||'pr-m'}">${c.pri}</span>
       <button onclick="excluirCompra(${c.id})" style="border:none;background:none;cursor:pointer;color:var(--cinza);font-size:13px;margin-left:4px">✕</button>
     </div>`).join('');
