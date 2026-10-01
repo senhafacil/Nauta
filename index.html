@@ -2168,8 +2168,10 @@ function applyNicho(key) {
   // relatório top
   if(document.getElementById('rel-topvend')) document.getElementById('rel-topvend').innerHTML = '<div style="text-align:center;color:var(--cinza);padding:20px;font-size:13px">Nenhum dado ainda</div>';
 
-  // compras extra
-  if(document.getElementById('nicho-compras-extra')) document.getElementById('nicho-compras-extra').innerHTML = n.compras_extra;
+  // compras extra — itens sugeridos de exemplo, adicionados uma única vez como itens reais
+  // (assim a pessoa consegue excluí-los normalmente, como qualquer outro item da lista)
+  if(document.getElementById('nicho-compras-extra')) document.getElementById('nicho-compras-extra').innerHTML = '';
+  seedComprasExtra(key);
 
   // precificação
   applyPrecNicho(key);
@@ -2594,6 +2596,31 @@ function addTarefa(){
 }
 
 /* ══════════ COMPRAS ══════════ */
+// Itens sugeridos por nicho, adicionados uma única vez (por conta) como itens reais
+// da Lista de Compras — assim eles aparecem com checkbox, preço e botão de excluir
+// como qualquer item cadastrado pela pessoa, em vez de um texto fixo que não some.
+const COMPRAS_SUGERIDAS = {
+  confeitaria: [{nome:'Fermento biológico (500g)', qty:'3 pcts', pri:'Urgente'}],
+  estamparia:  [{nome:'Tinta sublimática (preto)', qty:'1 kit', pri:'Urgente'}],
+  vidros:      [{nome:'Silicone neutro transparente', qty:'5 tubos', pri:'Urgente'}],
+  loja:        [{nome:'Sacolas / embalagens para envio', qty:'50 un.', pri:'Urgente'},
+                {nome:'Etiquetas de preço', qty:'1 rolo', pri:'Baixa'}],
+};
+function seedComprasExtra(key){
+  if(!DB.config) DB.config={};
+  if(DB.config.comprasExtraSeeded) return;
+  DB.config.comprasExtraSeeded = true;
+  const itens = COMPRAS_SUGERIDAS[key];
+  if(itens && itens.length){
+    if(!DB.compras) DB.compras=[];
+    if(!DB.nextId.compra) DB.nextId.compra=1;
+    itens.forEach(it=>{
+      DB.compras.push({id:DB.nextId.compra++, nome:it.nome, qty:it.qty, pri:it.pri, preco:0, forn:'', feito:false, criado:new Date().toISOString()});
+    });
+  }
+  salvarDados();
+  if(document.getElementById('compra-list')) renderCompras();
+}
 function toggleCompra(cb){
   const item=cb.closest('.comp-item');
   const name=item.querySelector('.comp-name');
