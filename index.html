@@ -422,7 +422,7 @@ textarea.fi{resize:vertical;min-height:70px}
     <div class="card-t">Próximos eventos</div>
     <div class="tw"><table class="tbl">
       <thead><tr><th>Data</th><th>Hora</th><th>Evento</th><th>Tipo</th><th>Responsável</th><th></th></tr></thead>
-      <tbody>
+      <tbody id="agenda-proximos">
         <tr><td colspan="6" style="text-align:center;color:var(--cinza);padding:16px;font-size:13px">Nenhum evento cadastrado</td></tr>
       </tbody>
     </table></div>
@@ -756,7 +756,7 @@ textarea.fi{resize:vertical;min-height:70px}
         <div id="amanha-list"><div style="text-align:center;color:var(--cinza);padding:14px;font-size:13px">Sem tarefas para amanhã</div></div>
       </div>
       <div class="card">
-        <div class="card-t">Por funcionária</div>
+        <div class="card-t">Por funcionário(a)</div>
         <div style="text-align:center;color:var(--cinza);padding:14px;font-size:13px">Sem tarefas atribuídas</div>
       </div>
     </div>
@@ -822,7 +822,7 @@ textarea.fi{resize:vertical;min-height:70px}
   <!-- LISTA -->
   <div class="card" style="padding:0">
     <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr 80px;gap:8px;padding:10px 16px;font-size:10px;font-weight:700;color:var(--cinza);text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--cream3)">
-      <span>Produto / Insumo</span>
+      <span id="est-col-nome">Produto / Insumo</span>
       <span style="text-align:center">Estoque atual</span>
       <span style="text-align:center">Mínimo</span>
       <span style="text-align:center">Status</span>
@@ -916,7 +916,7 @@ textarea.fi{resize:vertical;min-height:70px}
     <div style="padding:0 16px 6px;font-size:11px;color:var(--cinza)">Tudo que já saiu ou entrou no estoque, com data e origem</div>
     <div style="display:grid;grid-template-columns:110px 2fr 90px 80px 1fr;gap:8px;padding:10px 16px;font-size:10px;font-weight:700;color:var(--cinza);text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--cream3);margin-top:8px">
       <span>Data</span>
-      <span>Produto / Insumo</span>
+      <span id="est-hist-col-nome">Produto / Insumo</span>
       <span style="text-align:center">Tipo</span>
       <span style="text-align:center">Qtd</span>
       <span>Origem</span>
@@ -942,9 +942,9 @@ textarea.fi{resize:vertical;min-height:70px}
         </div>
       </div>
       <div id="func-lista-extra" style="display:flex;flex-direction:column;gap:11px">
-        <div style="text-align:center;color:var(--cinza);padding:20px;font-size:13px;border:1px dashed var(--borda);border-radius:var(--r-l)">Nenhuma funcionária cadastrada ainda</div>
+        <div style="text-align:center;color:var(--cinza);padding:20px;font-size:13px;border:1px dashed var(--borda);border-radius:var(--r-l)">Nenhum(a) funcionário(a) cadastrado(a) ainda</div>
       </div>
-      <button class="btn btn-p btn-sm" style="align-self:flex-start" onclick="openM('m-func')">+ Adicionar funcionária</button>
+      <button class="btn btn-p btn-sm" style="align-self:flex-start" onclick="openM('m-func')">+ Adicionar funcionário(a)</button>
     </div>
     <div style="display:flex;flex-direction:column;gap:14px">
       <div class="card">
@@ -1138,7 +1138,7 @@ textarea.fi{resize:vertical;min-height:70px}
             <input class="fi" type="number" id="prec-lucro" step="1" placeholder="Ex: 30" value="30" oninput="window.calcPreco&&calcPreco()">
           </div>
         </div>
-        <div class="fr2">
+        <div class="fr3">
           <div class="fg">
             <div class="fl" style="display:flex;align-items:center;gap:5px">Taxa de cartão (%)
               <span title="Percentual cobrado pela maquininha ou plataforma de pagamento. Verifique na sua conta (ex: Mercado Pago, Stone, PagSeguro)." style="cursor:help;background:var(--cinza);color:#fff;border-radius:50%;width:16px;height:16px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0">?</span>
@@ -1146,8 +1146,14 @@ textarea.fi{resize:vertical;min-height:70px}
             <input class="fi" type="number" id="prec-cartao" step="0.01" placeholder="Ex: 2,99" value="0" oninput="window.calcPreco&&calcPreco()">
           </div>
           <div class="fg">
-            <div class="fl" style="display:flex;align-items:center;gap:5px" id="lbl-prec-comissao">Comissão / parceria (%)
-              <span title="Percentual pago para parceiros, revendedoras ou plataformas (iFood, Elo7 etc.)." style="cursor:help;background:var(--cinza);color:#fff;border-radius:50%;width:16px;height:16px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0">?</span>
+            <div class="fl" style="display:flex;align-items:center;gap:5px" id="lbl-prec-marketplace">Marketplace (%)
+              <span title="Percentual cobrado pela plataforma onde você anuncia e vende seus produtos." style="cursor:help;background:var(--cinza);color:#fff;border-radius:50%;width:16px;height:16px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0">?</span>
+            </div>
+            <input class="fi" type="number" id="prec-marketplace" step="0.01" placeholder="Ex: 10" value="0" oninput="window.calcPreco&&calcPreco()">
+          </div>
+          <div class="fg">
+            <div class="fl" style="display:flex;align-items:center;gap:5px" id="lbl-prec-comissao">Comissão (%)
+              <span title="Percentual pago a quem faz a venda para você, como uma vendedora, representante ou revendedora." style="cursor:help;background:var(--cinza);color:#fff;border-radius:50%;width:16px;height:16px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0">?</span>
             </div>
             <input class="fi" type="number" id="prec-comissao" step="0.01" placeholder="Ex: 10" value="0" oninput="window.calcPreco&&calcPreco()">
           </div>
@@ -1161,7 +1167,7 @@ textarea.fi{resize:vertical;min-height:70px}
           </div>
           <div class="fg">
             <div class="fl" style="display:flex;align-items:center;gap:5px" id="lbl-prec-outro">Outro custo (R$)
-              <span title="Qualquer outro custo que não se encaixa nas categorias acima. Ex: taxa de marketplace, material de escritório etc." style="cursor:help;background:var(--cinza);color:#fff;border-radius:50%;width:16px;height:16px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0">?</span>
+              <span title="Qualquer outro custo que não se encaixa nas categorias acima. Ex: material de escritório, embalagem extra etc." style="cursor:help;background:var(--cinza);color:#fff;border-radius:50%;width:16px;height:16px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0">?</span>
             </div>
             <input class="fi" type="number" id="prec-outro-pct" step="0.01" placeholder="Ex: 5,00" value="0" oninput="window.calcPreco&&calcPreco()">
           </div>
@@ -1235,7 +1241,7 @@ textarea.fi{resize:vertical;min-height:70px}
 
       <!-- OUTROS CUSTOS -->
       <div style="font-size:12px;font-weight:700;color:var(--carvao);margin:14px 0 8px;text-transform:uppercase;letter-spacing:.05em">➕ Outros custos</div>
-      <div class="fr2">
+      <div class="fr3">
         <div class="fg">
           <div class="fl" style="display:flex;align-items:center;gap:5px">
             Custo fixo por unidade (R$)
@@ -1244,7 +1250,11 @@ textarea.fi{resize:vertical;min-height:70px}
           <input class="fi" type="number" id="diag-fixo" step="0.01" placeholder="Ex: 10,00" value="0" oninput="window.calcDiag&&calcDiag()">
         </div>
         <div class="fg">
-          <div class="fl" style="display:flex;align-items:center;gap:5px" id="lbl-diag-comissao">Comissão / parceria (%) <span title="Percentual pago para parceiros, revendedoras ou plataformas (iFood, Elo7 etc.)." style="cursor:help;background:var(--cinza);color:#fff;border-radius:50%;width:16px;height:16px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0">?</span></div>
+          <div class="fl" style="display:flex;align-items:center;gap:5px" id="lbl-diag-marketplace">Marketplace (%) <span title="Percentual cobrado pela plataforma onde você anuncia e vende seus produtos." style="cursor:help;background:var(--cinza);color:#fff;border-radius:50%;width:16px;height:16px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0">?</span></div>
+          <input class="fi" type="number" id="diag-marketplace" step="0.01" placeholder="Ex: 10" value="0" oninput="window.calcDiag&&calcDiag()">
+        </div>
+        <div class="fg">
+          <div class="fl" style="display:flex;align-items:center;gap:5px" id="lbl-diag-comissao">Comissão (%) <span title="Percentual pago a quem faz a venda para você, como uma vendedora, representante ou revendedora." style="cursor:help;background:var(--cinza);color:#fff;border-radius:50%;width:16px;height:16px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0">?</span></div>
           <input class="fi" type="number" id="diag-comissao" step="0.01" placeholder="Ex: 10" value="0" oninput="window.calcDiag&&calcDiag()">
         </div>
       </div>
@@ -1254,7 +1264,7 @@ textarea.fi{resize:vertical;min-height:70px}
           <input class="fi" type="number" id="diag-imposto" step="0.01" placeholder="Ex: 6" value="0" oninput="window.calcDiag&&calcDiag()">
         </div>
         <div class="fg">
-          <div class="fl" style="display:flex;align-items:center;gap:5px">Outro custo (R$) <span title="Qualquer custo que não se encaixa acima. Ex: taxa de marketplace, material de escritório, gás etc." style="cursor:help;background:var(--cinza);color:#fff;border-radius:50%;width:16px;height:16px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0">?</span></div>
+          <div class="fl" style="display:flex;align-items:center;gap:5px">Outro custo (R$) <span title="Qualquer custo que não se encaixa acima. Ex: material de escritório, gás etc." style="cursor:help;background:var(--cinza);color:#fff;border-radius:50%;width:16px;height:16px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0">?</span></div>
           <input class="fi" type="number" id="diag-outro" step="0.01" placeholder="Ex: 5,00" value="0" oninput="window.calcDiag&&calcDiag()">
         </div>
       </div>
@@ -1360,6 +1370,7 @@ function calcPreco(){
   const custoFixo = parseFloat(document.getElementById('prec-fixo')?.value)||0;
   const txCartao  = parseFloat(document.getElementById('prec-cartao')?.value)||0;
   const imposto   = parseFloat(document.getElementById('prec-imposto')?.value)||0;
+  const marketplace = parseFloat(document.getElementById('prec-marketplace')?.value)||0;
   const comissao  = parseFloat(document.getElementById('prec-comissao')?.value)||0;
   const lucro     = parseFloat(document.getElementById('prec-lucro')?.value)||0;
   const outroPct  = parseFloat(document.getElementById('prec-outro-pct')?.value)||0;
@@ -1375,7 +1386,7 @@ function calcPreco(){
   if(tcEl) tcEl.textContent = fmt2(totalFixosR);
   if(ti) ti.textContent = fmt2(custoProd);
 
-  const totalPct = txCartao + imposto + comissao + lucro;
+  const totalPct = txCartao + imposto + marketplace + comissao + lucro;
   const res = document.getElementById('prec-resultado');
   const sim = document.getElementById('prec-simulacao');
   if(!res) return;
@@ -1394,6 +1405,7 @@ function calcPreco(){
   const precoMin    = totalFixoR / (1 - totalPct/100);
   const valCartao   = precoMin * txCartao/100;
   const valImposto  = precoMin * imposto/100;
+  const valMarketplace = precoMin * marketplace/100;
   const valComissao = precoMin * comissao/100;
   const valOutro    = precoMin * outroPct/100;
   const valLucro    = precoMin * lucro/100;
@@ -1416,6 +1428,9 @@ function calcPreco(){
       </div>`:''}
       ${imposto>0?`<div style="display:flex;justify-content:space-between;padding:8px 12px;background:var(--cream);border-radius:var(--r)">
         <span>📋 Imposto (${imposto}%)</span><span style="font-weight:600;color:var(--rubi)">− ${fmt2(valImposto)}</span>
+      </div>`:''}
+      ${marketplace>0?`<div style="display:flex;justify-content:space-between;padding:8px 12px;background:var(--cream);border-radius:var(--r)">
+        <span>🛍️ Marketplace (${marketplace}%)</span><span style="font-weight:600;color:var(--amber)">− ${fmt2(valMarketplace)}</span>
       </div>`:''}
       ${comissao>0?`<div style="display:flex;justify-content:space-between;padding:8px 12px;background:var(--cream);border-radius:var(--r)">
         <span>🤝 Comissão (${comissao}%)</span><span style="font-weight:600;color:var(--amber)">− ${fmt2(valComissao)}</span>
@@ -1448,6 +1463,7 @@ function calcDiag(){
   const custoProd = getTotalInsumos2('diag');
   const custoFixo = parseFloat(document.getElementById('diag-fixo')?.value)||0;
   const txCartao  = parseFloat(document.getElementById('diag-cartao')?.value)||0;
+  const marketplace = parseFloat(document.getElementById('diag-marketplace')?.value)||0;
   const comissao  = parseFloat(document.getElementById('diag-comissao')?.value)||0;
   const imposto   = parseFloat(document.getElementById('diag-imposto')?.value)||0;
   const emb1      = parseFloat(document.getElementById('diag-emb1')?.value)||0;
@@ -1475,11 +1491,12 @@ function calcDiag(){
 
   const valCartao   = preco * txCartao/100;
   const valImposto  = preco * imposto/100;
+  const valMarketplace = preco * marketplace/100;
   const valComissao = preco * comissao/100;
-  const totalCustos = custoProd + custoFixo + maoObra + totalEmb + frete + outro + valCartao + valImposto + valComissao;
+  const totalCustos = custoProd + custoFixo + maoObra + totalEmb + frete + outro + valCartao + valImposto + valMarketplace + valComissao;
   const lucroLiq    = preco - totalCustos;
   const lucropct    = preco > 0 ? (lucroLiq/preco*100) : 0;
-  const totalPctVar = txCartao + imposto + comissao;
+  const totalPctVar = txCartao + imposto + marketplace + comissao;
   const custosTotaisFixos = custoProd + custoFixo + maoObra + totalEmb + frete + outro;
   const precoMinimo = totalPctVar < 100 ? custosTotaisFixos / (1 - totalPctVar/100) : 0;
   const precoComLucro = lucroDesej > 0 && totalPctVar + lucroDesej < 100 
@@ -1507,6 +1524,7 @@ function calcDiag(){
       ${custoFixo>0?`<div style="display:flex;justify-content:space-between;padding:8px 12px;background:var(--cream);border-radius:var(--r)"><span>🏢 Custo fixo</span><span style="font-weight:600;color:var(--rubi)">− ${fmt2(custoFixo)}</span></div>`:''}
       ${outro>0?`<div style="display:flex;justify-content:space-between;padding:8px 12px;background:var(--cream);border-radius:var(--r)"><span>➕ Outros</span><span style="font-weight:600;color:var(--rubi)">− ${fmt2(outro)}</span></div>`:''}
       ${txCartao>0?`<div style="display:flex;justify-content:space-between;padding:8px 12px;background:var(--cream);border-radius:var(--r)"><span>💳 Taxa cartão</span><span style="font-weight:600;color:var(--rubi)">− ${fmt2(valCartao)}</span></div>`:''}
+      ${marketplace>0?`<div style="display:flex;justify-content:space-between;padding:8px 12px;background:var(--cream);border-radius:var(--r)"><span>🛍️ Marketplace</span><span style="font-weight:600;color:var(--rubi)">− ${fmt2(valMarketplace)}</span></div>`:''}
       ${comissao>0?`<div style="display:flex;justify-content:space-between;padding:8px 12px;background:var(--cream);border-radius:var(--r)"><span>🤝 Comissão</span><span style="font-weight:600;color:var(--rubi)">− ${fmt2(valComissao)}</span></div>`:''}
       ${imposto>0?`<div style="display:flex;justify-content:space-between;padding:8px 12px;background:var(--cream);border-radius:var(--r)"><span>📋 Imposto</span><span style="font-weight:600;color:var(--rubi)">− ${fmt2(valImposto)}</span></div>`:''}
     </div>
@@ -1710,11 +1728,11 @@ window.renderInsumos = renderInsumos;
       <div class="fl">🛒 Itens do Pedido</div>
       <div id="mp-itens-wrap"></div>
       <div class="brow" style="gap:8px;margin-top:6px">
-        <button type="button" class="btn btn-xs" onclick="addItemCarrinhoManual()">+ Produto personalizado</button>
-        <button type="button" class="btn btn-xs" onclick="addItemCarrinhoEstoque()">+ Produto do estoque</button>
+        <button type="button" class="btn btn-xs" id="mp-btn-manual" onclick="addItemCarrinhoManual()">+ Produto personalizado</button>
+        <button type="button" class="btn btn-xs" id="mp-btn-estoque" onclick="addItemCarrinhoEstoque()">+ Produto do estoque</button>
       </div>
     </div>
-    <div class="fg">
+    <div class="fg" id="mp-insumos-wrap">
       <div class="fl">🔎 Insumos usados na produção (opcional)</div>
       <div id="mp-estoque-wrap"></div>
       <button type="button" class="btn btn-xs" onclick="addItemPedidoEstoque()">+ Adicionar item do estoque</button>
@@ -1771,12 +1789,12 @@ window.renderInsumos = renderInsumos;
       <div class="fg"><div class="fl">Como conheceu</div><select class="fi" id="cli-origem"><option>Selecione...</option><option>Instagram</option><option>WhatsApp</option><option>Indicação</option><option>Google</option><option>TikTok</option><option>Evento/Feira</option><option>Outro</option></select></div>
     </div>
     <div class="fg"><div class="fl">Endereço</div><input class="fi" id="cli-end" placeholder="Rua, número, bairro, cidade/UF"></div>
-    <div class="fg"><div class="fl">Alergias</div><input class="fi" id="cli-alergia" placeholder="Ex: amendoim, lactose, glúten..."></div>
+    <div class="fg" id="cli-alergia-wrap"><div class="fl">Alergias</div><input class="fi" id="cli-alergia" placeholder="Ex: amendoim, lactose, glúten..."></div>
     <div class="fg"><div class="fl">Observações</div><textarea class="fi" id="cli-obs" placeholder="Outras observações..."></textarea></div>
     <!-- nicho extra -->
     <div id="mc-nicho-fields"></div>
     <div class="fr2">
-      <div class="fg"><div class="fl">Classificação</div><select class="fi" id="cli-tipo"><option>Cliente comum</option><option>VIP</option><option>Atacado</option></select></div>
+      <div class="fg"><div class="fl">Classificação</div><select class="fi" id="cli-tipo"><option>Cliente tradicional</option><option>VIP</option><option>Atacado</option></select></div>
       <div class="fg"><div class="fl">Pgto preferido</div><select class="fi" id="cli-pgto"><option>Sem preferência</option><option>Pix</option><option>Cartão</option><option>Dinheiro</option></select></div>
     </div>
     <div class="brow" style="justify-content:flex-end;margin-top:8px">
@@ -1800,7 +1818,7 @@ window.renderInsumos = renderInsumos;
 
 <div class="modal-bg" id="m-forn"><div class="modal" style="width:420px"><div class="modal-hdr"><div class="modal-title">Novo Fornecedor</div><button class="modal-x" onclick="closeM('m-forn')">×</button></div><div class="fg"><div class="fl">Nome</div><input class="fi" placeholder="Nome do fornecedor"></div><div class="fr2"><div class="fg"><div class="fl">WhatsApp</div><input class="fi" placeholder="(11) 99999-9999"></div><div class="fg"><div class="fl">Categoria</div><select class="fi"><option>Embalagens</option><option>Matéria-prima</option><option>Equipamentos</option><option>Serviços</option><option>Outro</option></select></div></div><div class="fg"><div class="fl">Observações</div><textarea class="fi" rows="2" placeholder="Prazo, condições de pagamento, descontos..."></textarea></div><div class="brow" style="justify-content:flex-end;margin-top:8px"><button class="btn btn-sm" onclick="closeM('m-forn')">Cancelar</button><button class="btn btn-p btn-sm" onclick="salvarM('m-forn','Fornecedor cadastrado!')">Salvar</button></div></div></div>
 
-<div class="modal-bg" id="m-func"><div class="modal" style="width:440px"><div class="modal-hdr"><div class="modal-title">Nova Funcionária</div><button class="modal-x" onclick="closeM('m-func')">×</button></div><div class="fr2"><div class="fg"><div class="fl">Nome completo</div><input class="fi" id="func-mod-nome" placeholder="Nome"></div><div class="fg"><div class="fl">Cargo</div><input class="fi" id="func-mod-cargo" placeholder="Ex: Confeiteira, Atendente..."></div></div><div class="fr2"><div class="fg"><div class="fl">WhatsApp</div><input class="fi" id="func-mod-wpp" placeholder="(11) 99999-9999"></div><div class="fg"><div class="fl">Nível de acesso</div><select class="fi" id="func-mod-nivel"><option>Produção</option><option>Vendas</option><option>Gerente</option></select></div></div><div class="fg"><div class="fl">E-mail de acesso</div><input class="fi" id="func-mod-email" type="email" placeholder="email@exemplo.com"></div><div class="fg"><div class="fl">🔑 Acesso ao sistema (opcional — deixe em branco pra não criar login)</div></div><div class="fr2"><div class="fg"><div class="fl">Usuário (login)</div><input class="fi" id="func-mod-login" placeholder="ex: maria.confeiteira"></div><div class="fg"><div class="fl">Senha</div><input class="fi" id="func-mod-senha" placeholder="Senha de acesso"></div></div><div class="fg"><div class="fl">O que ela pode ver e acessar</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:12px;margin-top:6px"><label><input type="checkbox" id="func-perm-dashboard"> Dashboard</label><label><input type="checkbox" id="func-perm-agenda"> Agenda</label><label><input type="checkbox" id="func-perm-pedidos" checked> Pedidos</label><label><input type="checkbox" id="func-perm-clientes"> Clientes</label><label><input type="checkbox" id="func-perm-comanda"> Comanda</label><label><input type="checkbox" id="func-perm-financeiro"> Financeiro</label><label><input type="checkbox" id="func-perm-relatorios"> Relatórios</label><label><input type="checkbox" id="func-perm-gestao"> Central de Gestão</label><label><input type="checkbox" id="func-perm-precificacao"> Precificação</label><label><input type="checkbox" id="func-perm-tarefas" checked> Tarefas da Equipe</label><label><input type="checkbox" id="func-perm-compras"> Lista de Compras</label><label><input type="checkbox" id="func-perm-estoque"> Estoque</label><label><input type="checkbox" id="func-perm-funcionarios"> Funcionários</label><label><input type="checkbox" id="func-perm-configuracoes"> Configurações</label></div></div><div class="brow" style="justify-content:flex-end;margin-top:8px"><button class="btn btn-sm" onclick="closeM('m-func')">Cancelar</button><button class="btn btn-p btn-sm" onclick="salvarFuncionario()">Salvar</button></div></div></div>
+<div class="modal-bg" id="m-func"><div class="modal" style="width:440px"><div class="modal-hdr"><div class="modal-title">Novo(a) Funcionário(a)</div><button class="modal-x" onclick="closeM('m-func')">×</button></div><div class="fr2"><div class="fg"><div class="fl">Nome completo</div><input class="fi" id="func-mod-nome" placeholder="Nome"></div><div class="fg"><div class="fl">Cargo</div><input class="fi" id="func-mod-cargo" placeholder="Ex: Confeiteira, Atendente..."></div></div><div class="fr2"><div class="fg"><div class="fl">WhatsApp</div><input class="fi" id="func-mod-wpp" placeholder="(11) 99999-9999"></div><div class="fg"><div class="fl">Nível de acesso</div><select class="fi" id="func-mod-nivel"><option>Produção</option><option>Vendas</option><option>Gerente</option></select></div></div><div class="fg"><div class="fl">E-mail de acesso</div><input class="fi" id="func-mod-email" type="email" placeholder="email@exemplo.com"></div><div class="fg"><div class="fl">🔑 Acesso ao sistema (opcional — deixe em branco pra não criar login)</div></div><div class="fr2"><div class="fg"><div class="fl">Usuário (login)</div><input class="fi" id="func-mod-login" placeholder="ex: maria.confeiteira"></div><div class="fg"><div class="fl">Senha</div><input class="fi" id="func-mod-senha" placeholder="Senha de acesso"></div></div><div class="fg"><div class="fl">O que ele(a) pode ver e acessar</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:12px;margin-top:6px"><label><input type="checkbox" id="func-perm-dashboard"> Dashboard</label><label><input type="checkbox" id="func-perm-agenda"> Agenda</label><label><input type="checkbox" id="func-perm-pedidos" checked> Pedidos</label><label><input type="checkbox" id="func-perm-clientes"> Clientes</label><label><input type="checkbox" id="func-perm-comanda"> Comanda</label><label><input type="checkbox" id="func-perm-financeiro"> Financeiro</label><label><input type="checkbox" id="func-perm-relatorios"> Relatórios</label><label><input type="checkbox" id="func-perm-gestao"> Central de Gestão</label><label><input type="checkbox" id="func-perm-precificacao"> Precificação</label><label><input type="checkbox" id="func-perm-tarefas" checked> Tarefas da Equipe</label><label><input type="checkbox" id="func-perm-compras"> Lista de Compras</label><label><input type="checkbox" id="func-perm-estoque"> Estoque</label><label><input type="checkbox" id="func-perm-funcionarios"> Funcionários</label><label><input type="checkbox" id="func-perm-configuracoes"> Configurações</label></div></div><div class="brow" style="justify-content:flex-end;margin-top:8px"><button class="btn btn-sm" onclick="closeM('m-func')">Cancelar</button><button class="btn btn-p btn-sm" onclick="salvarFuncionario()">Salvar</button></div></div></div>
 <div class="modal-bg" id="m-receita"><div class="modal" style="width:400px"><div class="modal-hdr"><div class="modal-title">Registrar Receita</div><button class="modal-x" onclick="closeM('m-receita')">×</button></div><div class="fg"><div class="fl">Descrição</div><input class="fi" id="rec-desc" placeholder="Ex: Pedido #52 — saldo final"></div><div class="fr2"><div class="fg"><div class="fl">Valor (R$)</div><input class="fi" id="rec-valor" type="number" step="0.01" placeholder="0,00"></div><div class="fg"><div class="fl">Data</div><input class="fi" id="rec-data" type="date"></div></div><div class="fg"><div class="fl">Forma de pagamento</div><select class="fi" id="rec-forma"><option>Pix</option><option>Dinheiro</option><option>Débito</option><option>Crédito</option></select></div><div class="brow" style="justify-content:flex-end;margin-top:8px"><button class="btn btn-sm" onclick="closeM('m-receita')">Cancelar</button><button class="btn btn-v btn-sm" onclick="salvarReceita()">Salvar</button></div></div></div>
 
 <div class="modal-bg" id="m-despesa"><div class="modal" style="width:400px"><div class="modal-hdr"><div class="modal-title">Registrar Despesa</div><button class="modal-x" onclick="closeM('m-despesa')">×</button></div><div class="fg"><div class="fl">Descrição</div><input class="fi" id="desp-desc" placeholder="Ex: Compra de embalagens"></div><div class="fr2"><div class="fg"><div class="fl">Valor (R$)</div><input class="fi" id="desp-valor" type="number" step="0.01" placeholder="0,00"></div><div class="fg"><div class="fl">Data</div><input class="fi" id="desp-data" type="date"></div></div><div class="fg"><div class="fl">Tipo de custo</div>
@@ -2052,19 +2070,54 @@ function applyNicho(key) {
   const estTipoProdutoBtn = document.getElementById('est-tipo-produto');
   const estBtnBaixaInsumo = document.getElementById('est-btn-baixa');
   const estBtnProduto = document.getElementById('est-btn-produto');
+  const estColNome = document.getElementById('est-col-nome');
+  const estHistColNome = document.getElementById('est-hist-col-nome');
   if (key === 'loja') {
     if (estTipoInsumoBtn) estTipoInsumoBtn.style.display = 'none';
     if (estTipoProdutoBtn) estTipoProdutoBtn.style.display = 'none';
     if (estBtnBaixaInsumo) estBtnBaixaInsumo.style.display = 'none';
     estoqueTipoFiltro = 'produto';
     if (estBtnProduto) estBtnProduto.style.display = '';
+    if (estColNome) estColNome.textContent = 'Produto';
+    if (estHistColNome) estHistColNome.textContent = 'Produto';
     if (typeof renderEstoque === 'function') renderEstoque();
   } else {
     if (estTipoInsumoBtn) estTipoInsumoBtn.style.display = '';
     if (estTipoProdutoBtn) estTipoProdutoBtn.style.display = '';
     if (estBtnBaixaInsumo) estBtnBaixaInsumo.style.display = (estoqueTipoFiltro === 'insumo') ? '' : 'none';
     if (estBtnProduto) estBtnProduto.style.display = (estoqueTipoFiltro === 'produto') ? '' : 'none';
+    if (estColNome) estColNome.textContent = 'Produto / Insumo';
+    if (estHistColNome) estHistColNome.textContent = 'Produto / Insumo';
   }
+
+  // No pedido: Loja de Roupa não usa "Insumos usados na produção" (não tem insumo) e
+  // só adiciona item vindo do estoque cadastrado — sem "Produto personalizado" avulso.
+  const mpInsumosWrap = document.getElementById('mp-insumos-wrap');
+  const mpBtnManual = document.getElementById('mp-btn-manual');
+  const mpBtnEstoque = document.getElementById('mp-btn-estoque');
+  if (key === 'loja') {
+    if (mpInsumosWrap) mpInsumosWrap.style.display = 'none';
+    if (mpBtnManual) mpBtnManual.style.display = 'none';
+    if (mpBtnEstoque) mpBtnEstoque.textContent = '+ Produto';
+  } else {
+    if (mpInsumosWrap) mpInsumosWrap.style.display = '';
+    if (mpBtnManual) mpBtnManual.style.display = '';
+    if (mpBtnEstoque) mpBtnEstoque.textContent = '+ Produto do estoque';
+  }
+
+  // Exemplos do modal de estoque também mudam para Loja de Roupa (em vez dos exemplos de confeitaria)
+  const estNomeInput = document.getElementById('est-nome');
+  const estObsInput = document.getElementById('est-obs');
+  if (estNomeInput) estNomeInput.placeholder = (key === 'loja')
+    ? 'Ex: Vestido floral, Conjunto de lingerie, Vibrador, Camisola...'
+    : 'Ex: Bolo de pote, Caixinha decorada, Docinho...';
+  if (estObsInput) estObsInput.placeholder = (key === 'loja')
+    ? 'Ex: Fornecedor, tecido, peça sob encomenda...'
+    : 'Ex: Atacadão, validade 3 meses...';
+
+  // Campo "Alergias" no cadastro de cliente não faz sentido para Loja de Roupa — esconde
+  const cliAlergiaWrap = document.getElementById('cli-alergia-wrap');
+  if (cliAlergiaWrap) cliAlergiaWrap.style.display = (key === 'loja') ? 'none' : '';
 
   // sidebar + brand
   document.getElementById('sb-nicho').textContent = n.ico + ' ' + n.nome;
@@ -2158,7 +2211,10 @@ function getTodayStr(){
 
 function getTodayISO(){
   const d = hoje();
-  return d.toISOString().split('T')[0];
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth()+1).padStart(2,'0');
+  const dd = String(d.getDate()).padStart(2,'0');
+  return `${yyyy}-${mm}-${dd}`;
 }
 
 function buildCalendario(){
@@ -2231,7 +2287,7 @@ const pgMeta = {
   tarefas:     {title:'Tarefas da Equipe', sub:'Agenda e processos do dia',           btns:'<button class="btn btn-p btn-sm" onclick="openM(\'m-tarefa\')">+ Tarefa</button>'},
   compras:     {title:'Lista de Compras',  sub:'Insumos e materiais',                 btns:'<button class="btn btn-p btn-sm" onclick="openM(\'m-compra\')">+ Item</button><button class="btn btn-sm" onclick="openM(\'m-forn\')">+ Fornecedor</button>'},
   estoque:     {title:'Estoque',           sub:'Controle de insumos e materiais',      btns:''},
-  funcionarios:{title:'Funcionários',       sub:'Colaboradoras ativas',                btns:'<button class="btn btn-p btn-sm" onclick="openM(\'m-func\')">+ Adicionar</button>'},
+  funcionarios:{title:'Funcionários',       sub:'Colaboradores(as) ativos(as)',                btns:'<button class="btn btn-p btn-sm" onclick="openM(\'m-func\')">+ Adicionar</button>'},
   configuracoes:{title:'Configurações',     sub:'Nicho, taxas e personalização',       btns:''}
 };
 
@@ -2354,8 +2410,8 @@ async function salvarFuncionario(){
         body: JSON.stringify({login, senha, nome, negocio_id:NEGOCIO_ID, nivel, permissoes:JSON.stringify(permissoes)})
       });
       loginCriado = r.ok;
-      if(!r.ok){ toast('⚠️ Funcionária salva, mas não deu pra criar o login (usuário já existe?)'); }
-    }catch(e){ toast('⚠️ Funcionária salva, mas houve erro de conexão ao criar o login.'); }
+      if(!r.ok){ toast('⚠️ Funcionário(a) salvo(a), mas não deu pra criar o login (usuário já existe?)'); }
+    }catch(e){ toast('⚠️ Funcionário(a) salvo(a), mas houve erro de conexão ao criar o login.'); }
   }
 
   DB.funcionarios.push({
@@ -2366,7 +2422,7 @@ async function salvarFuncionario(){
   salvarDados();
   closeM('m-func');
   renderFuncionarios();
-  toast(loginCriado ? '✅ Funcionária cadastrada com login!' : '✅ Funcionária cadastrada!');
+  toast(loginCriado ? '✅ Funcionário(a) cadastrado(a) com login!' : '✅ Funcionário(a) cadastrado(a)!');
   ['func-mod-nome','func-mod-cargo','func-mod-wpp','func-mod-email','func-mod-login','func-mod-senha'].forEach(id=>{
     const el=document.getElementById(id); if(el) el.value='';
   });
@@ -2376,7 +2432,7 @@ function renderFuncionarios(){
   if(!wrap) return;
   const lista = DB.funcionarios||[];
   if(!lista.length){
-    wrap.innerHTML = '<div style="text-align:center;color:var(--cinza);padding:20px;font-size:13px;border:1px dashed var(--borda);border-radius:var(--r-l)">Nenhuma funcionária cadastrada ainda</div>';
+    wrap.innerHTML = '<div style="text-align:center;color:var(--cinza);padding:20px;font-size:13px;border:1px dashed var(--borda);border-radius:var(--r-l)">Nenhum(a) funcionário(a) cadastrado(a) ainda</div>';
     return;
   }
   wrap.innerHTML = lista.map(f=>`
@@ -3715,7 +3771,7 @@ function renderFinanceiro(){
   // Contas a receber: receitas futuras + pedidos pendentes
   const recLista = document.getElementById('fin-receber-lista');
   if(recLista){
-    const hoje2 = new Date().toISOString().split('T')[0];
+    const hoje2 = getTodayISO();
     // Receitas com data futura
     const receitasFuturas = (DB.financeiro?.entradas||[]).filter(e=>e.data && e.data>hoje2);
     // Pedidos em aberto (não entregue/cancelado)
@@ -3824,8 +3880,9 @@ function renderDashboard(){
 
 /* ══════════ RENDER TAREFAS ══════════ */
 function renderTarefas(){
-  const hoje = new Date().toISOString().split('T')[0];
-  const amanha = new Date(Date.now()+86400000).toISOString().split('T')[0];
+  const amanhaD = new Date(); amanhaD.setDate(amanhaD.getDate()+1);
+  const amanha = `${amanhaD.getFullYear()}-${String(amanhaD.getMonth()+1).padStart(2,'0')}-${String(amanhaD.getDate()).padStart(2,'0')}`;
+  const hoje = getTodayISO();
   const tarefas = DB.tarefas || [];
 
   const hoje_list  = tarefas.filter(t=>t.data===hoje);
@@ -4591,7 +4648,7 @@ function salvarCliente(){
   const obs    = document.getElementById('cli-obs')?.value.trim()||'';
   const alergia = document.getElementById('cli-alergia')?.value.trim()||'';
   const extra1  = document.getElementById('cli-extra1')?.value.trim()||'';
-  const tipo   = document.getElementById('cli-tipo')?.value||'Cliente comum';
+  const tipo   = document.getElementById('cli-tipo')?.value||'Cliente tradicional';
   const pgto   = document.getElementById('cli-pgto')?.value||'Sem preferência';
   if(!nome){ toast('Informe o nome da cliente!'); return; }
   if(!DB.clientes) DB.clientes=[];
@@ -4631,7 +4688,7 @@ function editarCliente(id){
   document.getElementById('cli-end').value = c.end||'';
   document.getElementById('cli-alergia').value = c.alergia||'';
   document.getElementById('cli-obs').value = c.obs||'';
-  document.getElementById('cli-tipo').value = c.tipo||'Cliente comum';
+  document.getElementById('cli-tipo').value = c.tipo||'Cliente tradicional';
   document.getElementById('cli-pgto').value = c.pgto||'Sem preferência';
   const extra1El = document.getElementById('cli-extra1');
   if(extra1El) extra1El.value = c.extra1||'';
@@ -4666,7 +4723,7 @@ function abrirFichaCliente(id){
   const badge = document.getElementById('cd-badge');
   if(badge){
     const cor = c.tipo==='VIP'?'bp-v':c.tipo==='Atacado'?'bp-a':'bp-d';
-    badge.innerHTML = c.tipo!=='Cliente comum' ? `<span class="bp ${cor}">${c.tipo}</span>` : '';
+    badge.innerHTML = c.tipo!=='Cliente tradicional' ? `<span class="bp ${cor}">${c.tipo}</span>` : '';
   }
   // Guardar id para editar
   window._clienteAbertoId = id;
