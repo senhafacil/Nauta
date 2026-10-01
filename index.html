@@ -1,4 +1,3 @@
-
 <!DOCTYPE html> 
 <html lang="pt-BR"> 
 <head>
@@ -810,7 +809,7 @@ textarea.fi{resize:vertical;min-height:70px}
     <!-- TIPO -->
   <div style="display:flex;gap:8px;margin-bottom:10px">
     <button class="btn btn-sm on" id="est-tipo-insumo" onclick="filtroTipoEstoque('insumo',this)">🧂 Insumos</button><button class="btn btn-sm" id="est-btn-baixa" onclick="openM('m-baixa-insumo')">🔄 Movimentar estoque</button>
-    <button class="btn btn-sm" id="est-tipo-produto" onclick="filtroTipoEstoque('produto',this)">📦 Produtos Prontos</button><button class="btn btn-p btn-sm" id="est-btn-produto" onclick="openM('m-estoque')" style="display:none">+ Produto</button>
+    <button class="btn btn-sm" id="est-tipo-produto" onclick="filtroTipoEstoque('produto',this)">📦 Produto</button><button class="btn btn-p btn-sm" id="est-btn-produto" onclick="openM('m-estoque')" style="display:none">+ Produto</button>
    
   </div><!-- FILTROS -->
   <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
@@ -848,6 +847,26 @@ textarea.fi{resize:vertical;min-height:70px}
       </div>
                 <div class="fl">Nome do produto *</div>
         <input class="fi" id="est-nome" placeholder="Ex: Bolo de pote, Caixinha decorada, Docinho...">
+      </div>
+
+      <div class="fg" id="est-tam-cor-wrap" style="display:none">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div class="fg" style="margin-bottom:0">
+            <div class="fl">Tamanho</div>
+            <select class="fi" id="est-tamanho" onchange="document.getElementById('est-tamanho-outro-wrap').style.display=this.value==='Outro'?'':'none'">
+              <option value="">Selecione...</option>
+              <option>PP</option><option>P</option><option>M</option><option>G</option><option>GG</option><option>XGG</option><option>Único</option><option>Outro</option>
+            </select>
+          </div>
+          <div class="fg" style="margin-bottom:0">
+            <div class="fl">Cor</div>
+            <input class="fi" id="est-cor" placeholder="Ex: Preto, Vermelho, Nude...">
+          </div>
+        </div>
+        <div class="fg" id="est-tamanho-outro-wrap" style="display:none;margin-top:8px;margin-bottom:0">
+          <div class="fl">Especifique o tamanho</div>
+          <input class="fi" id="est-tamanho-outro" placeholder="Ex: 36, 38, Único adulto...">
+        </div>
       </div>
 
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px">
@@ -965,7 +984,7 @@ textarea.fi{resize:vertical;min-height:70px}
         <button class="nb" onclick="selNicho(this,'marmitaria','🍱','Marmitaria')"><span class="nb-ico">🍱</span><div class="nb-lbl">Marmitaria</div></button>
         <button class="nb" onclick="selNicho(this,'vidros','🪟','Inst. de Vidros')"><span class="nb-ico">🪟</span><div class="nb-lbl">Inst. Vidros</div></button>
         <button class="nb" onclick="selNicho(this,'estetica','💅','Estética')"><span class="nb-ico">💅</span><div class="nb-lbl">Estética/Beleza</div></button>
-        <button class="nb" onclick="selNicho(this,'loja','🛍️','Loja Virtual')"><span class="nb-ico">🛍️</span><div class="nb-lbl">Loja Virtual</div></button>
+        <button class="nb" onclick="selNicho(this,'loja','👗','Loja de Roupa')"><span class="nb-ico">👗</span><div class="nb-lbl">Loja de Roupa</div></button>
       </div>
       <div id="nicho-preview" style="margin-top:16px;padding:14px;background:var(--cream);border-radius:var(--r);border:1px solid var(--borda)">
         <div style="font-size:11px;font-weight:700;color:var(--terra);text-transform:uppercase;letter-spacing:.05em;margin-bottom:9px">Adaptações ativas para Confeitaria:</div>
@@ -1963,14 +1982,39 @@ const nichos = {
     compras_extra:'',
     preview:`✅ Pedido: campos de <strong>cardápio, proteína, quantidade</strong><br>✅ Cliente: campo de <strong>restrições alimentares e dieta</strong><br>✅ Compras: lista padrão de <strong>proteínas, legumes, embalagens</strong><br>✅ Relatório: por <strong>tipo de cardápio</strong>`,
     agenda_ev1:'Entrega marmitas · rota 1',agenda_ev2:'Entrega marmitas · rota 2',agenda_prox1:'Encomenda especial · Rosa L.',agenda_prox2:'Compra de proteínas (açougue)',dash_alert_txt:'🍱 <strong>Marmitaria:</strong> 28 marmitas para entregar hoje. Confirmar rotas e entregadores!'
+  },
+  loja: {
+    ico:'👗', nome:'Loja de Roupa',
+    pedido_label:'Pedido', cliente_label:'Cliente', entrega_label:'Data de entrega',
+    prod_placeholder:'Ex: Vestido midi floral, Conjunto, Camisa social...',
+    obs_placeholder:'Observações do pedido...',
+    cliente_obs_label:'Preferências / Tamanho habitual',
+    pedido_fields:`
+      <div class="fr3">
+        <div class="fg"><div class="fl">Categoria</div><select class="fi" id="mp-extra1"><option>Roupa</option><option>Roupa íntima</option><option>Produtos</option><option>Acessório</option><option>Calçado</option><option>Outro</option></select></div>
+        <div class="fg"><div class="fl">Tamanho</div><select class="fi" id="mp-extra2"><option>PP</option><option>P</option><option>M</option><option>G</option><option>GG</option><option>XGG</option><option>Único</option><option>Outro</option></select></div>
+        <div class="fg"><div class="fl">Cor</div><input class="fi" id="mp-extra3" placeholder="Ex: Preto, Vermelho, Nude..."></div>
+      </div>
+      <div class="fr2">
+        <div class="fg"><div class="fl">Quantidade</div><input class="fi" id="mp-extra4" type="number" placeholder="Ex: 1"></div>
+        <div class="fg"><div class="fl">Tipo de entrega</div><select class="fi" id="mp-extra5"><option>Entrega</option><option>Retirada</option></select></div>
+      </div>`,
+    cliente_fields:`<div class="fg"><div class="fl">Tamanho habitual</div><select class="fi"><option>PP</option><option>P</option><option>M</option><option>G</option><option>GG</option><option>XGG</option></select></div>`,
+    comanda_extra:`<div class="ci"><div class="ci-qty">—</div><div class="ci-name" style="color:var(--cinza);font-size:12px">👗 M · Preto · Roupa</div></div>`,
+    comanda_det:`<div class="fr"><span style="color:var(--cinza)">Tamanho</span><span>M</span></div><div class="fr"><span style="color:var(--cinza)">Cor</span><span>Preto</span></div>`,
+    table_extra_header:'Tamanho/Cor',
+    top_vend:'<div style="text-align:center;color:var(--cinza);padding:16px;font-size:13px">Nenhum produto/serviço vendido ainda.<br>Os dados aparecem conforme você cadastra pedidos.</div>',
+    compras_extra:`<div class="comp-item"><input type="checkbox" class="comp-chk" onchange="toggleCompra(this)"><div class="comp-name">Sacolas / embalagens para envio</div><div class="comp-qty">50 un.</div><span class="comp-pri pr-a">Urgente</span></div><div class="comp-item"><input type="checkbox" class="comp-chk" onchange="toggleCompra(this)"><div class="comp-name">Etiquetas de preço</div><div class="comp-qty">1 rolo</div><span class="comp-pri pr-m">Em breve</span></div>`,
+    preview:`✅ Pedido: campos de <strong>categoria, tamanho (PP a XGG), cor, quantidade</strong><br>✅ Cliente: campo de <strong>tamanho habitual</strong><br>✅ Estoque: só <strong>produto</strong> (sem insumos), com controle de <strong>tamanho e cor por peça</strong><br>✅ Compras: lista padrão de <strong>embalagens e etiquetas</strong><br>✅ Relatório: por <strong>tamanho e categoria</strong>`,
+    agenda_ev1:'Entrega · cliente',agenda_ev2:'Reunião com cliente',agenda_prox1:'Entrega · cliente',agenda_prox2:'Compra de peças novas',dash_alert_txt:'👗 <strong>Loja de Roupa:</strong> Confira o estoque de tamanhos antes de fechar o pedido!'
   }
 };
 
 // fallback genérico para nichos sem detalhes
-['atelie','floricultura','artesanato','loja'].forEach(k => {
+['atelie','floricultura','artesanato'].forEach(k => {
   nichos[k] = {
-    ico: {atelie:'🧵',floricultura:'💐',artesanato:'🎨',loja:'🛍️'}[k],
-    nome: {atelie:'Ateliê/Costura',floricultura:'Floricultura',artesanato:'Artesanato',loja:'Loja Virtual'}[k],
+    ico: {atelie:'🧵',floricultura:'💐',artesanato:'🎨'}[k],
+    nome: {atelie:'Ateliê/Costura',floricultura:'Floricultura',artesanato:'Artesanato'}[k],
     pedido_label:'Pedido', cliente_label:'Cliente', entrega_label:'Data de entrega',
     prod_placeholder:'Descreva o produto ou serviço...',
     obs_placeholder:'Observações do pedido...',
@@ -1979,9 +2023,9 @@ const nichos = {
     table_extra_header:'Detalhes',
     top_vend:'<div style="text-align:center;color:var(--cinza);padding:16px;font-size:13px">Nenhum produto/serviço vendido ainda.<br>Os dados aparecem conforme você cadastra pedidos.</div>',
     compras_extra:'',
-    preview:`✅ Sistema configurado para <strong>${{atelie:'Ateliê/Costura',floricultura:'Floricultura',artesanato:'Artesanato',loja:'Loja Virtual'}[k]}</strong><br>✅ Campos gerais de pedido, cliente e comanda ativos<br>✅ Você pode personalizar os campos nas configurações`,
+    preview:`✅ Sistema configurado para <strong>${{atelie:'Ateliê/Costura',floricultura:'Floricultura',artesanato:'Artesanato'}[k]}</strong><br>✅ Campos gerais de pedido, cliente e comanda ativos<br>✅ Você pode personalizar os campos nas configurações`,
     agenda_ev1:'Entrega · cliente',agenda_ev2:'Reunião de planejamento',agenda_prox1:'Entrega especial',agenda_prox2:'Compra de insumos',
-    dash_alert_txt:`${({atelie:'🧵',floricultura:'💐',artesanato:'🎨',loja:'🛍️'}[k])} <strong>${{atelie:'Ateliê',floricultura:'Floricultura',artesanato:'Artesanato',loja:'Loja Virtual'}[k]}:</strong> Sistema adaptado para seu nicho. Configure os campos nas configurações!`
+    dash_alert_txt:`${({atelie:'🧵',floricultura:'💐',artesanato:'🎨'}[k])} <strong>${{atelie:'Ateliê',floricultura:'Floricultura',artesanato:'Artesanato'}[k]}:</strong> Sistema adaptado para seu nicho. Configure os campos nas configurações!`
   };
 });
 
@@ -1997,6 +2041,30 @@ function applyNicho(key) {
   // menu "Serviços" só aparece pro nicho de Estética/Beleza
   const navServ = document.getElementById('nav-servicos');
   if (navServ) navServ.style.display = (key === 'estetica') ? '' : 'none';
+
+  // campos de Tamanho/Cor no estoque só aparecem pro nicho de Loja de Roupa
+  const estTamCor = document.getElementById('est-tam-cor-wrap');
+  if (estTamCor) estTamCor.style.display = (key === 'loja') ? '' : 'none';
+
+  // Loja de Roupa não trabalha com insumos — só produto. Esconde a aba de Insumos
+  // e o botão de movimentar insumo, e deixa o estoque sempre na visão de Produto.
+  const estTipoInsumoBtn = document.getElementById('est-tipo-insumo');
+  const estTipoProdutoBtn = document.getElementById('est-tipo-produto');
+  const estBtnBaixaInsumo = document.getElementById('est-btn-baixa');
+  const estBtnProduto = document.getElementById('est-btn-produto');
+  if (key === 'loja') {
+    if (estTipoInsumoBtn) estTipoInsumoBtn.style.display = 'none';
+    if (estTipoProdutoBtn) estTipoProdutoBtn.style.display = 'none';
+    if (estBtnBaixaInsumo) estBtnBaixaInsumo.style.display = 'none';
+    estoqueTipoFiltro = 'produto';
+    if (estBtnProduto) estBtnProduto.style.display = '';
+    if (typeof renderEstoque === 'function') renderEstoque();
+  } else {
+    if (estTipoInsumoBtn) estTipoInsumoBtn.style.display = '';
+    if (estTipoProdutoBtn) estTipoProdutoBtn.style.display = '';
+    if (estBtnBaixaInsumo) estBtnBaixaInsumo.style.display = (estoqueTipoFiltro === 'insumo') ? '' : 'none';
+    if (estBtnProduto) estBtnProduto.style.display = (estoqueTipoFiltro === 'produto') ? '' : 'none';
+  }
 
   // sidebar + brand
   document.getElementById('sb-nicho').textContent = n.ico + ' ' + n.nome;
@@ -2345,7 +2413,7 @@ function selCl(av,nome,tel,niver,orig,end,obs,tag){
 }
 
 /* ══════════ COMANDA ══════════ */
-let pgtoSel=null, saldoBase=155;
+let pgtoSel=null, saldoBase=0;
 function selPgto(btn,tipo){
   document.querySelectorAll('.pgto-btn').forEach(b=>b.classList.remove('sel'));
   btn.classList.add('sel'); pgtoSel=tipo;
@@ -2570,7 +2638,7 @@ const NICHO_OPCOES = [
   {key:'marmitaria',  ico:'🍱', nome:'Marmitaria'},
   {key:'vidros',      ico:'🪟', nome:'Inst. de Vidros'},
   {key:'estetica',    ico:'💅', nome:'Estética / Beleza'},
-  {key:'loja',        ico:'🛍️', nome:'Loja Virtual'},
+  {key:'loja',        ico:'👗', nome:'Loja de Roupa'},
 ];
 
 function buildSetupScreen(){
@@ -3102,7 +3170,7 @@ function buildAdminScreen(){
             <option value="marmitaria">🍱 Marmitaria</option>
             <option value="vidros">🪟 Inst. de Vidros</option>
             <option value="estetica">💅 Estética / Beleza</option>
-            <option value="loja">🛍️ Loja Virtual</option>
+            <option value="loja">👗 Loja de Roupa</option>
           </select>
         </div>
         <button onclick="cadastrarMentoradaNauta()"
@@ -3427,6 +3495,7 @@ renderHistoricoEstoque();
     return `<div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr 80px;gap:8px;align-items:center;padding:12px 16px;border-bottom:1px solid var(--cream2)">
       <div>
         <div style="font-size:13px;font-weight:600;color:var(--carvao)">${i.nome}</div>
+        ${(i.tamanho||i.cor)?`<div style="font-size:11px;color:var(--terra-d);font-weight:600">${[i.tamanho,i.cor].filter(Boolean).join(' · ')}</div>`:''}
         ${i.obs?`<div style="font-size:11px;color:var(--cinza)">${i.obs}</div>`:''}
       </div>
       <div style="text-align:center;display:flex;align-items:center;gap:4px;justify-content:center">
@@ -3948,10 +4017,14 @@ function salvarItemEstoque(){
   const preco = parseFloat(document.getElementById('est-preco')?.value)||0;
   const precoVenda = parseFloat(document.getElementById('est-preco-venda')?.value)||0;
   const obs   = document.getElementById('est-obs')?.value.trim()||'';
+  const tamanhoSel = document.getElementById('est-tamanho')?.value||'';
+  const tamanhoOutro = document.getElementById('est-tamanho-outro')?.value.trim()||'';
+  const tamanho = (tamanhoSel==='Outro' ? tamanhoOutro : tamanhoSel) || '';
+  const cor = document.getElementById('est-cor')?.value.trim()||'';
   if(!nome){ toast('Informe o nome do item!'); return; }
   if(!DB.estoque) DB.estoque=[];
   if(!DB.nextId.estoque) DB.nextId.estoque=1;
-DB.estoque.push({id:DB.nextId.estoque++, nome, categoria, qtd, min, unid, preco, precoVenda, obs});  salvarDados();
+DB.estoque.push({id:DB.nextId.estoque++, nome, categoria, qtd, min, unid, preco, precoVenda, obs, tamanho, cor});  salvarDados();
   closeM('m-estoque');
   renderEstoque();
   toast('✅ Item adicionado ao estoque!');
@@ -4355,7 +4428,10 @@ function renderItensPedidoEstoque(){
   const wrap = document.getElementById('mp-estoque-wrap');
   if(!wrap) return;
   const itens = window.itensPedidoEstoque;
-  const opcoes = (DB.estoque||[]).map(e=>`<option value="${e.id}">${e.nome} (${e.qtd} ${e.unid} em estoque)</option>`).join('');
+  const opcoes = (DB.estoque||[]).map(e=>{
+    const tc = [e.tamanho,e.cor].filter(Boolean).join(' · ');
+    return `<option value="${e.id}">${e.nome}${tc?` — ${tc}`:''} (${e.qtd} ${e.unid} em estoque)</option>`;
+  }).join('');
   wrap.innerHTML = itens.map((it,i)=>`
     <div style="display:grid;grid-template-columns:1fr 90px 24px;gap:6px;align-items:center;margin-bottom:6px">
       <select class="fi" style="padding:6px 8px;font-size:12px" onchange="window.itensPedidoEstoque[${i}].estoqueId=this.value">
@@ -4376,7 +4452,10 @@ function renderItensPedidoCarrinho(){
       const nomeField = it.tipo==='estoque'
         ? `<select class="fi" style="font-size:12px" onchange="atualizarItemCarrinhoEstoque(${i},this.value)">
              <option value="">Selecione...</option>
-             ${(DB.estoque||[]).filter(e=>e.categoria==='Produto').map(e=>`<option value="${e.id}" ${it.estoqueProdutoId==e.id?'selected':''}>${e.nome}</option>`).join('')}
+             ${(DB.estoque||[]).filter(e=>e.categoria==='Produto').map(e=>{
+               const tc = [e.tamanho,e.cor].filter(Boolean).join(' · ');
+               return `<option value="${e.id}" ${it.estoqueProdutoId==e.id?'selected':''}>${e.nome}${tc?` — ${tc}`:''}</option>`;
+             }).join('')}
            </select>`
         : `<input class="fi" style="font-size:12px" value="${it.produto||''}" placeholder="Nome do produto" oninput="window.itensPedidoCarrinho[${i}].produto=this.value">`;
       return `<div class="brow" style="gap:6px;align-items:center;margin-bottom:6px">
@@ -4406,7 +4485,8 @@ function atualizarItemCarrinhoEstoque(i, estoqueId){
   const item = (DB.estoque||[]).find(e=>e.id==estoqueId);
   if(!window.itensPedidoCarrinho[i]) return;
   window.itensPedidoCarrinho[i].estoqueProdutoId = item?item.id:null;
-  window.itensPedidoCarrinho[i].produto = item?item.nome:'';
+  const tc = item?[item.tamanho,item.cor].filter(Boolean).join(' · '):'';
+  window.itensPedidoCarrinho[i].produto = item?(item.nome + (tc?` — ${tc}`:'')):'';
 window.itensPedidoCarrinho[i].valorUnit = item?(item.precoVenda||item.preco||0):0;  renderItensPedidoCarrinho();
 }function onChangeMpCliente(sel){
   if(sel.value === '+ Nova cliente'){
