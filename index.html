@@ -463,7 +463,7 @@ textarea.fi{resize:vertical;min-height:70px}
         <div id="cd-av" class="cl-av" style="width:50px;height:50px;font-size:17px">?</div>
         <div>
           <div id="cd-nome" style="font-family:'DM Serif Display',serif;font-size:17px">—</div>
-          <div style="font-size:11px;color:var(--cinza);margin-top:2px">Selecione uma cliente na lista</div>
+          <div id="cd-sub" style="font-size:11px;color:var(--cinza);margin-top:2px">Selecione uma cliente na lista</div>
           <div id="cd-badge" style="margin-top:5px"><span class="bp bp-v">VIP</span></div>
         </div>
       </div>
@@ -4698,7 +4698,11 @@ const editId = window._editandoClienteId;
   salvarDados();
   closeM('m-cliente');
   renderClientes();
-  toast('✅ Cliente cadastrada!');
+  toast(editId ? '✅ Cliente atualizada!' : '✅ Cliente cadastrada!');
+  // Atualiza a Ficha ao lado, se a cliente editada é a que está aberta nela
+  if(editId && window._clienteAbertoId === editId && typeof abrirFichaCliente === 'function'){
+    abrirFichaCliente(editId);
+  }
   if(window._voltarParaPedidoAposCliente){
     window._voltarParaPedidoAposCliente = false;
     openM('m-pedido');
@@ -4754,6 +4758,16 @@ function abrirFichaCliente(id){
   // Avatar
   const av = document.getElementById('cd-av');
   if(av) av.textContent = c.nome[0].toUpperCase();
+  // Subtítulo — data de cadastro, no lugar do texto fixo "Selecione uma cliente na lista"
+  const sub = document.getElementById('cd-sub');
+  if(sub){
+    if(c.criado){
+      const d = new Date(c.criado);
+      sub.textContent = 'Cliente desde ' + String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear();
+    } else {
+      sub.textContent = '';
+    }
+  }
   // Badge tipo
   const badge = document.getElementById('cd-badge');
   if(badge){
