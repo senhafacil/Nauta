@@ -343,9 +343,9 @@ textarea.fi{resize:vertical;min-height:70px}
 <div class="page active" id="pg-dashboard">
   <div class="mrow">
     <div class="mc mc-t"><div class="mc-lbl">Receita do Mês</div><div class="mc-val" id="dash-receita">R$0</div></div>
-    <div class="mc mc-v"><div class="mc-lbl" id="dash-lbl-pedidos">Pedidos Abertos</div><div class="mc-val">0</div></div>
-    <div class="mc mc-d"><div class="mc-lbl" id="dash-lbl-clientes">Clientes Ativos</div><div class="mc-val">0</div></div>
-    <div class="mc mc-r"><div class="mc-lbl">Ticket Médio</div><div class="mc-val">R$0</div></div>
+    <div class="mc mc-v"><div class="mc-lbl" id="dash-lbl-pedidos">Pedidos Abertos</div><div class="mc-val" id="dash-pedidos">0</div></div>
+    <div class="mc mc-d"><div class="mc-lbl" id="dash-lbl-clientes">Clientes Ativos</div><div class="mc-val" id="dash-clientes">0</div></div>
+    <div class="mc mc-r"><div class="mc-lbl">Ticket Médio</div><div class="mc-val" id="dash-ticket">R$0</div></div>
   </div>
 
   <!-- NICHO-SPECIFIC ALERT -->
@@ -358,14 +358,14 @@ textarea.fi{resize:vertical;min-height:70px}
       <div class="card-t"><span id="dash-t-hoje">Pedidos de hoje</span> <span class="bp bp-c" id="dash-badge-pedidos">0 pedidos</span></div>
       <div class="tw"><table class="tbl">
         <thead><tr><th id="th-cod">Código</th><th id="th-cli">Cliente</th><th id="th-prod">Produto</th><th id="th-ent">Entrega</th><th>Status</th><th></th></tr></thead>
-        <tbody>
+        <tbody id="dash-pedidos-tbody">
           <tr id="dash-pedidos-empty"><td colspan="6" style="text-align:center;color:var(--cinza);padding:18px;font-size:13px">Nenhum pedido para hoje</td></tr>
         </tbody>
       </table></div>
     </div>
     <div class="card">
       <div class="card-t">Aniversariantes <span class="bp bp-c" id="dash-badge-aniv">0 🎂</span></div>
-      <div style="text-align:center;color:var(--cinza);padding:18px;font-size:13px">Nenhum aniversariante este mês</div>
+      <div id="dash-aniv-list" style="text-align:center;color:var(--cinza);padding:18px;font-size:13px">Nenhum aniversariante este mês</div>
       <button class="btn btn-sm" style="width:100%;justify-content:center;margin-top:10px" onclick="go('clientes')">Ver todos →</button>
     </div>
   </div>
@@ -384,8 +384,8 @@ textarea.fi{resize:vertical;min-height:70px}
         <div style="background:var(--rubi-l);border-radius:var(--r);padding:12px"><div style="font-size:10px;color:var(--rubi);font-weight:700;margin-bottom:4px">SAÍDAS</div><div style="font-size:20px;font-weight:700;color:var(--rubi)" id="dash-sai">R$0,00</div></div>
       </div>
       <div style="display:flex;justify-content:space-between;font-size:14px;font-weight:700;padding:11px 0;border-top:1px solid var(--borda)"><span>Saldo</span><span style="color:var(--verde)" id="dash-saldo">+ R$0,00</span></div>
-      <div class="prog"><div class="prog-f" style="width:0%"></div></div>
-      <div style="font-size:11px;color:var(--cinza);margin-top:5px">0% da meta — configure nas Configurações</div>
+      <div class="prog"><div class="prog-f" id="dash-meta-bar" style="width:0%"></div></div>
+      <div id="dash-meta-txt" style="font-size:11px;color:var(--cinza);margin-top:5px">0% da meta — configure nas Configurações</div>
       <button class="btn btn-sm" style="width:100%;justify-content:center;margin-top:11px" onclick="go('financeiro')">Ver financeiro →</button>
     </div>
   </div>
@@ -587,26 +587,26 @@ textarea.fi{resize:vertical;min-height:70px}
       </div>
       <div style="margin-top:13px;display:flex;gap:8px;align-items:flex-end">
         <div class="fg" style="flex:1;margin-bottom:0"><div class="fl">Desconto (R$)</div><input class="fi" id="desc-inp" type="number" placeholder="0,00" step="0.01" oninput="calcDesc()"></div>
-        <button class="btn btn-sm" onclick="aplicarDesc()">Aplicar</button>
+        <button class="btn btn-sm" id="cmd-btn-desc" onclick="aplicarDesc()">Aplicar</button>
       </div>
       <div id="desc-res" style="display:none;font-size:12px;color:var(--verde);margin-top:5px;font-weight:600"></div>
       <div style="margin-top:18px;padding-top:15px;border-top:2px solid var(--borda)">
         <div class="brow">
           <button class="btn btn-sm" onclick="imprimirComanda()">🖨 Imprimir</button>
-          <button class="btn btn-v" onclick="fecharComanda()">✓ Fechar Comanda</button>
+          <button class="btn btn-v" id="cmd-btn-fechar" onclick="fecharComanda()">✓ Fechar Comanda</button>
         </div>
       </div>
       <div id="cmd-msg" style="display:none;margin-top:11px;padding:11px 13px;background:var(--verde-l);border-radius:var(--r);font-size:13px;color:var(--verde);font-weight:600"></div>
     </div>
     <div class="card">
       <div class="card-t">Detalhes do Pedido <button class="btn btn-xs" onclick="if(comandaAtualId) editarPedidoNaComanda(comandaAtualId)">Editar</button></div>
-      <div class="fr"><span style="color:var(--cinza)">Cliente</span><strong>—</strong></div>
+      <div class="fr"><span style="color:var(--cinza)">Cliente</span><strong id="cmd-cliente">—</strong></div>
       <div class="fr"><span style="color:var(--cinza)">WhatsApp</span><span id="cmd-wpp">—</span></div>
-      <div class="fr"><span style="color:var(--cinza)">Pedido em</span><span>—</span></div>
-      <div class="fr"><span style="color:var(--cinza)">Entrega</span><strong>—</strong></div>
+      <div class="fr"><span style="color:var(--cinza)">Pedido em</span><span id="cmd-data">—</span></div>
+      <div class="fr"><span style="color:var(--cinza)">Entrega</span><strong id="cmd-entrega">—</strong></div>
       <!-- NICHO específicos -->
       <div id="cmd-det-nicho"></div>
-      <div class="fr" style="border:none"><span style="color:var(--cinza)">Status</span><span class="bp bp-c">—</span></div>
+      <div class="fr" style="border:none"><span style="color:var(--cinza)">Status</span><span class="bp bp-c" id="cmd-status">—</span></div>
       <div style="margin-top:13px;padding:11px 13px;background:var(--dourado-l);border-radius:var(--r);border-left:3px solid var(--dourado)">
         <div style="font-size:10px;font-weight:700;color:var(--dourado);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">📝 Obs.</div>
         <div id="cmd-obs" style="font-size:13px;color:var(--carvao2)">Nenhuma observação.</div>
@@ -646,9 +646,9 @@ textarea.fi{resize:vertical;min-height:70px}
 <!-- ══════════ RELATÓRIOS ══════════ -->
 <div class="page" id="pg-relatorios">
   <div class="g3">
-    <div class="mc mc-t"><div class="mc-lbl">Pedidos no mês</div><div class="mc-val">0</div></div>
-    <div class="mc mc-v"><div class="mc-lbl">Ticket médio</div><div class="mc-val">—</div></div>
-    <div class="mc mc-d"><div class="mc-lbl">Retorno</div><div class="mc-val">—</div></div>
+    <div class="mc mc-t"><div class="mc-lbl">Pedidos no mês</div><div class="mc-val" id="rel-kpi-pedidos">0</div></div>
+    <div class="mc mc-v"><div class="mc-lbl">Ticket médio</div><div class="mc-val" id="rel-kpi-ticket">—</div></div>
+    <div class="mc mc-d"><div class="mc-lbl">Retorno</div><div class="mc-val" id="rel-kpi-retorno">—</div></div>
   </div>
   <div class="g2">
     <div class="card">
@@ -657,7 +657,7 @@ textarea.fi{resize:vertical;min-height:70px}
     </div>
     <div class="card">
       <div class="card-t">Como chegaram</div>
-      <div class="bc">
+      <div class="bc" id="rel-como-chegaram">
         <div style="text-align:center;color:var(--cinza);padding:20px;font-size:13px">Nenhum dado ainda</div>
 
       </div>
@@ -1714,7 +1714,7 @@ window.renderInsumos = renderInsumos;
 <!-- ═══════ MODAIS ═══════ -->
 <div class="modal-bg" id="m-pedido">
   <div class="modal">
-    <div class="modal-hdr"><div class="modal-title">Novo Pedido</div><button class="modal-x" onclick="closeM('m-pedido')">×</button></div>
+    <div class="modal-hdr"><div class="modal-title" id="mp-modal-title">Novo Pedido</div><button class="modal-x" onclick="closeM('m-pedido')">×</button></div>
     
       <div class="fr2">
       <div class="fg"><div class="fl" id="mp-lbl-cli">Cliente</div><select class="fi" id="mp-cliente" onchange="onChangeMpCliente(this)"><option>Selecione...</option><option>+ Nova cliente</option></select></div>
@@ -1779,7 +1779,7 @@ window.renderInsumos = renderInsumos;
   </div>
 </div><div class="modal-bg" id="m-cliente">
   <div class="modal">
-    <div class="modal-hdr"><div class="modal-title">Nova Cliente</div><button class="modal-x" onclick="closeM('m-cliente')">×</button></div>
+    <div class="modal-hdr"><div class="modal-title" id="mc-modal-title">Nova Cliente</div><button class="modal-x" onclick="closeM('m-cliente')">×</button></div>
     <div class="fr2">
       <div class="fg"><div class="fl">Nome completo</div><input class="fi" id="cli-nome" placeholder="Maria da Silva"></div>
       <div class="fg"><div class="fl">WhatsApp</div><input class="fi" id="cli-fone" placeholder="(11) 99999-9999"></div>
@@ -1789,7 +1789,7 @@ window.renderInsumos = renderInsumos;
       <div class="fg"><div class="fl">Como conheceu</div><select class="fi" id="cli-origem"><option>Selecione...</option><option>Instagram</option><option>WhatsApp</option><option>Indicação</option><option>Google</option><option>TikTok</option><option>Evento/Feira</option><option>Outro</option></select></div>
     </div>
     <div class="fg"><div class="fl">Endereço</div><input class="fi" id="cli-end" placeholder="Rua, número, bairro, cidade/UF"></div>
-    <div class="fg" id="cli-alergia-wrap"><div class="fl">Alergias</div><input class="fi" id="cli-alergia" placeholder="Ex: amendoim, lactose, glúten..."></div>
+    <div class="fg" id="cli-alergia-wrap"><div class="fl" id="mc-obs-lbl">Alergias</div><input class="fi" id="cli-alergia" placeholder="Ex: amendoim, lactose, glúten..."></div>
     <div class="fg"><div class="fl">Observações</div><textarea class="fi" id="cli-obs" placeholder="Outras observações..."></textarea></div>
     <!-- nicho extra -->
     <div id="mc-nicho-fields"></div>
@@ -1875,6 +1875,7 @@ const nichos = {
     cliente_fields:`<div class="fg"><div class="fl">Preferências alimentares</div><input class="fi" id="cli-extra1" placeholder="Ex: vegetariana, sem lactose..."></div>`,
     comanda_extra:`<div class="ci"><div class="ci-qty">—</div><div class="ci-name" style="color:var(--cinza);font-size:12px">🎂 Tema: Unicórnio · 30 porções · Chantilly</div></div>`,
     comanda_det:`<div class="fr"><span style="color:var(--cinza)">Sabor/Recheio</span><span>Choc. c/ morango</span></div><div class="fr"><span style="color:var(--cinza)">Tema</span><span>Unicórnio · Rosa/Dourado</span></div>`,
+    comanda_det_fields:['Sabor/Recheio','Cobertura','Nº de porções','Tema/Decoração'],
     dashboard_alert:'🎂 <strong>Confeitaria:</strong> — e 2 bolos para decorar. Estoque de caixas kraft baixo — repor antes de sexta!',
     table_extra_header:'Sabor/Tema',
     top_vend:'<div style="text-align:center;color:var(--cinza);padding:16px;font-size:13px">Nenhum produto/serviço vendido ainda.<br>Os dados aparecem conforme você cadastra pedidos.</div>',
@@ -1904,6 +1905,7 @@ const nichos = {
     cliente_fields:`<div class="fg"><div class="fl">Intolerâncias</div><input class="fi" placeholder="Glúten, lactose..."></div>`,
     comanda_extra:`<div class="ci"><div class="ci-qty">—</div><div class="ci-name" style="color:var(--cinza);font-size:12px">🍞 Integral · 500g · Sem recheio</div></div>`,
     comanda_det:`<div class="fr"><span style="color:var(--cinza)">Tipo</span><span>Integral</span></div><div class="fr"><span style="color:var(--cinza)">Peso</span><span>500g</span></div>`,
+    comanda_det_fields:['Tipo de pão','Peso/Quantidade','Recheio/Sabor','Retirada'],
     table_extra_header:'Tipo/Peso',
     top_vend:'<div style="text-align:center;color:var(--cinza);padding:16px;font-size:13px">Nenhum produto/serviço vendido ainda.<br>Os dados aparecem conforme você cadastra pedidos.</div>',
     compras_extra:`<div class="comp-item"><input type="checkbox" class="comp-chk" onchange="toggleCompra(this)"><div class="comp-name">Fermento biológico (500g)</div><div class="comp-qty">3 pcts</div><span class="comp-pri pr-a">Urgente</span></div>`,
@@ -1929,6 +1931,7 @@ const nichos = {
     cliente_fields:`<div class="fg"><div class="fl">Tamanho habitual</div><select class="fi"><option>PP</option><option>P</option><option>M</option><option>G</option><option>GG</option><option>XGG</option></select></div>`,
     comanda_extra:`<div class="ci"><div class="ci-qty">—</div><div class="ci-name" style="color:var(--cinza);font-size:12px">👕 Sublimação · P×2, M×3 · Arte do cliente</div></div>`,
     comanda_det:`<div class="fr"><span style="color:var(--cinza)">Técnica</span><span>Sublimação</span></div><div class="fr"><span style="color:var(--cinza)">Tamanhos</span><span>P×2, M×3, G×1</span></div>`,
+    comanda_det_fields:['Tipo de peça','Tamanhos','Quantidade total','Técnica'],
     table_extra_header:'Técnica/Tamanhos',
     top_vend:'<div style="text-align:center;color:var(--cinza);padding:16px;font-size:13px">Nenhum produto/serviço vendido ainda.<br>Os dados aparecem conforme você cadastra pedidos.</div>',
     compras_extra:`<div class="comp-item"><input type="checkbox" class="comp-chk" onchange="toggleCompra(this)"><div class="comp-name">Tinta sublimática (preto)</div><div class="comp-qty">1 kit</div><span class="comp-pri pr-a">Urgente</span></div>`,
@@ -1954,6 +1957,7 @@ const nichos = {
     cliente_fields:`<div class="fr2"><div class="fg"><div class="fl">Endereço da obra</div><input class="fi" placeholder="Rua, número, complemento..."></div><div class="fg"><div class="fl">Andar / Acesso</div><input class="fi" placeholder="Ex: 5º andar, sem elevador"></div></div>`,
     comanda_extra:`<div class="ci"><div class="ci-qty">—</div><div class="ci-name" style="color:var(--cinza);font-size:12px">🪟 Temperado 8mm · 2.40m² · Box banheiro</div></div>`,
     comanda_det:`<div class="fr"><span style="color:var(--cinza)">Tipo</span><span>Temperado 8mm</span></div><div class="fr"><span style="color:var(--cinza)">Metragem</span><span>2.40 m²</span></div>`,
+    comanda_det_fields:['Tipo de vidro','Espessura','Metragem (m²)','Tipo de serviço'],
     table_extra_header:'Tipo/Metragem',
     top_vend:'<div style="text-align:center;color:var(--cinza);padding:16px;font-size:13px">Nenhum produto/serviço vendido ainda.<br>Os dados aparecem conforme você cadastra pedidos.</div>',
     compras_extra:`<div class="comp-item"><input type="checkbox" class="comp-chk" onchange="toggleCompra(this)"><div class="comp-name">Silicone neutro transparente</div><div class="comp-qty">5 tubos</div><span class="comp-pri pr-a">Urgente</span></div>`,
@@ -1974,6 +1978,7 @@ const nichos = {
     cliente_fields:`<div class="fg"><div class="fl">Anamnese / Alergias</div><textarea class="fi" rows="2" placeholder="Histórico de pele, alergias a produtos, condições de saúde..."></textarea></div>`,
     comanda_extra:'',
     comanda_det:`<div class="fr"><span style="color:var(--cinza)">Serviço</span><span>Limpeza de pele</span></div><div class="fr"><span style="color:var(--cinza)">Duração</span><span>1h30</span></div>`,
+    comanda_det_fields:['Serviço','Duração estimada'],
     table_extra_header:'Serviço/Duração',
     top_vend:'<div style="text-align:center;color:var(--cinza);padding:16px;font-size:13px">Nenhum produto/serviço vendido ainda.<br>Os dados aparecem conforme você cadastra pedidos.</div>',
     compras_extra:'',
@@ -1995,6 +2000,7 @@ const nichos = {
     cliente_fields:`<div class="fg"><div class="fl">Restrições alimentares / Dieta</div><input class="fi" placeholder="Ex: sem glúten, low carb, vegetariano..."></div>`,
     comanda_extra:`<div class="ci"><div class="ci-qty">—</div><div class="ci-name" style="color:var(--cinza);font-size:12px">🍱 Fitness · Frango grelhado · Low carb</div></div>`,
     comanda_det:`<div class="fr"><span style="color:var(--cinza)">Cardápio</span><span>Fitness</span></div><div class="fr"><span style="color:var(--cinza)">Proteína</span><span>Frango grelhado</span></div>`,
+    comanda_det_fields:['Cardápio','Proteína','Quantidade'],
     table_extra_header:'Cardápio/Proteína',
     top_vend:'<div style="text-align:center;color:var(--cinza);padding:16px;font-size:13px">Nenhum produto/serviço vendido ainda.<br>Os dados aparecem conforme você cadastra pedidos.</div>',
     compras_extra:'',
@@ -2020,6 +2026,7 @@ const nichos = {
     cliente_fields:`<div class="fg"><div class="fl">Tamanho habitual</div><select class="fi"><option>PP</option><option>P</option><option>M</option><option>G</option><option>GG</option><option>XGG</option></select></div>`,
     comanda_extra:`<div class="ci"><div class="ci-qty">—</div><div class="ci-name" style="color:var(--cinza);font-size:12px">👗 M · Preto · Roupa</div></div>`,
     comanda_det:`<div class="fr"><span style="color:var(--cinza)">Tamanho</span><span>M</span></div><div class="fr"><span style="color:var(--cinza)">Cor</span><span>Preto</span></div>`,
+    comanda_det_fields:['Categoria','Tamanho','Cor','Quantidade'],
     table_extra_header:'Tamanho/Cor',
     top_vend:'<div style="text-align:center;color:var(--cinza);padding:16px;font-size:13px">Nenhum produto/serviço vendido ainda.<br>Os dados aparecem conforme você cadastra pedidos.</div>',
     compras_extra:`<div class="comp-item"><input type="checkbox" class="comp-chk" onchange="toggleCompra(this)"><div class="comp-name">Sacolas / embalagens para envio</div><div class="comp-qty">50 un.</div><span class="comp-pri pr-a">Urgente</span></div><div class="comp-item"><input type="checkbox" class="comp-chk" onchange="toggleCompra(this)"><div class="comp-name">Etiquetas de preço</div><div class="comp-qty">1 rolo</div><span class="comp-pri pr-m">Em breve</span></div>`,
@@ -2155,9 +2162,11 @@ function applyNicho(key) {
   // nicho extra na ficha
   if(document.getElementById('cd-nicho-extra')) document.getElementById('cd-nicho-extra').innerHTML = n.cliente_fields ? '<div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--cream2)"><div class="fl" style="margin-bottom:6px">Campos específicos</div></div>' : '';
 
-  // comanda
-  if(document.getElementById('cmd-nicho-extra')) document.getElementById('cmd-nicho-extra').innerHTML = n.comanda_extra;
-  if(document.getElementById('cmd-det-nicho')) document.getElementById('cmd-det-nicho').innerHTML = n.comanda_det;
+  // comanda — os campos específicos do nicho (ex: Tamanho/Cor) e o resumo extra
+  // são preenchidos com os dados reais do pedido aberto (ver renderComandaExtra/
+  // renderComandaDetNicho, chamadas por abrirComanda), não mais com texto de exemplo fixo.
+  if(document.getElementById('cmd-nicho-extra')) document.getElementById('cmd-nicho-extra').innerHTML = '';
+  if(document.getElementById('cmd-det-nicho')) document.getElementById('cmd-det-nicho').innerHTML = '';
 
   // agenda
   if(document.getElementById('ag-ev1')) document.getElementById('ag-ev1').textContent = n.agenda_ev1;
@@ -2280,7 +2289,7 @@ const pgMeta = {
   agenda:      {title:'Agenda',             sub:getMesAno(),                         btns:'<button class="btn btn-p btn-sm" onclick="openM(\'m-evento\')">+ Evento</button>'},
   pedidos:     {title:'Pedidos',            sub:'14 abertos · 3 para hoje',           btns:'<button class="btn btn-p btn-sm" onclick="openM(\'m-pedido\')">+ Novo Pedido</button>'},
   clientes:    {title:'Clientes',           sub:'87 cadastradas',                     btns:'<button class="btn btn-p btn-sm" onclick="openM(\'m-cliente\')">+ Nova</button>'},
-  comanda:     {title:'Comanda',    sub:'Selecione um pedido',                       btns:'<button class="btn btn-sm" onclick="imprimirComanda()">🖨 Imprimir</button><button class="btn btn-v btn-sm" onclick="fecharComanda()">✓ Fechar Comanda</button>'},
+  comanda:     {title:'Comanda',    sub:'Selecione um pedido',                       btns:'<button class="btn btn-sm" onclick="imprimirComanda()">🖨 Imprimir</button><button class="btn btn-v btn-sm" id="tb-btn-fechar" onclick="fecharComanda()">✓ Fechar Comanda</button>'},
   servicos:    {title:'Serviços',        sub:'Catálogo de serviços oferecidos',      btns:'<button class="btn btn-p btn-sm" onclick="openM(\'m-servico\')">+ Serviço</button>'},
   financeiro:  {title:'Financeiro',         sub:'Controle de caixa — '+getMesAno(),     btns:'<button class="btn btn-xs" onclick="openM(\'m-despesa\')">+ Despesa</button><button class="btn btn-p btn-sm" onclick="openM(\'m-receita\')">+ Receita</button>'},
   relatorios:  {title:'Relatórios',         sub:'Análise de desempenho',              btns:'<button class="btn btn-sm">📄 Exportar PDF</button>'},
@@ -2316,6 +2325,28 @@ function aplicarPermissoes(){
   document.getElementById('tb-title').textContent = m.title||id;
   document.getElementById('tb-sub').textContent   = m.sub||'';
   document.getElementById('tb-right').innerHTML   = m.btns||'';
+
+  // Subtítulos com dados reais — substituem os valores de exemplo fixos do pgMeta
+  // (ex: "87 cadastradas" e "14 abertos · 3 para hoje" eram só texto de demonstração)
+  const tbSub = document.getElementById('tb-sub');
+  if(id==='clientes' && tbSub){
+    const n = (DB.clientes||[]).length;
+    tbSub.textContent = n===1 ? '1 cadastrada' : n+' cadastradas';
+  }
+  if(id==='pedidos' && tbSub){
+    const pedidos = DB.pedidos||[];
+    const abertos = pedidos.filter(p=>p.status && !['entregue','cancelado','pago'].includes((p.status||'').toLowerCase())).length;
+    const hojeISO = getTodayISO();
+    const paraHoje = pedidos.filter(p=>p.entrega===hojeISO).length;
+    tbSub.textContent = `${abertos} aberto${abertos===1?'':'s'} · ${paraHoje} para hoje`;
+  }
+  if(id==='compras' && tbSub){
+    tbSub.textContent = 'Itens para comprar';
+  }
+  if(id==='estoque' && tbSub){
+    tbSub.textContent = (nichoAtual==='loja') ? 'Controle de produtos' : 'Controle de insumos e materiais';
+  }
+
   // Render dinâmico por página
   if(id==='dashboard') setTimeout(renderDashboard, 50);
   if(id==='agenda'){ setTimeout(()=>{buildCalendario();renderAgenda();},50); }
@@ -2334,8 +2365,29 @@ function aplicarPermissoes(){
 }
 
 /* ══════════ MODAIS ══════════ */
+// Limpa o formulário de cliente — evita que data de nascimento, "como conheceu",
+// classificação, forma de pagamento etc. fiquem com o valor da cliente anterior
+// quando a pessoa abre "+ Nova" depois de cadastrar ou editar outra cliente.
+function limparFormCliente(){
+  const campos = {'cli-nome':'','cli-fone':'','cli-nasc':'','cli-end':'','cli-alergia':'','cli-obs':'','cli-extra1':''};
+  Object.entries(campos).forEach(([id,val])=>{ const el=document.getElementById(id); if(el) el.value=val; });
+  const origemEl = document.getElementById('cli-origem'); if(origemEl) origemEl.value='Selecione...';
+  const tipoEl = document.getElementById('cli-tipo'); if(tipoEl) tipoEl.value='Cliente tradicional';
+  const pgtoEl = document.getElementById('cli-pgto'); if(pgtoEl) pgtoEl.value='Sem preferência';
+}
 function openM(id){
   document.getElementById(id).classList.add('open');
+  if(id==='m-cliente'){
+    const t = document.getElementById('mc-modal-title');
+    if(!window._editandoClienteId){
+      limparFormCliente();
+      if(t) t.textContent = 'Nova Cliente';
+    } else if(t) t.textContent = 'Editar Cliente';
+  }
+  if(id==='m-pedido' && !window._editandoPedidoId){
+    const t = document.getElementById('mp-modal-title');
+    if(t) t.textContent = 'Novo Pedido';
+  }
   if(id==='m-tarefa'){
     const dt=document.getElementById('mt-data');
     if(dt) dt.value=getTodayISO();
@@ -2382,7 +2434,14 @@ function openM(id){
   
   }
 }
-function closeM(id){document.getElementById(id).classList.remove('open')}
+function closeM(id){
+  document.getElementById(id).classList.remove('open');
+  // Garante que o modal nunca "lembre" de uma edição anterior na próxima vez que
+  // for aberto para cadastrar algo novo, não importa qual botão o abriu de novo
+  // (Cancelar, X, clique fora do modal ou depois de salvar passam todos por aqui).
+  if(id==='m-cliente') window._editandoClienteId = null;
+  if(id==='m-pedido') window._editandoPedidoId = null;
+}
 document.querySelectorAll('.modal-bg').forEach(bg=>{bg.addEventListener('click',function(e){if(e.target===this)this.classList.remove('open')})});
 
 function salvarM(id,msg){closeM(id);toast(msg)}
@@ -2534,6 +2593,14 @@ if(p.status === 'Entregue'){toast('⚠️ Essa comanda já foi fechada!');return
   renderPedidos();
   renderEstoque && renderEstoque();
   renderDashboard && renderDashboard();
+
+  // Atualiza a própria tela da comanda na hora: antes, depois de fechar, a tela
+  // continuava parecendo aberta (botão "Fechar Comanda" ativo, status antigo) até a
+  // pessoa trocar de pedido e voltar — só avisava que já estava fechada se tentasse
+  // fechar de novo. Agora o botão desabilita, o badge de status muda pra "Entregue"
+  // e os botões de pagamento ficam travados, tudo no mesmo instante.
+  const pedidoAtualizado = (DB.pedidos||[]).find(x=>x.id===comandaAtualId);
+  atualizarEstadoComanda(pedidoAtualizado, {keepMsg:true});
 
   const msg=document.getElementById('cmd-msg');
   msg.style.display='block';
@@ -3909,6 +3976,77 @@ function renderDashboard(){
   if(elEntr) elEntr.textContent = fmtR(totalRec);
   if(elSai)  elSai.textContent  = fmtR(totalSai);
   if(elSaldo){ elSaldo.textContent = (saldo>=0?'+ ':'')+fmtR(saldo); elSaldo.style.color = saldo>=0?'var(--verde)':'var(--rubi)'; }
+
+  // Mais vendidos — antes ficava sempre fixo em "Nenhum produto cadastrado ainda"
+  if(typeof renderRankingProdutosEm === 'function') renderRankingProdutosEm('dash-topvend', 5);
+
+  // Pedidos de hoje, Aniversariantes e % da meta — os três ficavam sempre
+  // travados no estado vazio/zero, mesmo com pedidos, clientes e meta cadastrados.
+  renderDashPedidosHoje();
+  renderDashAniversariantes();
+  renderDashMeta(totalRec);
+}
+
+function renderDashPedidosHoje(){
+  const tbody = document.getElementById('dash-pedidos-tbody');
+  const badge = document.getElementById('dash-badge-pedidos');
+  if(!tbody) return;
+  const hojeISO = getTodayISO();
+  const pedidosHoje = (DB.pedidos||[]).filter(p=>p.entrega===hojeISO);
+  if(badge) badge.textContent = pedidosHoje.length + (pedidosHoje.length===1 ? ' pedido' : ' pedidos');
+  if(!pedidosHoje.length){
+    tbody.innerHTML = '<tr id="dash-pedidos-empty"><td colspan="6" style="text-align:center;color:var(--cinza);padding:18px;font-size:13px">Nenhum pedido para hoje</td></tr>';
+    return;
+  }
+  const statusCor = {
+    'Novo':'#e67e22','Em produção':'#2980b9','Pronto':'#8e44ad',
+    'Entregue':'#27ae60','Cancelado':'#c0392b'
+  };
+  tbody.innerHTML = pedidosHoje.map(p=>{
+    const cor = statusCor[p.status]||'var(--cinza)';
+    return `<tr onclick="abrirPedido(${p.id})" style="cursor:pointer">
+      <td>#${p.id}</td>
+      <td style="font-weight:600">${p.cliente||'—'}</td>
+      <td>${p.produto||'—'}</td>
+      <td>${p.entrega.split('-').reverse().join('/')}</td>
+      <td><span style="font-size:11px;font-weight:700;color:${cor};background:${cor}22;padding:2px 8px;border-radius:10px">${p.status||'Novo'}</span></td>
+      <td></td>
+    </tr>`;
+  }).join('');
+}
+
+function renderDashAniversariantes(){
+  const wrap = document.getElementById('dash-aniv-list');
+  const badge = document.getElementById('dash-badge-aniv');
+  if(!wrap) return;
+  const mesAtual = new Date().getMonth()+1;
+  const aniversariantes = (DB.clientes||[])
+    .filter(c=>c.nasc && parseInt(c.nasc.split('-')[1],10)===mesAtual)
+    .sort((a,b)=>parseInt(a.nasc.split('-')[2],10)-parseInt(b.nasc.split('-')[2],10));
+  if(badge) badge.textContent = aniversariantes.length + ' 🎂';
+  if(!aniversariantes.length){
+    wrap.innerHTML = 'Nenhum aniversariante este mês';
+    return;
+  }
+  wrap.innerHTML = '<div style="display:flex;flex-direction:column;gap:8px;text-align:left">' + aniversariantes.map(c=>{
+    const dia = c.nasc.split('-')[2];
+    return `<div style="display:flex;justify-content:space-between;font-size:13px"><span style="font-weight:600">${c.nome}</span><span style="color:var(--cinza)">${dia}/${String(mesAtual).padStart(2,'0')}</span></div>`;
+  }).join('') + '</div>';
+}
+
+function renderDashMeta(totalRec){
+  const bar = document.getElementById('dash-meta-bar');
+  const txt = document.getElementById('dash-meta-txt');
+  if(!bar || !txt) return;
+  const meta = parseFloat(DB.config?.meta_mensal)||0;
+  if(!meta){
+    bar.style.width = '0%';
+    txt.textContent = '0% da meta — configure nas Configurações';
+    return;
+  }
+  const pct = Math.round(totalRec/meta*100);
+  bar.style.width = Math.min(pct,100)+'%';
+  txt.textContent = pct+'% da meta de R$ '+meta.toFixed(2).replace('.',',');
 }
 
 
@@ -3925,13 +4063,16 @@ function renderTarefas(){
   const total      = hoje_list.length;
   const pct        = total>0?Math.round(feitas/total*100):0;
 
-  // Progresso
+  // Progresso — "X de Y tarefas" fica em dois spans separados (prog-done/prog-tot),
+  // não em um "prog-sub" só, que não existe no HTML e por isso nunca era atualizado.
   const elPct = document.getElementById('prog-pct');
   const elBar = document.getElementById('prog-bar');
-  const elSub = document.getElementById('prog-sub');
+  const elDone = document.getElementById('prog-done');
+  const elTot = document.getElementById('prog-tot');
   if(elPct) elPct.textContent = pct+'%';
   if(elBar) elBar.style.width = pct+'%';
-  if(elSub) elSub.textContent = feitas+' de '+total+' tarefas';
+  if(elDone) elDone.textContent = feitas;
+  if(elTot) elTot.textContent = total;
 
   // Lista de hoje
   const taskList = document.getElementById('task-list');
@@ -4184,11 +4325,14 @@ function renderServicos(){
 }
 
 /* ══════════ RELATÓRIO: SERVIÇO MAIS VENDIDO ══════════ */
-function renderRelatorioServicoTop(){
-  const wrap = document.getElementById('rel-servico-top');
-  if(!wrap) return;
+// Ranking de produtos/serviços mais vendidos a partir dos itens de cada pedido.
+// Usado pelo Dashboard ("Mais vendidos"), por Relatórios ("Mais vendidos" e
+// "Serviço mais vendido") — eram três textos fixos de "Nenhum dado ainda" que
+// nunca somavam os pedidos de verdade.
+function calcularRankingProdutos(limit){
   const contagem = {};
   (DB.pedidos||[]).forEach(p=>{
+    if((p.status||'').toLowerCase()==='cancelado') return;
     (p.itens||[]).forEach(it=>{
       const nome = (it.produto||'').trim();
       if(!nome) return;
@@ -4197,9 +4341,14 @@ function renderRelatorioServicoTop(){
       contagem[nome].valor += (it.qtd||1)*(it.valorUnit||0);
     });
   });
-  const ranking = Object.entries(contagem).sort((a,b)=>b[1].qtd-a[1].qtd).slice(0,8);
+  return Object.entries(contagem).sort((a,b)=>b[1].qtd-a[1].qtd).slice(0, limit||8);
+}
+function renderRankingProdutosEm(elId, limit, msgVazio){
+  const wrap = document.getElementById(elId);
+  if(!wrap) return;
+  const ranking = calcularRankingProdutos(limit);
   if(!ranking.length){
-    wrap.innerHTML = '<div style="text-align:center;color:var(--cinza);padding:20px;font-size:13px">Nenhum dado ainda</div>';
+    wrap.innerHTML = `<div style="text-align:center;color:var(--cinza);padding:20px;font-size:13px">${msgVazio||'Nenhum produto vendido ainda'}</div>`;
     return;
   }
   const max = ranking[0][1].qtd;
@@ -4211,6 +4360,64 @@ function renderRelatorioServicoTop(){
       </div>
       <div style="height:6px;background:var(--cream3);border-radius:3px;overflow:hidden">
         <div style="height:100%;width:${(info.qtd/max*100).toFixed(0)}%;background:var(--terra)"></div>
+      </div>
+    </div>`).join('');
+}
+function renderRelatorioServicoTop(){
+  renderRankingProdutosEm('rel-servico-top', 8);
+}
+// KPIs do topo de Relatórios — "Pedidos no mês", "Ticket médio" e "Retorno"
+// ficavam sempre travados em 0 / — / —, sem id nenhum pra receber valor real.
+function renderRelatorioKPIs(){
+  const hojeISO = getTodayISO();
+  const prefixoMes = hojeISO.slice(0,7); // "AAAA-MM"
+  const pedidos = DB.pedidos||[];
+  const pedidosMes = pedidos.filter(p=>(p.data||'').startsWith(prefixoMes) && (p.status||'').toLowerCase()!=='cancelado');
+
+  const elPed = document.getElementById('rel-kpi-pedidos');
+  if(elPed) elPed.textContent = pedidosMes.length;
+
+  const comValor = pedidosMes.filter(p=>p.valor_total);
+  const ticket = comValor.length ? comValor.reduce((s,p)=>s+parseFloat(p.valor_total||0),0)/comValor.length : 0;
+  const elTicket = document.getElementById('rel-kpi-ticket');
+  if(elTicket) elTicket.textContent = comValor.length ? 'R$ '+ticket.toFixed(2).replace('.',',') : '—';
+
+  // Retorno = % de clientes com mais de um pedido, entre quem já comprou alguma vez
+  const porCliente = {};
+  pedidos.forEach(p=>{
+    const nome = (p.cliente||'').trim();
+    if(!nome) return;
+    porCliente[nome] = (porCliente[nome]||0) + 1;
+  });
+  const clientesComPedido = Object.keys(porCliente).length;
+  const clientesRecorrentes = Object.values(porCliente).filter(n=>n>1).length;
+  const elRet = document.getElementById('rel-kpi-retorno');
+  if(elRet) elRet.textContent = clientesComPedido ? Math.round(clientesRecorrentes/clientesComPedido*100)+'%' : '—';
+}
+// "Como chegaram" — quantas clientes vieram de cada origem (campo "Como conheceu" do cadastro)
+function renderComoChegaram(){
+  const wrap = document.getElementById('rel-como-chegaram');
+  if(!wrap) return;
+  const contagem = {};
+  (DB.clientes||[]).forEach(c=>{
+    const origem = (c.origem||'').trim();
+    if(!origem || origem==='Selecione...') return;
+    contagem[origem] = (contagem[origem]||0)+1;
+  });
+  const ranking = Object.entries(contagem).sort((a,b)=>b[1]-a[1]);
+  if(!ranking.length){
+    wrap.innerHTML = '<div style="text-align:center;color:var(--cinza);padding:20px;font-size:13px">Nenhum dado ainda</div>';
+    return;
+  }
+  const max = ranking[0][1];
+  wrap.innerHTML = ranking.map(([origem,qtd])=>`
+    <div style="margin-bottom:10px">
+      <div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:4px">
+        <span style="font-weight:600">${origem}</span>
+        <span style="color:var(--cinza)">${qtd}</span>
+      </div>
+      <div style="height:6px;background:var(--cream3);border-radius:3px;overflow:hidden">
+        <div style="height:100%;width:${(qtd/max*100).toFixed(0)}%;background:var(--terra)"></div>
       </div>
     </div>`).join('');
 }
@@ -4254,6 +4461,9 @@ function renderRelatorioUltimaVisita(){
 function renderRelatoriosExtra(){
   renderRelatorioServicoTop();
   renderRelatorioUltimaVisita();
+  renderRelatorioKPIs();
+  renderComoChegaram();
+  renderRankingProdutosEm('rel-topvend', 8);
 }
 
 /* ══════════ DIRECAO SAVE ══════════ */
@@ -4374,7 +4584,7 @@ function setStatusEvento(id, status){
 function renderIndicadoresSemana(){
   const hoje = new Date();
   const seteDiasAtras = new Date(Date.now() - 7*86400000);
-  const iso = d => d.toISOString().split('T')[0];
+  const iso = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
   const inicio = iso(seteDiasAtras);
 
   const pedidosSemana = (DB.pedidos||[]).filter(p => (p.criado||'').split('T')[0] >= inicio);
@@ -4642,18 +4852,32 @@ function salvarPedido(){
   if(!DB.nextId) DB.nextId = {};
   if(!DB.nextId.pedido) DB.nextId.pedido = 1;
 
-  const idPedidoNovo = DB.nextId.pedido++;
-  DB.pedidos.push({
-    id: idPedidoNovo,
-    cliente, resp, data, entrega,
-    produto: produtoResumo,
-    itens: carrinho,
-    sabor_tema,
-    valor_total: valor, sinal, pagto, obs,
-    status: 'Novo',
-    baixaFeita: false,
-    criado: new Date().toISOString()
-  });
+  // Editando um pedido existente (ex: botão "Editar" na Comanda) atualiza o mesmo
+  // registro em vez de criar um pedido duplicado — antes não existia essa distinção.
+  const editId = window._editandoPedidoId;
+  let idPedidoNovo;
+  if(editId){
+    idPedidoNovo = editId;
+    DB.pedidos = DB.pedidos.map(x=>x.id===editId ? {
+      ...x, cliente, resp, data, entrega,
+      produto: produtoResumo, itens: carrinho, sabor_tema,
+      valor_total: valor, sinal, pagto, obs
+    } : x);
+    window._editandoPedidoId = null;
+  } else {
+    idPedidoNovo = DB.nextId.pedido++;
+    DB.pedidos.push({
+      id: idPedidoNovo,
+      cliente, resp, data, entrega,
+      produto: produtoResumo,
+      itens: carrinho,
+      sabor_tema,
+      valor_total: valor, sinal, pagto, obs,
+      status: 'Novo',
+      baixaFeita: false,
+      criado: new Date().toISOString()
+    });
+  }
 
   itensEstoqueUsados.forEach(it=>{
     const itemEst = (DB.estoque||[]).find(e=>e.id==it.estoqueId);
@@ -4667,7 +4891,11 @@ function salvarPedido(){
   closeM('m-pedido');
   renderPedidos();
   renderDashboard && renderDashboard();
-  toast('✅ Pedido registrado!');
+  toast(editId ? '✅ Pedido atualizado!' : '✅ Pedido registrado!');
+  // Se o pedido editado é o que está aberto na Comanda, atualiza a tela na hora
+  if(editId && typeof comandaAtualId !== 'undefined' && comandaAtualId === idPedidoNovo && typeof abrirComanda === 'function'){
+    abrirComanda(idPedidoNovo);
+  }
   ['mp-obs','mp-sinal'].forEach(id=>{
     const el=document.getElementById(id);
     if(el) el.value='';
@@ -4711,7 +4939,7 @@ const editId = window._editandoClienteId;
       if(sel) sel.value = nome;
     }, 80);
   }
-  ['cli-nome','cli-fone','cli-end','cli-obs'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  if(typeof limparFormCliente === 'function') limparFormCliente();
 }
 
 // v1783120506
@@ -4909,14 +5137,86 @@ function popularSelectComanda(){
 function editarPedidoNaComanda(id){
   const p = (DB.pedidos||[]).find(x=>x.id===id);
   if(!p) return;
-  openM('m-pedido');
-  document.getElementById('mp-cliente').value = p.cliente||'';
-  document.getElementById('mp-data').value = p.data||'';
-  document.getElementById('mp-entrega').value = p.entrega||'';
-  document.getElementById('mp-prod').value = p.produto||'';
-  document.getElementById('mp-valor').value = p.valor_total||'';
-  document.getElementById('mp-sinal').value = p.sinal||'';
-  document.getElementById('mp-obs').value = p.obs||'';
+  openM('m-pedido'); // já reseta o carrinho e os campos do modal para o estado vazio
+  window._editandoPedidoId = id;
+  const tituloEl = document.getElementById('mp-modal-title');
+  if(tituloEl) tituloEl.textContent = 'Editar Pedido';
+  const set = (elId, val) => { const el=document.getElementById(elId); if(el) el.value = val||''; };
+  set('mp-cliente', p.cliente);
+  set('mp-resp', p.resp);
+  set('mp-data', p.data);
+  set('mp-entrega', p.entrega);
+  set('mp-sinal', p.sinal);
+  set('mp-pagto', p.pagto);
+  set('mp-obs', p.obs);
+  // Campos específicos do nicho (categoria/tamanho/cor etc.) — salvos como texto único
+  // separado por " · ", repopulados aqui na mesma ordem dos campos mp-extra1..4
+  const extras = (p.sabor_tema||'').split(' · ');
+  ['mp-extra1','mp-extra2','mp-extra3','mp-extra4'].forEach((elId,i)=>set(elId, extras[i]));
+  // Itens do pedido (carrinho) — recalcula o valor total a partir deles, como sempre
+  window.itensPedidoCarrinho = (p.itens||[]).slice();
+  if(typeof renderItensPedidoCarrinho === 'function') renderItensPedidoCarrinho();
+}
+// Resumo extra (ícone + Categoria/Tamanho/Cor etc.) do pedido real aberto na comanda —
+// antes era um texto de exemplo fixo (ex: "M · Preto · Roupa"), igual pra qualquer pedido.
+function renderComandaExtra(p){
+  const el = document.getElementById('cmd-nicho-extra');
+  if(!el) return;
+  const n = nichos[nichoAtual];
+  if(!n || !p || !p.sabor_tema){ el.innerHTML=''; return; }
+  el.innerHTML = `<div class="ci"><div class="ci-qty">—</div><div class="ci-name" style="color:var(--cinza);font-size:12px">${n.ico||''} ${p.sabor_tema}</div></div>`;
+}
+// "Detalhes do Pedido" → campos específicos do nicho (Categoria/Tamanho/Cor na Loja de
+// Roupa, Sabor/Tema na Confeitaria, etc.), lidos de verdade do pedido (p.sabor_tema),
+// não mais um texto de exemplo fixo igual pra todo pedido.
+function renderComandaDetNicho(p){
+  const el = document.getElementById('cmd-det-nicho');
+  if(!el) return;
+  const n = nichos[nichoAtual];
+  const labels = (n && n.comanda_det_fields) || [];
+  if(!p || !labels.length){ el.innerHTML=''; return; }
+  const valores = (p.sabor_tema||'').split(' · ').filter(v=>v && v.trim()!=='');
+  el.innerHTML = labels.map((lbl,i)=> valores[i] ? `<div class="fr"><span style="color:var(--cinza)">${lbl}</span><span>${valores[i]}</span></div>` : '').join('');
+}
+// Reflete o status real do pedido na tela da comanda: mostra o badge de status correto
+// e, se o pedido já foi entregue/fechado, desabilita os botões de fechar/pagar/desconto
+// e deixa a mensagem de "já fechada" visível — antes a tela continuava parecendo aberta
+// mesmo depois de fechar, só avisando que já estava fechada se a pessoa tentasse de novo.
+function atualizarEstadoComanda(p, opts){
+  opts = opts || {};
+  if(!p) return;
+  const fechado = p.status === 'Entregue';
+  const statusEl = document.getElementById('cmd-status');
+  if(statusEl){
+    const badgeCls = {'Novo':'bp-c','Em produção':'bp-a','Pronto':'bp-d','Entregue':'bp-v','Cancelado':'bp-r'}[p.status] || 'bp-c';
+    statusEl.className = 'bp ' + badgeCls;
+    statusEl.textContent = p.status || 'Novo';
+  }
+  [document.getElementById('cmd-btn-fechar'), document.getElementById('tb-btn-fechar')].forEach(btnFechar=>{
+    if(!btnFechar) return;
+    btnFechar.disabled = fechado;
+    btnFechar.textContent = fechado ? '✓ Comanda Fechada' : '✓ Fechar Comanda';
+    btnFechar.style.opacity = fechado ? '0.6' : '1';
+    btnFechar.style.cursor = fechado ? 'not-allowed' : 'pointer';
+  });
+  document.querySelectorAll('.pgto-btn').forEach(b=>{
+    b.disabled = fechado;
+    b.style.opacity = fechado ? '0.5' : '1';
+    b.style.pointerEvents = fechado ? 'none' : '';
+  });
+  const descInp = document.getElementById('desc-inp'); if(descInp) descInp.disabled = fechado;
+  const descBtn = document.getElementById('cmd-btn-desc'); if(descBtn) descBtn.disabled = fechado;
+  if(!opts.keepMsg){
+    const msg = document.getElementById('cmd-msg');
+    if(msg){
+      if(fechado){
+        msg.style.display='block';
+        msg.textContent = `✓ Comanda do pedido #${p.id} já está fechada` + (p.pgto ? ' · pago via '+p.pgto : '') + '.';
+      } else {
+        msg.style.display='none';
+      }
+    }
+  }
 }
 function abrirComanda(id){
   const pedidoId = parseInt(id);
@@ -4934,6 +5234,13 @@ function abrirComanda(id){
   document.getElementById('cmd-wpp').textContent = (DB.clientes||[]).find(c=>c.nome===p.cliente)?.fone || '—';
   document.getElementById('saldo-val').textContent = fmtR(saldo);
   document.getElementById('cmd-obs').textContent = p.obs || 'Nenhuma observação.';
+  // Detalhes do pedido — antes esses 4 campos ficavam travados em "—" pra sempre,
+  // porque não tinham id no HTML e nada aqui os preenchia.
+  const cEl=document.getElementById('cmd-cliente'); if(cEl) cEl.textContent = p.cliente || '—';
+  const dEl=document.getElementById('cmd-data'); if(dEl) dEl.textContent = p.data ? p.data.split('-').reverse().join('/') : '—';
+  const eEl=document.getElementById('cmd-entrega'); if(eEl) eEl.textContent = p.entrega ? p.entrega.split('-').reverse().join('/') : '—';
+  renderComandaExtra(p);
+  renderComandaDetNicho(p);
   window._saldoComandaBase = saldo;
   saldoBase = saldo;
   pgtoSel = null;
@@ -4941,7 +5248,7 @@ function abrirComanda(id){
   const ti=document.getElementById('taxa-info'); if(ti) ti.style.display='none';
   const dr=document.getElementById('desc-res'); if(dr) dr.style.display='none';
   const di=document.getElementById('desc-inp'); if(di) di.value='';
-  const msg=document.getElementById('cmd-msg'); if(msg) msg.style.display='none';
+  atualizarEstadoComanda(p);
 }
 function abrirNaComanda(id){
   go('comanda');
